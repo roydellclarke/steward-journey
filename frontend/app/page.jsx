@@ -46,7 +46,16 @@ export default function PublicHome() {
     setLead((current) => ({ ...current, [field]: value }));
   }
 
+  function scrollToRequest() {
+    document.getElementById("request")?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
   async function submitLead(intent) {
+    if (!lead.name && !lead.email) {
+      scrollToRequest();
+      setStatus("Add your name or email below, then we will send it.");
+      return;
+    }
     setStatus("Saving your request...");
     try {
       await apiFetch("/leads", {
@@ -78,8 +87,8 @@ export default function PublicHome() {
             </p>
             <div className="publicActions">
               <a href="/intake" className="primaryCta">Start private readiness check</a>
-              <button type="button" onClick={() => submitLead("sample_report")}>Request sample report</button>
-              <button type="button" onClick={() => submitLead("readiness_call")}>Book a readiness review</button>
+              <button type="button" onClick={scrollToRequest}>Request sample report</button>
+              <button type="button" onClick={scrollToRequest}>Book a readiness review</button>
             </div>
             <p className="heroAlt">
               Prefer the classic workbench? <a href="/readiness">Open it here</a>.
@@ -174,7 +183,7 @@ export default function PublicHome() {
         </div>
       </section>
 
-      <section className="publicBand leadPanel">
+      <section className="publicBand leadPanel" id="request">
         <div>
           <p className="publicEyebrow">Request a sample or bring your advisor in</p>
           <h2>Start with a private check. Share only when you are ready.</h2>
@@ -189,6 +198,7 @@ export default function PublicHome() {
           </select>
           <div className="leadButtons">
             <button type="button" onClick={() => submitLead("sample_report")}>Request sample report</button>
+            <button type="button" onClick={() => submitLead("readiness_call")}>Book a readiness review</button>
             <button type="button" onClick={() => navigator.clipboard?.writeText(advisorMessage)}>Copy advisor message</button>
           </div>
         </form>
