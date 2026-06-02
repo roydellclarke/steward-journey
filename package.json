@@ -1,0 +1,18 @@
+{
+  "name": "agent-harness-root",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -H 0.0.0.0 -p 3001",
+    "build": "next build",
+    "start": "next start -H 0.0.0.0 -p 3001",
+    "puppeteer:install": "npm --prefix puppeteer install",
+    "test": "python3 -m unittest discover -s tests"
+  },
+  "dependencies": {
+    "next": "^15.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {}
+}

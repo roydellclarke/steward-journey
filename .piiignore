@@ -1,0 +1,11 @@
+# Paths that should not be indexed, embedded, or sent to live LLMs without
+# explicit approval.
+.env
+.env.*
+workspace/screenshots/*
+workspace/state/cost_log.json
+workspace/state/events.jsonl
+*.pem
+*.key
+*secret*
+*token*

@@ -1,0 +1,14 @@
+name: agent-harness
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - nodejs>=20
+  - pip:
+      - litellm>=1.60.0
+      - prefect>=3.0.0
+      - fastapi>=0.115.0
+      - uvicorn>=0.30.0
+      - mcp>=1.0.0
+      - -e .

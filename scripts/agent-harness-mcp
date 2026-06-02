@@ -1,0 +1,12 @@
+#!/usr/bin/env zsh
+set -euo pipefail
+
+REPO_ROOT="/Users/roydellclarke/Documents/PlanGenEval"
+
+cd "$REPO_ROOT"
+
+export PYTHONPATH="$REPO_ROOT${PYTHONPATH:+:$PYTHONPATH}"
+export HARNESS_WORKSPACE="${HARNESS_WORKSPACE:-$REPO_ROOT/workspace}"
+export HARNESS_USE_LLM="${HARNESS_USE_LLM:-false}"
+
+exec python3 -u -m harness.mcp_server "$@"
