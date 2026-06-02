@@ -140,20 +140,23 @@ def successor_fit_brief(state: dict[str, Any]) -> str:
 def narrative_outputs(state: dict[str, Any], scored: dict[str, Any]) -> dict[str, str]:
     """Owner-facing copyable artifacts, grounded in inputs. No fabrication."""
 
-    industry = field_value(state, "business", "industry") or "your business"
+    industry = field_value(state, "business", "industry")
     years = field_value(state, "business", "yearsOperating")
-    business_ref = f"your {industry} business" + (f" of {years} years" if years else "")
+    business_ref = f"This {industry} business" if industry else "This business"
+    if years:
+        business_ref += f", built over {years} years,"
     non_neg = _list(state, "nonNegotiables", "nonNegotiables")
-    protect = _join(non_neg) if non_neg else "the people, standards, and trust you've built"
+    protect = _join(non_neg) if non_neg else "the people, standards, and trust behind it"
     overall = scored.get("overall", 0)
     top_gaps = [g["gap"] for g in scored.get("topGaps", [])]
     gap_text = _join(top_gaps) if top_gaps else "a few areas worth tightening"
 
+    # Advisor brief stays in one voice: third person about the owner throughout.
     advisor = (
-        f"{business_ref.capitalize()} is preparing for a thoughtful transition. "
-        f"Current readiness is {overall}/100. Above all, the owner wants to protect {protect}. "
+        f"{business_ref} is preparing for a thoughtful transition. "
+        f"Current readiness is {overall} out of 100. Above all, the owner wants to protect {protect}. "
         f"Before any buyer conversation, the priorities are: {gap_text}. "
-        f"This is preparation support, not a valuation, and not legal, tax, or investment advice."
+        f"This is preparation support: not a valuation, and not legal, tax, or investment advice."
     )
     family = (
         "This isn't only a decision about whether to sell. It's a decision about what must not be lost, "

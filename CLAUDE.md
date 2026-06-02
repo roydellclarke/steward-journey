@@ -12,6 +12,8 @@ These are binding for all work in this repo. Follow them every time, without bei
 6. **No clichés, no AI-tell words.** Banned: "actionable", "leverage" (as a verb), "seamless", "elevate", "unlock", "robust", "delve", "in today's world", "at the end of the day", "game-changer". Prefer plain, owner-facing language.
 7. **Plain language for the audience.** Owners are often older and non-technical. No jargon ("SOPs", "operational transferability") in owner-facing text. Define or replace it.
 8. **Tone.** Calm, warm, advisor-grade. Never salesy, never alarmist.
+9. **Parallelism.** Keep items in a list or series grammatically parallel. "fix the books, document the work, name the goal", not "fix the books, no areas documented, the goal isn't named".
+10. **One voice per passage.** Hold a single point of view. Owner-facing copy uses second person ("you", "your"). Advisor-facing briefs use third person ("the owner"). Never drift between "the owner" and "you" inside the same passage.
 
 ## Design laws
 
