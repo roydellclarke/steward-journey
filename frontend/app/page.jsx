@@ -20,7 +20,8 @@ const outcomes = [
   ["In control of what's shared", "Private by default. You decide what, if anything, leaves this space — and with whom."],
   ["Less overwhelmed", "A staged plan and a score you can read turn a heavy decision into clear next steps."],
   ["More confident with advisors", "Walk into the CPA or attorney conversation already prepared, with a brief you can hand over."],
-  ["Supported, not abandoned", "When you want a person, a private readiness review is one click away."]
+  ["Supported, not abandoned", "When you want a person, a private readiness review is one click away."],
+  ["Clear on where you stand", "An honest readiness score across five areas — with the reasoning behind it — so you always know where you are today."]
 ];
 
 const journeySteps = [
