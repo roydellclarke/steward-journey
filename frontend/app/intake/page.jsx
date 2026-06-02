@@ -472,6 +472,7 @@ function ReportView({ report, score, projectId, onBackToIntake }) {
           <p className="conciergeEyebrow">Your readiness</p>
           <h1>{score.overall}/100</h1>
           <p>{score.interpretation}</p>
+          <p className="reportSubnote">This is not a one-time report. Your readiness stays private and saved, and it moves as you prepare.</p>
         </div>
         <button type="button" onClick={onBackToIntake}>Keep refining</button>
       </header>
@@ -514,6 +515,7 @@ function ReportView({ report, score, projectId, onBackToIntake }) {
 
       <section className="reportSection">
         <h3>Briefs you can use</h3>
+        <p className="reportLead">Hand these to your advisor or your family. Arriving organized makes their work faster, and lighter on the bill.</p>
         {Object.entries(synthesis.narratives || {}).map(([key, body]) => (
           <article key={key} className="briefCard">
             <div><span>{prettify(key)}</span><p>{body}</p></div>
@@ -570,7 +572,7 @@ function BookReview({ projectId, onClose }) {
     <div className="dataOverlay" role="dialog" aria-modal="true">
       <div className="dataPanel">
         <div className="dataHead"><h2>Private readiness review</h2><button type="button" onClick={onClose} aria-label="Close">×</button></div>
-        <p>A person reviews what you've prepared and helps you turn it into a clear, paced plan. We only see what you've chosen to share.</p>
+        <p>A real person reviews what you've prepared and helps shape a clear, paced plan. You reach your lawyer and accountant organized, which lightens their work. We see only what you choose to share, and your progress stays here, private and saved.</p>
         <input placeholder="Your name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
         <input placeholder="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
         <input placeholder="Preferred time, e.g. next week mornings" value={form.preferredTime} onChange={(e) => setForm({ ...form, preferredTime: e.target.value })} />
