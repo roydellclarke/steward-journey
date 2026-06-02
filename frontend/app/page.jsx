@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { apiFetch } from "../lib/api";
 
-// What you actually get — reframed around the concierge upgrade: a program that
-// listens and accompanies you, not a one-time PDF.
+// What you actually get — reframed around the concierge upgrade: something that
+// listens and stays with you, not a one-time report.
 const sampleSections = [
   ["A guided intake that listens", "Answer at your pace. StewardPath reflects back what you've shared, so it feels like being heard — not filling in a form."],
   ["A readiness score you understand", "One clear number across five areas, with the plain-language reason behind every part of it. No black box."],
@@ -16,7 +16,7 @@ const sampleSections = [
 
 // The JTBD outcomes from the product brief, in the owner's own language.
 const outcomes = [
-  ["Feel heard, less alone", "Every step reflects your situation back to you. You're accompanied, not handed software."],
+  ["Feel heard, less alone", "Every step reflects back what you've shared, so it feels like someone's listening — not like using software."],
   ["In control of what's shared", "Private by default. You decide what, if anything, leaves this space — and with whom."],
   ["Less overwhelmed", "A staged plan and a score you can read turn a heavy decision into clear next steps."],
   ["More confident with advisors", "Walk into the CPA or attorney conversation already prepared, with a brief you can hand over."],
@@ -112,8 +112,8 @@ export default function PublicHome() {
       <section className="publicBand">
         <div>
           <p className="publicEyebrow">How it works</p>
-          <h2>Accompaniment, not an artifact.</h2>
-          <p>StewardPath is a program you can return to — guided intake, a plan, and a readiness that updates over time — not a one-time PDF.</p>
+          <h2>We stay with you — it's not just a report.</h2>
+          <p>StewardPath is something you can come back to — a guided check, a plan, and a readiness picture that updates as you prepare — not a one-time report you file away.</p>
         </div>
         <div className="publicGrid">
           {journeySteps.map(([step, title, body]) => (
@@ -197,7 +197,7 @@ export default function PublicHome() {
         <article><span>Free</span><strong>Sample report</strong><p>See the questions, the score, and the kind of next steps StewardPath prepares.</p></article>
         <article><span>$249</span><strong>Owner readiness report</strong><p>Your private, guided readiness — with the reasoning behind every score — to review before advisor or buyer conversations.</p></article>
         <article><span>$1,500</span><strong>Concierge readiness package</strong><p>Guided intake plus a private readiness review with a person, and transition-conversation prep. Supported, not left to software.</p></article>
-        <article><span>$199/mo</span><strong>Advisor pilot</strong><p>For CPAs, exit planners, and advisors accompanying up to 10 owner clients.</p></article>
+        <article><span>$199/mo</span><strong>Advisor pilot</strong><p>For CPAs, exit planners, and advisors supporting up to 10 owner clients.</p></article>
       </section>
     </main>
   );

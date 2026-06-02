@@ -21,7 +21,7 @@ const scripts = [
   },
   {
     title: "Flyer copy",
-    body: "Thinking about stepping back someday? Don't let the first serious buyer define the future of your business. Prepare privately, at your pace, with a readiness program that accompanies you — and a person when you want one."
+    body: "Thinking about stepping back someday? Don't let the first serious buyer define the future of your business. Prepare privately, at your pace, with a readiness program that stays with you — and a real person when you want one."
   },
   {
     title: "Trust & privacy line",
