@@ -1120,7 +1120,7 @@ button:focus-visible,
 
 .heroLower {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 340px;
+  grid-template-columns: minmax(0, 1fr) 380px;
   gap: 56px;
   align-items: start;
   margin-top: 36px;
@@ -1214,10 +1214,12 @@ button:focus-visible,
   letter-spacing: var(--sp-tracking-tight);
 }
 
-.heroReport ul { margin: 18px 0 0; padding-left: 18px; }
+.heroReport ul { margin: 18px 0 0; padding-left: 16px; }
 .heroReport li {
   color: var(--sp-muted);
   margin: 10px 0;
+  font-size: 0.95rem;
+  white-space: nowrap;
 }
 
 .publicBand {
