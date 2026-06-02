@@ -1,13 +1,15 @@
 .mvpShell {
-  --bg: #f5f3ef;
-  --surface: #fffdf8;
+  /* Consume the shared StewardPath tokens (theme.css) so the workbench matches
+     the rest of the system. mode-* presets below still shift these per report. */
+  --bg: var(--sp-paper);
+  --surface: var(--sp-card);
   --surface-strong: #f8f5ee;
-  --ink: #1d2520;
-  --muted: #626961;
-  --line: #d8d1c5;
-  --accent: #315b45;
-  --accent-strong: #26352d;
-  --accent-soft: #f3f7f1;
+  --ink: var(--sp-ink);
+  --muted: var(--sp-muted);
+  --line: var(--sp-line);
+  --accent: var(--sp-green);
+  --accent-strong: var(--sp-green-strong);
+  --accent-soft: var(--sp-soft);
   --signal: #b9d2bc;
   min-height: 100vh;
   background: var(--bg);
@@ -1083,10 +1085,10 @@ button,
   min-height: 42px;
   align-items: center;
   justify-content: center;
-  border: 1px solid #315b45;
+  border: 1px solid var(--sp-green);
   border-radius: 6px;
   padding: 9px 14px;
-  background: #315b45;
+  background: var(--sp-green);
   color: #fff;
   -webkit-text-fill-color: #fff;
   font-weight: 800;
@@ -1098,8 +1100,8 @@ button:hover,
 button:focus-visible,
 .primaryCta:hover,
 .primaryCta:focus-visible {
-  background: #203a2e;
-  border-color: #203a2e;
+  background: var(--sp-green-strong);
+  border-color: var(--sp-green-strong);
   color: #fff;
   -webkit-text-fill-color: #fff;
 }
@@ -1114,8 +1116,8 @@ button:focus-visible,
   gap: 32px;
   align-items: end;
   padding: 64px min(6vw, 78px) 42px;
-  background: linear-gradient(120deg, #203a2e, #315b45);
-  color: #fffaf0;
+  background: var(--sp-gradient);
+  color: var(--sp-on-dark);
 }
 
 .publicEyebrow {
@@ -1275,7 +1277,7 @@ select {
 }
 
 .leadStatus {
-  color: #203a2e;
+  color: var(--sp-green-strong);
   font-weight: 800;
 }
 
@@ -1286,7 +1288,7 @@ select {
 }
 
 .offerBand span {
-  color: #315b45;
+  color: var(--sp-green);
 }
 
 @media (max-width: 980px) {

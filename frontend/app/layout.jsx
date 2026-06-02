@@ -1,4 +1,6 @@
+import "./theme.css";
 import "./styles.css";
+import { SiteHeader, SiteFooter } from "./Chrome";
 
 export const metadata = {
   title: "StewardPath — private readiness, with you the whole way",
@@ -7,8 +9,12 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="en" data-theme="steward">
+      <body>
+        <SiteHeader />
+        {children}
+        <SiteFooter />
+      </body>
     </html>
   );
 }

@@ -109,7 +109,7 @@ export default function PublicHome() {
         </div>
       </section>
 
-      <section className="publicBand">
+      <section className="publicBand" id="how-it-works">
         <div>
           <p className="publicEyebrow">How it works</p>
           <h2>We stay with you — it's not just a report.</h2>
@@ -155,7 +155,7 @@ export default function PublicHome() {
         </div>
       </section>
 
-      <section className="publicBand split">
+      <section className="publicBand split" id="confidentiality">
         <div>
           <p className="publicEyebrow">Confidentiality first</p>
           <h2>You choose what stays private until successor fit is real.</h2>

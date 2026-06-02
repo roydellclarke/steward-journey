@@ -1,0 +1,115 @@
+/* StewardPath design language — the single source of truth.
+   One coherent, advisor-grade, warm palette (deliberately NOT the AI-cliché
+   purple gradient). All surfaces (landing, intake, report) consume these tokens
+   so the system is self-consistent.
+
+   Architected under [data-theme="steward"] so additional presentation themes
+   can be added later by defining another [data-theme="..."] block — without
+   touching component CSS. Today we ship exactly one theme. */
+
+:root,
+[data-theme="steward"] {
+  /* Brand greens */
+  --sp-green: #20543c;          /* primary brand / actions */
+  --sp-green-strong: #15402d;   /* hover / deep */
+  --sp-accent: #2f7a55;         /* links, accents, progress */
+  --sp-soft: #e8efe7;           /* tinted surfaces */
+  --sp-soft-line: #cfe0d3;
+
+  /* Neutrals */
+  --sp-paper: #f6f3ec;          /* page background */
+  --sp-card: #fffdf8;           /* cards / header / footer */
+  --sp-ink: #1d2a24;            /* primary text */
+  --sp-muted: #5d665f;          /* secondary text */
+  --sp-line: #ddd6c8;           /* borders */
+  --sp-danger: #8d4646;
+
+  /* Hero / feature gradient (green, never purple) */
+  --sp-gradient: linear-gradient(120deg, #1a4731, #2f7a55);
+  --sp-on-dark: #fffaf0;
+  --sp-on-dark-eyebrow: #cfe1c9;
+
+  /* Scale */
+  --sp-radius: 14px;
+  --sp-radius-lg: 22px;
+  --sp-radius-pill: 999px;
+  --sp-shadow: 0 12px 34px rgba(32, 58, 46, 0.07);
+  --sp-shadow-strong: 0 24px 60px rgba(0, 0, 0, 0.22);
+  --sp-maxw: 1100px;
+  --sp-pad-x: clamp(20px, 5vw, 72px);
+  --sp-font: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+/* ---------------------------------------------------------------- chrome */
+.siteHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 14px var(--sp-pad-x);
+  background: var(--sp-card);
+  border-bottom: 1px solid var(--sp-line);
+  font-family: var(--sp-font);
+}
+.siteHeader .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--sp-green);
+  font-weight: 800;
+  font-size: 1.18rem;
+  letter-spacing: -0.01em;
+}
+.brandMark { width: 30px; height: 30px; display: block; flex: none; }
+
+.siteNav { display: flex; gap: 18px; align-items: center; }
+.siteNav a {
+  color: var(--sp-ink);
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+.siteNav a:hover { color: var(--sp-accent); }
+.siteNav a.navCta {
+  background: var(--sp-green);
+  color: var(--sp-on-dark);
+  padding: 9px 16px;
+  border-radius: 10px;
+}
+.siteNav a.navCta:hover { background: var(--sp-green-strong); color: var(--sp-on-dark); }
+
+.secureChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--sp-accent);
+  background: var(--sp-soft);
+  border: 1px solid var(--sp-soft-line);
+  padding: 6px 13px;
+  border-radius: var(--sp-radius-pill);
+}
+
+.siteFooter {
+  background: var(--sp-card);
+  border-top: 1px solid var(--sp-line);
+  padding: 30px var(--sp-pad-x);
+  color: var(--sp-muted);
+  font-size: 0.85rem;
+  font-family: var(--sp-font);
+  display: grid;
+  gap: 10px;
+}
+.siteFooter .footTop { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: space-between; }
+.siteFooter .footBrand { display: inline-flex; align-items: center; gap: 9px; color: var(--sp-green); font-weight: 800; font-size: 1.02rem; }
+.siteFooter .footLinks { display: flex; gap: 16px; flex-wrap: wrap; }
+.siteFooter .footLinks a { color: var(--sp-muted); text-decoration: none; }
+.siteFooter .footLinks a:hover { color: var(--sp-accent); }
+.siteFooter .footFine { max-width: 70ch; }
+
+@media (max-width: 620px) {
+  .siteHeader { flex-wrap: wrap; }
+  .siteNav { gap: 12px; }
+}

@@ -2,15 +2,16 @@
    Large type and generous spacing for an older, non-technical audience. */
 
 .conciergeShell {
-  --ink: #1d2a24;
-  --muted: #5d665f;
-  --paper: #f6f3ec;
-  --card: #fffdf8;
-  --line: #ddd6c8;
-  --green: #20543c;
-  --green-soft: #e8efe7;
-  --accent: #2f7a55;
-  --danger: #8d4646;
+  /* Consume the shared StewardPath tokens (theme.css) for one consistent look. */
+  --ink: var(--sp-ink);
+  --muted: var(--sp-muted);
+  --paper: var(--sp-paper);
+  --card: var(--sp-card);
+  --line: var(--sp-line);
+  --green: var(--sp-green);
+  --green-soft: var(--sp-soft);
+  --accent: var(--sp-accent);
+  --danger: var(--sp-danger);
   min-height: 100vh;
   background: var(--paper);
   color: var(--ink);
