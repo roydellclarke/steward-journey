@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 
-// Minimal monoline mark: a path cresting to a single point — a way forward,
+// Minimal monoline mark: a path cresting to a single point, a way forward,
 // guided. Thin stroke in ink, in keeping with the modern-luxe aesthetic.
 function BrandMark() {
   return (
@@ -66,7 +66,7 @@ export function SiteFooter() {
         Private by default · never used to train AI · export or delete your data anytime.
       </p>
       <p className="footFine">
-        StewardPath is educational preparation support — not legal, tax, investment, valuation, or brokerage advice.
+        StewardPath is educational preparation support, not legal, tax, investment, valuation, or brokerage advice.
       </p>
     </footer>
   );

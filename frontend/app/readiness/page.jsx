@@ -233,8 +233,7 @@ export default function StewardPathMvp() {
           <p>
             You spent years building trust with employees, customers, family,
             and your community. This workbench shows what could be lost, what to
-            prepare, and what kind of next owner can protect what you built —
-            with the reasoning behind every score. Prefer to be guided, at your
+            prepare, and what kind of next owner can protect what you built,             with the reasoning behind every score. Prefer to be guided, at your
             pace, with privacy reassurance at each step? <a href="/intake">Try the
             concierge readiness program</a>.
           </p>

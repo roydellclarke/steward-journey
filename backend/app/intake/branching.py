@@ -1,4 +1,4 @@
-"""Deterministic Branching Ruleset — the 80/20 of the "listening" feeling.
+"""Deterministic Branching Ruleset, the 80/20 of the "listening" feeling.
 
 Given an ``IntakeState``, this builds the adaptive intake plan the frontend
 renders: which sections/questions are visible, where confidentiality
@@ -59,7 +59,7 @@ def _visible_questions(state: dict[str, Any], section_key: str) -> list[dict[str
         family_relevant = bool(family_in_biz) or category == "family"
         if family_in_biz is False and not family_relevant:
             # Collapse family-successor drill-down, but ALWAYS keep
-            # expectationsKnown — family may hold expectations regardless.
+            # expectationsKnown, family may hold expectations regardless.
             return [q for q in base if q["field"] in {"familyInBusiness", "expectationsKnown"}]
     return base
 
@@ -225,7 +225,7 @@ def routing(state: dict[str, Any], readiness_score: int | None) -> dict[str, Any
             "mode": "warm_handoff",
             "reason": "prepared",
             "headline": "You're prepared enough to bring in an advisor.",
-            "body": "Your readiness is strong. When you're ready, we can connect you with a vetted advisor — only with your explicit permission, and only what you choose to share.",
+            "body": "Your readiness is strong. When you're ready, we can connect you with a vetted advisor, only with your explicit permission, and only what you choose to share.",
             "cta": "See advisor options",
         }
     return {

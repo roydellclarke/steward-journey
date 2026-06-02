@@ -3,32 +3,32 @@
 import { useState } from "react";
 import { apiFetch } from "../lib/api";
 
-// What you actually get — reframed around the concierge upgrade: something that
+// What you actually get, reframed around the concierge upgrade: something that
 // listens and stays with you, not a one-time report.
 const sampleSections = [
-  ["A guided intake that listens", "Answer at your pace. StewardPath reflects back what you've shared, so it feels like being heard — not filling in a form."],
+  ["A guided intake that listens", "Answer at your pace. StewardPath reflects back what you've shared, so it feels like being heard, not filling in a form."],
   ["A readiness score you understand", "One clear number across five areas, with the plain-language reason behind every part of it. No black box."],
-  ["What must be protected", "Name the employees, customers, standards, and reputation you want to carry through — and we keep it private by default."],
-  ["Successor fit, weighed your way", "Compare paths by continuity, financial outcome, and emotional fit — and exclude the ones you'd never accept."],
-  ["Briefs you can actually use", "Advisor-ready summary, family-conversation guide, and a successor-fit brief — grounded only in what you said."],
+  ["What must be protected", "Name the employees, customers, standards, and reputation you want to carry through, and we keep it private by default."],
+  ["Successor fit, weighed your way", "Compare paths by continuity, financial outcome, and emotional fit, and exclude the ones you'd never accept."],
+  ["Briefs you can actually use", "Advisor-ready summary, family-conversation guide, and a successor-fit brief, grounded only in what you said."],
   ["Progress over time", "Save and return whenever you like. Your readiness updates as you prepare, so you can see yourself moving forward."]
 ];
 
 // The JTBD outcomes from the product brief, in the owner's own language.
 const outcomes = [
-  ["Feel heard, less alone", "Every step reflects back what you've shared, so it feels like someone's listening — not like using software."],
-  ["In control of what's shared", "Private by default. You decide what, if anything, leaves this space — and with whom."],
+  ["Feel heard, less alone", "Every step reflects back what you've shared, so it feels like someone's listening, not like using software."],
+  ["In control of what's shared", "Private by default. You decide what, if anything, leaves this space, and with whom."],
   ["Less overwhelmed", "A staged plan and a score you can read turn a heavy decision into clear next steps."],
   ["More confident with advisors", "Walk into the CPA or attorney conversation already prepared, with a brief you can hand over."],
   ["Supported, not abandoned", "When you want a person, a private readiness review is one click away."],
-  ["Clear on where you stand", "An honest readiness score across five areas — with the reasoning behind it — so you always know where you are today."]
+  ["Clear on where you stand", "An honest readiness score across five areas, with the reasoning behind it, so you always know where you are today."]
 ];
 
 const journeySteps = [
   ["1", "Begin privately", "A short trust step first: what we collect, why, and your control over it. Then start whenever you're ready."],
   ["2", "Share at your pace", "Easy questions first, sensitive ones later, with reassurance before each. “I don't know” is always a fine answer."],
   ["3", "See where you stand", "A readiness score with the reasoning behind it, your biggest opportunities, and successor paths weighed your way."],
-  ["4", "Bring in a person when ready", "Book a private readiness review. A human picks up exactly where you left off — with only what you chose to share."]
+  ["4", "Bring in a person when ready", "Book a private readiness review. A human picks up exactly where you left off, with only what you chose to share."]
 ];
 
 const advisorTypes = ["Owner", "CPA", "Exit planner", "Wealth advisor", "Estate attorney", "Community bank", "Other advisor"];
@@ -69,7 +69,7 @@ export default function PublicHome() {
           <p className="publicEyebrow">Private, guided transition readiness for founder-led businesses</p>
           <h1>Before you sell, decide what must be protected.</h1>
           <p>
-            You built more than an asset — you built trust with employees,
+            You built more than an asset, you built trust with employees,
             customers, family, and your community. StewardPath walks with you
             through a once-in-a-lifetime decision: what could be lost, what to
             prepare, and what kind of next owner would protect what you built.
@@ -112,8 +112,8 @@ export default function PublicHome() {
       <section className="publicBand" id="how-it-works">
         <div>
           <p className="publicEyebrow">How it works</p>
-          <h2>We stay with you — it's not just a report.</h2>
-          <p>StewardPath is something you can come back to — a guided check, a plan, and a readiness picture that updates as you prepare — not a one-time report you file away.</p>
+          <h2>We stay with you, it's not just a report.</h2>
+          <p>StewardPath is something you can come back to, a guided check, a plan, and a readiness picture that updates as you prepare, not a one-time report you file away.</p>
         </div>
         <div className="publicGrid">
           {journeySteps.map(([step, title, body]) => (
@@ -160,7 +160,7 @@ export default function PublicHome() {
           <p className="publicEyebrow">Confidentiality first</p>
           <h2>You choose what stays private until successor fit is real.</h2>
           <p>
-            Share ranges and your own words — never exact figures. Revenue band,
+            Share ranges and your own words, never exact figures. Revenue band,
             customer concentration, owner dependency, key-employee risk, whether
             procedures are documented. Everything is private by default; mark
             anything advisor-only, or share later with a serious match.
@@ -168,7 +168,7 @@ export default function PublicHome() {
         </div>
         <div className="privacyBox">
           <strong>This is not a broker pitch.</strong>
-          <p>Private by default. Never shared with employees, family, or buyers unless you choose to. Never used to train AI. Export or permanently delete your data anytime. StewardPath is preparation support — not legal, tax, investment, valuation, or brokerage advice.</p>
+          <p>Private by default. Never shared with employees, family, or buyers unless you choose to. Never used to train AI. Export or permanently delete your data anytime. StewardPath is preparation support, not legal, tax, investment, valuation, or brokerage advice.</p>
         </div>
       </section>
 
@@ -195,7 +195,7 @@ export default function PublicHome() {
 
       <section className="publicBand offerBand">
         <article><span>Free</span><strong>Sample report</strong><p>See the questions, the score, and the kind of next steps StewardPath prepares.</p></article>
-        <article><span>$249</span><strong>Owner readiness report</strong><p>Your private, guided readiness — with the reasoning behind every score — to review before advisor or buyer conversations.</p></article>
+        <article><span>$249</span><strong>Owner readiness report</strong><p>Your private, guided readiness, with the reasoning behind every score, to review before advisor or buyer conversations.</p></article>
         <article><span>$1,500</span><strong>Concierge readiness package</strong><p>Guided intake plus a private readiness review with a person, and transition-conversation prep. Supported, not left to software.</p></article>
         <article><span>$199/mo</span><strong>Advisor pilot</strong><p>For CPAs, exit planners, and advisors supporting up to 10 owner clients.</p></article>
       </section>

@@ -199,14 +199,14 @@ function TrustScreen({ onBegin, onResume, busy, status }) {
         <p className="conciergeEyebrow">Private readiness</p>
         <h1>Before we begin, here's how this stays private.</h1>
         <ul className="trustList">
-          <li><strong>What we collect:</strong> ranges and your own words about your business and wishes — never exact financials.</li>
+          <li><strong>What we collect:</strong> ranges and your own words about your business and wishes, never exact financials.</li>
           <li><strong>Why:</strong> so the plan reflects your situation and what you want protected.</li>
-          <li><strong>Private by default:</strong> nothing is shared with anyone — not family, not employees, not buyers — unless you choose to.</li>
+          <li><strong>Private by default:</strong> nothing is shared with anyone, not family, not employees, not buyers, unless you choose to.</li>
           <li><strong>You're in control:</strong> you decide later what, if anything, to share, and with whom.</li>
-          <li><strong>Never used to train AI:</strong> your answers stay yours — we don't use them to train any computer system.</li>
+          <li><strong>Never used to train AI:</strong> your answers stay yours, we don't use them to train any computer system.</li>
           <li><strong>Delete anytime:</strong> export or permanently delete everything whenever you want.</li>
         </ul>
-        <p className="trustScope">StewardPath is preparation support — not legal, tax, valuation, or investment advice. You can stop, skip anything, or come back later.</p>
+        <p className="trustScope">StewardPath is preparation support, not legal, tax, valuation, or investment advice. You can stop, skip anything, or come back later.</p>
         <div className="trustActions">
           <button type="button" className="primaryCta" onClick={onBegin} disabled={busy}>
             {busy ? "Setting up…" : "Begin privately"}
@@ -368,7 +368,7 @@ function ReadinessSidebar({ score, completion, snapshots, onOpenData, onSeeReadi
     <aside className="readinessSidebar">
       <div className="sidebarScore">
         <span>Readiness so far</span>
-        <strong>{score ? `${score.overall}/100` : "—"}</strong>
+        <strong>{score ? `${score.overall}/100` : ", "}</strong>
         <small>{completion}% of intake complete</small>
       </div>
       {score?.topGaps?.length ? (

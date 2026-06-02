@@ -20,8 +20,8 @@ from typing import Any
 # Surfaces Security & Confidentiality Requirement #1 inside the flow.
 SECTION_REASSURANCE: dict[str, str] = {
     "financialClarity": (
-        "This stays private. We only ask for ranges and yes/no clarity — never "
-        "exact figures — and you decide later what, if anything, to share, and "
+        "This stays private. We only ask for ranges and yes/no clarity, never "
+        "exact figures, and you decide later what, if anything, to share, and "
         "with whom."
     ),
     "familyAlignment": (
@@ -82,7 +82,7 @@ SECTIONS: list[dict[str, Any]] = [
     {
         "key": "business",
         "title": "Your business",
-        "intro": "Let's start with the basics — nothing sensitive yet.",
+        "intro": "Let's start with the basics, nothing sensitive yet.",
         "questions": [
             _q("biz_category", "business", "category",
                "How would you describe your business?", "single",
@@ -101,7 +101,7 @@ SECTIONS: list[dict[str, Any]] = [
                placeholder="e.g. specialty manufacturing"),
             _q("biz_region", "business", "region",
                "What region are you in?", "text",
-               placeholder="e.g. Midwest US — region only, not your address",
+               placeholder="e.g. Midwest US, region only, not your address",
                why="We only ask for region, never a street address, so nothing identifies you."),
             _q("biz_years", "business", "yearsOperating",
                "Roughly how many years has the business been operating?", "text",
@@ -118,9 +118,9 @@ SECTIONS: list[dict[str, Any]] = [
                why="A range is enough to gauge readiness. We never ask for exact figures."),
             _q("biz_concentration", "business", "customerConcentration",
                "How concentrated is your customer base?", "single",
-               options=_opts(("diversified", "Diversified — many customers"),
-                             ("moderate", "Moderate — a few important ones"),
-                             ("high_few_clients", "High — a few clients are most of the business")),
+               options=_opts(("diversified", "Diversified, many customers"),
+                             ("moderate", "Moderate, a few important ones"),
+                             ("high_few_clients", "High, a few clients are most of the business")),
                why="Customer concentration is one of the first things a careful buyer looks at."),
         ],
     },
@@ -159,14 +159,14 @@ SECTIONS: list[dict[str, Any]] = [
                why="Where the business leans on you personally is the clearest signal of how transferable it is."),
             _q("op_keyperson", "operationalTransferability", "keyPersonRisk",
                "If you were out for a month, how at-risk would things be?", "single",
-               options=_opts(("low", "Low — the team would manage"),
-                             ("medium", "Medium — some things would slip"),
-                             ("high", "High — a lot depends on me"))),
+               options=_opts(("low", "Low, the team would manage"),
+                             ("medium", "Medium, some things would slip"),
+                             ("high", "High, a lot depends on me"))),
             _q("op_mgmt", "operationalTransferability", "managementDepth",
                "How deep is your management bench?", "single",
-               options=_opts(("none", "None — it's mostly me"),
-                             ("thin", "Thin — one or two key people"),
-                             ("solid", "Solid — capable leaders in place"))),
+               options=_opts(("none", "None, it's mostly me"),
+                             ("thin", "Thin, one or two key people"),
+                             ("solid", "Solid, capable leaders in place"))),
             _q("op_systems", "operationalTransferability", "systemsDocumented",
                "Are your core systems and tools documented?", "boolean"),
         ],
@@ -185,19 +185,19 @@ SECTIONS: list[dict[str, Any]] = [
                              ("hr", "HR / onboarding"), ("safety", "Safety / compliance"))),
             _q("proc_tribal", "processDocumentation", "tribalKnowledgeRisk",
                "How much of the business runs on knowledge that isn't written down?", "single",
-               options=_opts(("low", "Low — most is documented"),
-                             ("medium", "Medium — some gaps"),
-                             ("high", "High — a lot is in people's heads"))),
+               options=_opts(("low", "Low, most is documented"),
+                             ("medium", "Medium, some gaps"),
+                             ("high", "High, a lot is in people's heads"))),
         ],
     },
     {
         "key": "financialClarity",
         "title": "Financial clarity",
-        "intro": "Ranges and yes/no only — never exact numbers.",
+        "intro": "Ranges and yes/no only, never exact numbers.",
         "questions": [
             _q("fin_books", "financialClarity", "booksUpToDate",
                "Are your books current and up to date?", "boolean", sensitive=True,
-               why="A buyer's first question is whether the numbers can be trusted — not what they are."),
+               why="A buyer's first question is whether the numbers can be trusted, not what they are."),
             _q("fin_documented", "financialClarity", "financialsDocumented",
                "Do you have documented financial statements (P&L, balance sheet)?", "boolean",
                sensitive=True),
@@ -210,13 +210,13 @@ SECTIONS: list[dict[str, Any]] = [
             _q("fin_ownercomp", "financialClarity", "ownerCompNormalized",
                "Are personal expenses and owner pay cleanly separated from the business?",
                "boolean", sensitive=True,
-               why="Mixing personal and business spending is common and fixable — sorting it out early keeps you in a stronger spot when you talk to a buyer."),
+               why="Mixing personal and business spending is common and fixable, sorting it out early keeps you in a stronger spot when you talk to a buyer."),
         ],
     },
     {
         "key": "successorPreferences",
         "title": "Who could take it on",
-        "intro": "There are no wrong answers — this is about your preferences.",
+        "intro": "There are no wrong answers, this is about your preferences.",
         "questions": [
             _q("suc_acceptable", "successorPreferences", "acceptablePaths",
                "Which kinds of transition feel acceptable to you?", "multi",
@@ -238,7 +238,7 @@ SECTIONS: list[dict[str, Any]] = [
                    ("strategic_buyer", "Strategic buyer / competitor"),
                    ("private_equity", "Private equity"),
                ),
-               why="Telling us what you'd refuse is just as useful as what you'd accept — we'll respect it."),
+               why="Telling us what you'd refuse is just as useful as what you'd accept, we'll respect it."),
             _q("suc_traits", "successorPreferences", "idealBuyerTraits",
                "What traits would the right next owner have?", "multi",
                options=_opts(("patient operator", "Patient operator"),
@@ -258,7 +258,7 @@ SECTIONS: list[dict[str, Any]] = [
     {
         "key": "protectedInterests",
         "title": "What must be protected",
-        "intro": "The heart of stewardship — what you will not let be lost.",
+        "intro": "The heart of stewardship, what you will not let be lost.",
         "questions": [
             _q("prot_employees", "protectedInterests", "employeeConcerns",
                "What do you most want protected for your employees?", "multi",
@@ -284,7 +284,7 @@ SECTIONS: list[dict[str, Any]] = [
     {
         "key": "familyAlignment",
         "title": "Family alignment",
-        "intro": "Only if relevant — and only as much as you want to share.",
+        "intro": "Only if relevant, and only as much as you want to share.",
         "questions": [
             _q("fam_inbiz", "familyAlignment", "familyInBusiness",
                "Is any family member involved in the business?", "boolean", sensitive=True),

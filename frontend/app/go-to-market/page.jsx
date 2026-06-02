@@ -5,23 +5,23 @@ const scripts = [
   },
   {
     title: "Advisor outreach",
-    body: "I built a private, guided readiness program for owner clients who aren't ready for a broker conversation yet. It accompanies them through naming what must be protected, where the business depends too much on them, and what to prepare — then hands you an advisor-ready brief. Could I show you a sample for one owner profile?"
+    body: "I built a private, guided readiness program for owner clients who aren't ready for a broker conversation yet. It accompanies them through naming what must be protected, where the business depends too much on them, and what to prepare, then hands you an advisor-ready brief. Could I show you a sample for one owner profile?"
   },
   {
     title: "Seller-facing email",
-    body: "Before you sell, decide what must be protected. StewardPath walks privately with you — a guided readiness check, a score you actually understand, and a plan you can return to — before a buyer controls the conversation. Private by default, and never used to train AI."
+    body: "Before you sell, decide what must be protected. StewardPath walks privately with you, a guided readiness check, a score you actually understand, and a plan you can return to, before a buyer controls the conversation. Private by default, and never used to train AI."
   },
   {
     title: "LinkedIn DM",
-    body: "I'm testing a private readiness program for founder-led owners — built for people who care about employees, customers, and legacy, not just price. It listens and reflects back what you share, and you control what's ever revealed. Would a sample be useful for you or one client?"
+    body: "I'm testing a private readiness program for founder-led owners, built for people who care about employees, customers, and legacy, not just price. It listens and reflects back what you share, and you control what's ever revealed. Would a sample be useful for you or one client?"
   },
   {
     title: "Local workshop title",
-    body: "Before You Sell: What Every Business Owner Should Protect — and Prepare — Before Talking To Buyers"
+    body: "Before You Sell: What Every Business Owner Should Protect, and Prepare, Before Talking To Buyers"
   },
   {
     title: "Flyer copy",
-    body: "Thinking about stepping back someday? Don't let the first serious buyer define the future of your business. Prepare privately, at your pace, with a readiness program that stays with you — and a real person when you want one."
+    body: "Thinking about stepping back someday? Don't let the first serious buyer define the future of your business. Prepare privately, at your pace, with a readiness program that stays with you, and a real person when you want one."
   },
   {
     title: "Trust & privacy line",
@@ -43,7 +43,7 @@ export default function GoToMarketPage() {
           <p>
             With limited budget, begin where trust already exists: CPAs, exit
             planners, estate attorneys, wealth advisors, and community banks.
-            The pitch isn't a report — it's a private program that listens,
+            The pitch isn't a report, it's a private program that listens,
             keeps the owner in control of what's shared, and prepares them for
             the advisor conversation. Use the public page as the proof they can
             forward to owners.

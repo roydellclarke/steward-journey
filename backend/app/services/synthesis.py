@@ -2,7 +2,7 @@
 
 Implements the three brief synthesis prompts as deterministic, fabrication-free
 generators with OPTIONAL Kimi/DeepSeek augmentation that may only improve the
-*wording* of narrative text — never invent facts, figures, or scores:
+*wording* of narrative text, never invent facts, figures, or scores:
 
   1. Score Rationale  (delegated to ``scoring.score_intake`` for the numbers;
      this module adds the owner-facing narrative summary)
@@ -26,7 +26,7 @@ from app.storage.intake_state import field_value
 # main trade-off to name. Mirrors the legacy engine so the report stays familiar.
 PATH_BASE: dict[str, dict[str, Any]] = {
     "family_transfer": {"label": "Family transfer", "legacy": 5, "financial": 3, "emotional": 4,
-                        "tradeoff": "Best when family desire and capability are both real — not assumed."},
+                        "tradeoff": "Best when family desire and capability are both real, not assumed."},
     "employee_ownership": {"label": "Employee ownership", "legacy": 5, "financial": 3, "emotional": 4,
                            "tradeoff": "Strong continuity, but depends on a leadership bench and workable financing."},
     "management_buyout": {"label": "Management buyout", "legacy": 4, "financial": 4, "emotional": 4,
@@ -125,7 +125,7 @@ def successor_fit_brief(state: dict[str, Any]) -> str:
     if traits:
         sentences.append(f"The right next owner would be {_join(traits)}.")
     else:
-        sentences.append("The right next owner hasn't been described in detail yet — that's worth defining before buyer conversations.")
+        sentences.append("The right next owner hasn't been described in detail yet, that's worth defining before buyer conversations.")
     if protected_emp or protected_cust:
         protect = _join(list(dict.fromkeys(protected_emp + protected_cust)))
         sentences.append(f"Above price, this transition must protect {protect}.")
@@ -153,10 +153,10 @@ def narrative_outputs(state: dict[str, Any], scored: dict[str, Any]) -> dict[str
         f"{business_ref.capitalize()} is preparing for a thoughtful transition. "
         f"Current readiness is {overall}/100. Above all, the owner wants to protect {protect}. "
         f"Before any buyer conversation, the priorities are: {gap_text}. "
-        f"This is preparation support — not a valuation, and not legal, tax, or investment advice."
+        f"This is preparation support, not a valuation, and not legal, tax, or investment advice."
     )
     family = (
-        "This isn't only a decision about whether to sell. It's a decision about what must not be lost — "
+        "This isn't only a decision about whether to sell. It's a decision about what must not be lost, "
         f"{protect}. The next step is to prepare carefully, together, before timing or a buyer defines the terms."
     )
     return {

@@ -5,7 +5,7 @@ weakest-link-weighted formula as the legacy profile-based engine, a plain-langua
 RATIONALE for every driver grounded strictly in the owner's actual answers
 (Requirement #5: score explainability), and ``flaggedGaps`` + top next steps.
 
-``unknown``/``skipped`` fields are treated as gaps that hold a driver back — never
+``unknown``/``skipped`` fields are treated as gaps that hold a driver back, never
 as errors, and never silently inflated. Pure Python; no LLM, no fabrication.
 """
 
@@ -230,7 +230,7 @@ def _compose_rationale(
     status = field_status(state, *primary)
     if status in {"unknown", "skipped"} and not notes and not gaps:
         return (
-            f"{label} hasn't been established yet — you haven't answered these "
+            f"{label} hasn't been established yet, you haven't answered these "
             f"questions. That's a normal gap to come back to, not a problem."
         )
     parts: list[str] = []
@@ -260,7 +260,7 @@ def _join(items: list[str]) -> str:
 def _next_step_for(gap: str) -> str:
     mapping = {
         "books aren't up to date": "Ask your bookkeeper or CPA to bring the books current.",
-        "financial statements aren't documented": "Have current P&L and balance sheet prepared — ranges are fine to start.",
+        "financial statements aren't documented": "Have current P&L and balance sheet prepared, ranges are fine to start.",
         "profitability isn't clearly established": "Clarify a normalized profit picture with your accountant.",
         "personal and business spending are still mixed": "Separate owner pay and personal expenses from the business.",
         "revenue has been declining": "Prepare a short, honest explanation of the trend before any buyer asks.",
@@ -270,15 +270,15 @@ def _next_step_for(gap: str) -> str:
         "core systems aren't documented": "Write down the one process only you know how to run.",
         "there are no written procedures yet": "Start with a simple SOP for your most critical task.",
         "a lot of the business runs on undocumented knowledge": "Capture the customer-handoff steps that live in your head.",
-        "no specific areas are documented yet": "Document one area — operations or customer handoff is a good start.",
+        "no specific areas are documented yet": "Document one area, operations or customer handoff is a good start.",
         "your family isn't aligned yet": "Have a low-stakes first conversation about what matters, not timing.",
-        "family expectations aren't clear": "Ask family members what they each expect — separately, without pressure.",
+        "family expectations aren't clear": "Ask family members what they each expect, separately, without pressure.",
         "there's real risk of family conflict": "Consider a neutral facilitator before decisions, not after.",
-        "stepping back still feels hard": "You don't need to be ready to sell — just to prepare. Move at your pace.",
+        "stepping back still feels hard": "You don't need to be ready to sell, just to prepare. Move at your pace.",
         "much of your identity is tied to the business": "Picture what a good next chapter looks like for you, beyond the business.",
         "the motivation behind a transition isn't named yet": "Write one sentence on why you're thinking about this now.",
     }
-    return mapping.get(gap, "Revisit this when you're ready — it's a normal gap, not a problem.")
+    return mapping.get(gap, "Revisit this when you're ready, it's a normal gap, not a problem.")
 
 
 def score_intake(state: dict[str, Any]) -> dict[str, Any]:

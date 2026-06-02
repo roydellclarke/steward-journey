@@ -1,4 +1,4 @@
-"""Reflective-Summary moments — the highest-leverage concierge component.
+"""Reflective-Summary moments, the highest-leverage concierge component.
 
 After a section (or every few answers), StewardPath echoes back the SPECIFICS the
 owner actually gave and bridges warmly to the next question. This is what
@@ -41,7 +41,7 @@ def _summ_operational(state: dict[str, Any]) -> str | None:
     risk = field_value(state, "operationalTransferability", "keyPersonRisk")
     parts = []
     if functions:
-        parts.append(f"a lot still runs through you — especially {_join(functions)}")
+        parts.append(f"a lot still runs through you, especially {_join(functions)}")
     if sops is False:
         parts.append("much of it lives in your head rather than written down")
     if risk == "high":
@@ -87,7 +87,7 @@ def _acknowledge(section_key: str, state: dict[str, Any]) -> str:
         return " Family makes this more personal, and there's no wrong way to feel about it."
     if section_key == "emotionalReadiness":
         if tone_flags(state).get("soften"):
-            return " And to be clear — you don't need to be ready to sell. There's no rush here."
+            return " And to be clear, you don't need to be ready to sell. There's no rush here."
         return " This part carries real weight, and it's worth taking slowly."
     if section_key == "protectedInterests":
         return " That care is exactly the kind of thing worth protecting before any buyer conversation."
@@ -160,7 +160,7 @@ def _augment_reflection(
             timeout=getattr(settings, "request_timeout_seconds", 120),
         )
         patch = _parse_json_object(content)
-    except Exception:  # noqa: BLE001 — never surface to the owner; fall back
+    except Exception:  # noqa: BLE001, never surface to the owner; fall back
         return None
     text = patch.get("text") or patch.get("reflection")
     if isinstance(text, str) and text.strip():
@@ -184,7 +184,7 @@ job is to make the owner feel genuinely heard and gently bridge to what comes ne
 You are NOT giving legal, tax, valuation, or investment advice.
 RULES: Reflect back SPECIFICS the owner actually gave, in their own framing. Ground
 everything strictly in intake_state_slice; do NOT invent facts, numbers, or
-implications. Treat "unknown"/"skipped" as normal, acceptable gaps — never a fault.
+implications. Treat "unknown"/"skipped" as normal, acceptable gaps, never a fault.
 Briefly and warmly acknowledge emotional weight before bridging. Plain language, no
-jargon, calm and unhurried. SHORT — a few sentences. Then bridge to next_question.
+jargon, calm and unhurried. SHORT, a few sentences. Then bridge to next_question.
 Return ONLY JSON: {"text": "<reflection + bridge>"}."""
