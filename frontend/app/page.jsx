@@ -3,12 +3,31 @@
 import { useState } from "react";
 import { apiFetch } from "../lib/api";
 
+// What you actually get — reframed around the concierge upgrade: a program that
+// listens and accompanies you, not a one-time PDF.
 const sampleSections = [
-  ["Readiness", "See where the business may lose value or trust if you wait too long."],
-  ["What Matters", "Name the employees, customers, standards, and reputation you want protected."],
-  ["Business Quality", "Spot the questions a careful buyer may ask before those questions cost you leverage."],
-  ["Buyer Fit", "Compare successor paths by continuity, financial outcome, and emotional fit."],
-  ["Your Next Steps", "Leave with a short preparation plan you can discuss with advisors and family."]
+  ["A guided intake that listens", "Answer at your pace. StewardPath reflects back what you've shared, so it feels like being heard — not filling in a form."],
+  ["A readiness score you understand", "One clear number across five areas, with the plain-language reason behind every part of it. No black box."],
+  ["What must be protected", "Name the employees, customers, standards, and reputation you want to carry through — and we keep it private by default."],
+  ["Successor fit, weighed your way", "Compare paths by continuity, financial outcome, and emotional fit — and exclude the ones you'd never accept."],
+  ["Briefs you can actually use", "Advisor-ready summary, family-conversation guide, and a successor-fit brief — grounded only in what you said."],
+  ["Progress over time", "Save and return whenever you like. Your readiness updates as you prepare, so you can see yourself moving forward."]
+];
+
+// The JTBD outcomes from the product brief, in the owner's own language.
+const outcomes = [
+  ["Feel heard, less alone", "Every step reflects your situation back to you. You're accompanied, not handed software."],
+  ["In control of what's shared", "Private by default. You decide what, if anything, leaves this space — and with whom."],
+  ["Less overwhelmed", "A staged plan and a score you can read turn a heavy decision into clear next steps."],
+  ["More confident with advisors", "Walk into the CPA or attorney conversation already prepared, with a brief you can hand over."],
+  ["Supported, not abandoned", "When you want a person, a private readiness review is one click away."]
+];
+
+const journeySteps = [
+  ["1", "Begin privately", "A short trust step first: what we collect, why, and your control over it. Then start whenever you're ready."],
+  ["2", "Share at your pace", "Easy questions first, sensitive ones later, with reassurance before each. “I don't know” is always a fine answer."],
+  ["3", "See where you stand", "A readiness score with the reasoning behind it, your biggest opportunities, and successor paths weighed your way."],
+  ["4", "Bring in a person when ready", "Book a private readiness review. A human picks up exactly where you left off — with only what you chose to share."]
 ];
 
 const advisorTypes = ["Owner", "CPA", "Exit planner", "Wealth advisor", "Estate attorney", "Community bank", "Other advisor"];
@@ -30,7 +49,7 @@ export default function PublicHome() {
   async function submitLead(intent) {
     setStatus("Saving your request...");
     try {
-      const payload = await apiFetch("/leads", {
+      await apiFetch("/leads", {
         method: "POST",
         body: JSON.stringify({ ...lead, intent })
       });
@@ -46,31 +65,33 @@ export default function PublicHome() {
     <main className="publicShell">
       <section className="publicHero">
         <div>
-          <p className="publicEyebrow">Private transition readiness for founder-led businesses</p>
+          <p className="publicEyebrow">Private, guided transition readiness for founder-led businesses</p>
           <h1>Before you sell, decide what must be protected.</h1>
           <p>
-            You built more than an asset. You built trust with employees,
-            customers, family, and your community. StewardPath helps you see
-            what could be lost, what must be prepared, and what kind of next
-            owner may actually protect what you built.
+            You built more than an asset — you built trust with employees,
+            customers, family, and your community. StewardPath walks with you
+            through a once-in-a-lifetime decision: what could be lost, what to
+            prepare, and what kind of next owner would protect what you built.
+            You won't do this alone, and nothing is shared unless you choose to.
           </p>
           <div className="publicActions">
             <a href="/intake" className="primaryCta">Start private readiness check</a>
             <button type="button" onClick={() => submitLead("sample_report")}>Request sample report</button>
-            <button type="button" onClick={() => submitLead("readiness_call")}>Book readiness call</button>
+            <button type="button" onClick={() => submitLead("readiness_call")}>Book a readiness review</button>
           </div>
           <p style={{ marginTop: "10px", fontSize: "0.85rem" }}>
             Prefer the classic workbench? <a href="/readiness">Open it here</a>.
           </p>
         </div>
         <aside className="heroReport">
-          <span>Your report helps you answer</span>
+          <span>StewardPath helps you answer</span>
           <strong>What should not be lost if you step back?</strong>
           <ul>
             <li>Where the business still depends on you</li>
-            <li>What a buyer may question</li>
+            <li>What a careful buyer may question</li>
             <li>Which successor paths fit your values</li>
-            <li>What to share with advisors first</li>
+            <li>What to keep private until fit is real</li>
+            <li>What to prepare before advisor conversations</li>
           </ul>
         </aside>
       </section>
@@ -82,15 +103,31 @@ export default function PublicHome() {
         </div>
         <div className="publicGrid three">
           <article><strong>You have no clear successor.</strong><p>Your children may not want the business, employees may not be ready, and outside buyers may not understand the culture.</p></article>
-          <article><strong>You worry about the wrong buyer.</strong><p>You want price, but not at the cost of staff, customer trust, service standards, or the company name.</p></article>
+          <article><strong>You worry about the wrong buyer.</strong><p>You want a fair price, but not at the cost of staff, customer trust, service standards, or the company name.</p></article>
           <article><strong>You need a cleaner advisor conversation.</strong><p>You want your CPA, attorney, banker, or planner to see the full picture before a broker or buyer frames it for you.</p></article>
+        </div>
+      </section>
+
+      <section className="publicBand">
+        <div>
+          <p className="publicEyebrow">How it works</p>
+          <h2>Accompaniment, not an artifact.</h2>
+          <p>StewardPath is a program you can return to — guided intake, a plan, and a readiness that updates over time — not a one-time PDF.</p>
+        </div>
+        <div className="publicGrid">
+          {journeySteps.map(([step, title, body]) => (
+            <article key={step}>
+              <strong>{step}. {title}</strong>
+              <p>{body}</p>
+            </article>
+          ))}
         </div>
       </section>
 
       <section className="publicBand reportPreview">
         <div>
           <p className="publicEyebrow">What you get</p>
-          <h2>A readiness report that turns private worry into next steps.</h2>
+          <h2>A readiness program that turns private worry into clear next steps.</h2>
         </div>
         <div className="publicGrid">
           {sampleSections.map(([title, body]) => (
@@ -102,20 +139,35 @@ export default function PublicHome() {
         </div>
       </section>
 
+      <section className="publicBand">
+        <div>
+          <p className="publicEyebrow">What owners tell us they want to feel</p>
+          <h2>The point isn't a document. It's how the decision finally feels.</h2>
+        </div>
+        <div className="publicGrid">
+          {outcomes.map(([title, body]) => (
+            <article key={title}>
+              <strong>{title}</strong>
+              <p>{body}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
       <section className="publicBand split">
         <div>
-          <p className="publicEyebrow">Financial clarity without oversharing</p>
+          <p className="publicEyebrow">Confidentiality first</p>
           <h2>You choose what stays private until successor fit is real.</h2>
           <p>
-            Add revenue range, margin, debt, customer concentration, recurring
-            revenue, owner compensation, key employee risk, and whether SOPs
-            are documented. Mark sensitive details as private, advisor-only,
-            or share later with a serious match.
+            Share ranges and your own words — never exact figures. Revenue band,
+            customer concentration, owner dependency, key-employee risk, whether
+            procedures are documented. Everything is private by default; mark
+            anything advisor-only, or share later with a serious match.
           </p>
         </div>
         <div className="privacyBox">
           <strong>This is not a broker pitch.</strong>
-          <p>You control what gets shared. StewardPath is preparation support, not legal, tax, investment, valuation, or brokerage advice.</p>
+          <p>Private by default. Never shared with employees, family, or buyers unless you choose to. Never used to train AI. Export or permanently delete your data anytime. StewardPath is preparation support — not legal, tax, investment, valuation, or brokerage advice.</p>
         </div>
       </section>
 
@@ -141,10 +193,10 @@ export default function PublicHome() {
       </section>
 
       <section className="publicBand offerBand">
-        <article><span>Free</span><strong>Sample report</strong><p>See the kind of questions and next steps StewardPath prepares.</p></article>
-        <article><span>$249</span><strong>Owner readiness report</strong><p>Prepare a private report you can review before advisor or buyer conversations.</p></article>
-        <article><span>$1,500</span><strong>Concierge readiness package</strong><p>Guided intake, reviewed report, and transition conversation prep.</p></article>
-        <article><span>$199/mo</span><strong>Advisor pilot</strong><p>For advisors serving up to 10 owner clients.</p></article>
+        <article><span>Free</span><strong>Sample report</strong><p>See the questions, the score, and the kind of next steps StewardPath prepares.</p></article>
+        <article><span>$249</span><strong>Owner readiness report</strong><p>Your private, guided readiness — with the reasoning behind every score — to review before advisor or buyer conversations.</p></article>
+        <article><span>$1,500</span><strong>Concierge readiness package</strong><p>Guided intake plus a private readiness review with a person, and transition-conversation prep. Supported, not left to software.</p></article>
+        <article><span>$199/mo</span><strong>Advisor pilot</strong><p>For CPAs, exit planners, and advisors accompanying up to 10 owner clients.</p></article>
       </section>
     </main>
   );

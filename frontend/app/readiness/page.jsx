@@ -228,13 +228,15 @@ export default function StewardPathMvp() {
     <main className={`mvpShell mode-${designMode}`}>
       <section className="heroBand">
         <div className="heroCopy">
-          <p className="mvpEyebrow">StewardPath Readiness</p>
+          <p className="mvpEyebrow">StewardPath Readiness · classic workbench</p>
           <h1>Before you sell, decide what must be protected.</h1>
           <p>
             You spent years building trust with employees, customers, family,
-            and your community. StewardPath helps you see what could be lost,
-            what must be fixed, and what kind of next owner can protect what
-            you built.
+            and your community. This workbench shows what could be lost, what to
+            prepare, and what kind of next owner can protect what you built —
+            with the reasoning behind every score. Prefer to be guided, at your
+            pace, with privacy reassurance at each step? <a href="/intake">Try the
+            concierge readiness program</a>.
           </p>
         </div>
         <div className="heroSignal">
