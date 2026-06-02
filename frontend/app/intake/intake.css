@@ -212,3 +212,67 @@ button.danger:hover { border-color: var(--danger); }
   .conciergeShell { grid-template-columns: 1fr; }
   .readinessSidebar { position: static; }
 }
+
+/* --- Button overrides ---------------------------------------------------
+   The app-wide styles.css styles every <button> as a solid green pill with
+   `-webkit-text-fill-color: #fff`, which would render the concierge choice
+   buttons as white text on a white background until hover. These
+   .conciergeShell-scoped rules out-specify the bare global `button` rule, so
+   they win regardless of stylesheet load order. */
+.conciergeShell button {
+  background: #fff;
+  color: var(--ink);
+  -webkit-text-fill-color: currentColor;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  font-weight: 600;
+}
+.conciergeShell button:hover {
+  background: #fff;
+  color: var(--ink);
+  -webkit-text-fill-color: currentColor;
+  border-color: var(--accent);
+}
+.conciergeShell .primaryCta,
+.conciergeShell .primaryCta:hover {
+  background: var(--green);
+  color: #fdfcf6;
+  -webkit-text-fill-color: #fdfcf6;
+  border-color: var(--green);
+  font-weight: 700;
+}
+.conciergeShell .primaryCta:hover { background: #1a4731; border-color: #1a4731; }
+.conciergeShell .choice.active {
+  background: var(--green);
+  color: #fdfcf6;
+  -webkit-text-fill-color: #fdfcf6;
+  border-color: var(--green);
+}
+.conciergeShell .softBtn {
+  background: none;
+  color: var(--muted);
+  -webkit-text-fill-color: var(--muted);
+  border: 1px dashed var(--line);
+}
+.conciergeShell .softBtn.active {
+  color: var(--accent);
+  -webkit-text-fill-color: var(--accent);
+  border-color: var(--accent);
+}
+.conciergeShell .whyLink {
+  background: none;
+  border: none;
+  color: var(--accent);
+  -webkit-text-fill-color: var(--accent);
+  font-weight: 600;
+}
+.conciergeShell button.danger {
+  color: var(--danger);
+  -webkit-text-fill-color: var(--danger);
+  border-color: #e3c9c9;
+}
+.conciergeShell .dataHead button {
+  border: none;
+  color: var(--ink);
+  -webkit-text-fill-color: currentColor;
+}
