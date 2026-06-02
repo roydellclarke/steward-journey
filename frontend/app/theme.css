@@ -120,13 +120,14 @@ h1, h2, h3 {
 .siteFooter {
   background: var(--sp-paper);
   border-top: 1px solid var(--sp-line);
-  padding: 48px var(--sp-pad-x);
+  padding: 32px var(--sp-pad-x);
   color: var(--sp-muted);
   font-size: 0.85rem;
   font-family: var(--sp-font);
   display: grid;
-  gap: 12px;
+  gap: 8px;
 }
+.siteFooter p { margin: 0; }
 .siteFooter .footTop { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; justify-content: space-between; }
 .siteFooter .footBrand { display: inline-flex; align-items: center; gap: 10px; color: var(--sp-ink); font-weight: 600; font-size: 1rem; }
 .siteFooter .footLinks { display: flex; gap: 22px; flex-wrap: wrap; }
