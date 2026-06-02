@@ -2,22 +2,18 @@
 
 import { usePathname } from "next/navigation";
 
-// Inline SVG so there's no asset dependency. A shield (stewardship / protection)
-// with a path line and a guiding point (a way forward) — in the brand green.
+// Minimal monoline mark: a path cresting to a single point — a way forward,
+// guided. Thin stroke in ink, in keeping with the modern-luxe aesthetic.
 function BrandMark() {
   return (
-    <svg className="brandMark" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+    <svg className="brandMark" viewBox="0 0 28 28" fill="none" aria-hidden="true">
       <path
-        d="M16 2.5l11 3.8v7.9c0 7.1-4.7 12.3-11 14.9-6.3-2.6-11-7.8-11-14.9V6.3L16 2.5z"
-        fill="#20543c"
-      />
-      <path
-        d="M9.5 18.2c2.4 0 3.3-3 6.5-3s4.1 3 6.5 3"
-        stroke="#bfe0c9"
-        strokeWidth="2"
+        d="M3.5 20.5C8 20.5 9.5 8.5 14 8.5s6 12 10.5 12"
+        stroke="#15171a"
+        strokeWidth="1.5"
         strokeLinecap="round"
       />
-      <circle cx="16" cy="11" r="2.3" fill="#bfe0c9" />
+      <circle cx="14" cy="5.4" r="1.7" fill="#15171a" />
     </svg>
   );
 }
@@ -41,9 +37,9 @@ export function SiteHeader() {
         </nav>
       ) : (
         <span className="secureChip">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <rect x="4" y="10" width="16" height="11" rx="2.5" fill="#2f7a55" />
-            <path d="M8 10V7.5a4 4 0 0 1 8 0V10" stroke="#2f7a55" strokeWidth="2" />
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect x="4" y="10" width="16" height="11" rx="2.5" fill="#4a6a55" />
+            <path d="M8 10V7.5a4 4 0 0 1 8 0V10" stroke="#4a6a55" strokeWidth="2" />
           </svg>
           Private &amp; secure
         </span>

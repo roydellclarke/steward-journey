@@ -15,7 +15,7 @@
   min-height: 100vh;
   background: var(--paper);
   color: var(--ink);
-  font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-family: var(--sp-font);
   font-size: 18px;
   line-height: 1.6;
   display: grid;
@@ -43,10 +43,10 @@
 .trustCard {
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: 22px;
+  border-radius: 16px;
   padding: clamp(28px, 5vw, 52px);
   margin-top: 24px;
-  box-shadow: 0 14px 40px rgba(32, 58, 46, 0.07);
+  box-shadow: var(--sp-shadow);
 }
 .trustCard h1 { font-size: clamp(1.7rem, 3.4vw, 2.5rem); line-height: 1.2; margin: 0 0 22px; }
 .trustList { list-style: none; padding: 0; margin: 0 0 22px; display: grid; gap: 14px; }
@@ -74,7 +74,7 @@ button:disabled { opacity: 0.55; cursor: default; }
   border-color: var(--green);
   font-weight: 700;
 }
-.primaryCta:hover { background: #1a4731; }
+.primaryCta:hover { background: #000000; }
 
 /* Progress header */
 .progressHeader { display: flex; justify-content: space-between; gap: 24px; align-items: flex-end; margin-bottom: 22px; flex-wrap: wrap; }
@@ -89,15 +89,15 @@ button:disabled { opacity: 0.55; cursor: default; }
 .sectionCard, .reflectionCard {
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: 22px;
+  border-radius: 16px;
   padding: clamp(24px, 4vw, 40px);
-  box-shadow: 0 12px 34px rgba(32, 58, 46, 0.06);
+  box-shadow: var(--sp-shadow);
 }
 .sectionIntro { color: var(--muted); margin: 4px 0 18px; }
 .reassureBanner {
   display: flex; gap: 12px; align-items: flex-start;
   background: var(--green-soft);
-  border: 1px solid #cfe0d3;
+  border: 1px solid var(--sp-soft-line);
   border-radius: 14px;
   padding: 14px 16px;
   margin-bottom: 24px;
@@ -107,7 +107,7 @@ button:disabled { opacity: 0.55; cursor: default; }
 .questionList { display: grid; gap: 26px; }
 .questionBlock { border-bottom: 1px solid var(--line); padding-bottom: 22px; }
 .questionBlock:last-child { border-bottom: none; padding-bottom: 0; }
-.questionBlock.sensitive { background: #fbf8f1; border-radius: 12px; padding: 16px; border-bottom: none; }
+.questionBlock.sensitive { background: var(--green-soft); border-radius: 12px; padding: 16px; border-bottom: none; }
 .questionPrompt { display: flex; justify-content: space-between; gap: 14px; align-items: baseline; }
 .questionPrompt label { font-weight: 700; font-size: 1.08rem; }
 .whyLink { background: none; border: none; color: var(--accent); padding: 0; text-decoration: underline; font-size: 0.85rem; }
@@ -137,7 +137,7 @@ button:disabled { opacity: 0.55; cursor: default; }
 .sectionActions { display: flex; justify-content: space-between; align-items: center; margin-top: 30px; }
 
 /* Reflection moment */
-.reflectionCard { background: linear-gradient(180deg, #fffdf8, #f3f7f1); }
+.reflectionCard { background: var(--card); }
 .reflectionText { font-size: 1.22rem; line-height: 1.6; margin: 12px 0 26px; }
 
 /* Sidebar */
@@ -145,10 +145,10 @@ button:disabled { opacity: 0.55; cursor: default; }
   position: sticky; top: 40px;
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: 20px;
+  border-radius: 16px;
   padding: 24px;
   display: grid; gap: 22px;
-  box-shadow: 0 12px 34px rgba(32, 58, 46, 0.06);
+  box-shadow: var(--sp-shadow);
 }
 .sidebarScore { display: grid; gap: 4px; }
 .sidebarScore span { color: var(--muted); font-size: 0.85rem; }
@@ -164,7 +164,7 @@ button:disabled { opacity: 0.55; cursor: default; }
 /* Report */
 .reportHead { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; margin: 16px 0 28px; flex-wrap: wrap; }
 .reportHead h1 { font-size: clamp(2.4rem, 6vw, 3.4rem); color: var(--green); margin: 4px 0; }
-.reportSection { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: clamp(22px, 4vw, 34px); margin-bottom: 22px; }
+.reportSection { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: clamp(22px, 4vw, 34px); margin-bottom: 22px; }
 .reportSection h3 { margin: 0 0 18px; font-size: 1.25rem; }
 .driverGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
 .driverCard { border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
@@ -190,13 +190,13 @@ button:disabled { opacity: 0.55; cursor: default; }
 .briefCard p { margin: 6px 0 0; }
 .briefCard button { white-space: nowrap; }
 
-.reportSection.routing { background: linear-gradient(180deg, #fffdf8, #eef4ec); }
+.reportSection.routing { background: var(--soft); border-color: var(--soft-line); }
 
 .disclaimerBand { display: flex; flex-wrap: wrap; gap: 10px 20px; color: var(--muted); font-size: 0.82rem; margin-top: 8px; }
 
 /* Data control / book review overlay */
 .dataOverlay { position: fixed; inset: 0; background: rgba(20, 30, 25, 0.42); display: grid; place-items: center; padding: 20px; z-index: 50; }
-.dataPanel { background: var(--card); border-radius: 20px; padding: 28px; width: min(560px, 100%); max-height: 88vh; overflow: auto; box-shadow: 0 24px 60px rgba(0,0,0,0.22); }
+.dataPanel { background: var(--card); border-radius: 16px; padding: 28px; width: min(560px, 100%); max-height: 88vh; overflow: auto; box-shadow: var(--sp-shadow-strong); }
 .dataHead { display: flex; justify-content: space-between; align-items: center; }
 .dataHead button { border: none; background: none; font-size: 1.6rem; line-height: 1; padding: 4px 10px; }
 .dataStats { list-style: none; padding: 0; margin: 18px 0; display: grid; gap: 10px; }
@@ -242,7 +242,7 @@ button.danger:hover { border-color: var(--danger); }
   border-color: var(--green);
   font-weight: 700;
 }
-.conciergeShell .primaryCta:hover { background: #1a4731; border-color: #1a4731; }
+.conciergeShell .primaryCta:hover { background: #000000; border-color: #000000; }
 .conciergeShell .choice.active {
   background: var(--green);
   color: #fdfcf6;
