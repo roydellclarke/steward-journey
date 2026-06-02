@@ -1,35 +1,35 @@
 const scripts = [
   {
     title: "Ideal customer",
-    body: "Founder-led businesses with 10-100 employees where the owner is 55+, cares about employees and reputation, has no clear successor, is privacy-sensitive, and wants to prepare before buyers define the terms."
+    body: "Founder-led businesses with 10 to 100 employees. The owner is 55 or older, cares about employees and reputation, has no clear successor, and guards their privacy. They want to prepare before a buyer sets the terms."
   },
   {
     title: "Advisor outreach",
-    body: "I built a private, guided readiness program for owner clients who aren't ready for a broker conversation yet. It accompanies them through naming what must be protected, where the business depends too much on them, and what to prepare, then hands you an advisor-ready brief. Could I show you a sample for one owner profile?"
+    body: "I built a private readiness program for owner clients who aren't ready for a broker yet. It walks them through what must be protected and where the business leans too much on them, then hands you an advisor-ready brief. Could I show you a sample for one owner profile?"
   },
   {
     title: "Seller-facing email",
-    body: "Before you sell, decide what must be protected. StewardPath walks privately with you, a guided readiness check, a score you actually understand, and a plan you can return to, before a buyer controls the conversation. Private by default, and never used to train AI."
+    body: "Before you sell, decide what must be protected. StewardPath works through it with you in private: a guided check, a score you can read, a plan you return to. You prepare before a buyer controls the conversation. Private by default. Never used to train AI."
   },
   {
     title: "LinkedIn DM",
-    body: "I'm testing a private readiness program for founder-led owners, built for people who care about employees, customers, and legacy, not just price. It listens and reflects back what you share, and you control what's ever revealed. Would a sample be useful for you or one client?"
+    body: "I'm testing a private readiness program for founder-led owners. It's built for people who care about their team, their customers, and their legacy, not just price. It listens, reflects back what you share, and leaves you in control of what anyone sees. Useful for you or a client?"
   },
   {
     title: "Local workshop title",
-    body: "Before You Sell: What Every Business Owner Should Protect, and Prepare, Before Talking To Buyers"
+    body: "Before You Sell: What Every Owner Should Protect and Prepare Before They Talk to Buyers"
   },
   {
     title: "Flyer copy",
-    body: "Thinking about stepping back someday? Don't let the first serious buyer define the future of your business. Prepare privately, at your pace, with a readiness program that stays with you, and a real person when you want one."
+    body: "Thinking about stepping back one day? Don't let the first serious buyer decide your company's future. Prepare in private, at your own pace, with a program that stays with you and a real person when you want one."
   },
   {
-    title: "Trust & privacy line",
-    body: "Private by default. Nothing is shared with employees, family, or buyers unless you choose to. Your answers are never used to train AI, and you can export or delete everything anytime."
+    title: "Trust and privacy line",
+    body: "Private by default. We share nothing with employees, family, or buyers unless you choose. We never use your answers to train AI. Export or delete everything anytime."
   },
   {
     title: "Pricing test",
-    body: "Free sample report, $249 owner readiness report, $1,500 concierge readiness package (guided intake + a private review with a person), and $199/month advisor pilot for up to 10 owner clients."
+    body: "Free sample report. $249 owner readiness report. $1,500 concierge package with a guided intake and a private review. $199 a month for an advisor pilot of up to ten clients."
   }
 ];
 
@@ -39,14 +39,13 @@ export default function GoToMarketPage() {
       <section className="publicHero">
         <div>
           <p className="publicEyebrow">Go-to-market support</p>
-          <h1>Start with trusted advisors. Let the program accompany the owner.</h1>
+          <h1>Start where trust already lives. Let the program prepare the owner.</h1>
           <p>
-            With limited budget, begin where trust already exists: CPAs, exit
-            planners, estate attorneys, wealth advisors, and community banks.
-            The pitch isn't a report, it's a private program that listens,
-            keeps the owner in control of what's shared, and prepares them for
-            the advisor conversation. Use the public page as the proof they can
-            forward to owners.
+            On a tight budget, begin where trust already exists: CPAs, exit
+            planners, estate attorneys, wealth advisors, community banks. The
+            pitch is not a report. It is a private program that listens, keeps
+            the owner in control of what they share, and readies them for the
+            advisor conversation. Use the public page as proof they can forward.
           </p>
           <div className="publicActions">
             <a href="/" className="primaryCta">View public page</a>

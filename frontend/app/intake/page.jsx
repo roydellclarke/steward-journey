@@ -197,16 +197,16 @@ function TrustScreen({ onBegin, onResume, busy, status }) {
     <main className="conciergeShell single">
       <section className="trustCard">
         <p className="conciergeEyebrow">Private readiness</p>
-        <h1>Before we begin, here's how this stays private.</h1>
+        <h1>First, how this stays private.</h1>
         <ul className="trustList">
-          <li><strong>What we collect:</strong> ranges and your own words about your business and wishes, never exact financials.</li>
-          <li><strong>Why:</strong> so the plan reflects your situation and what you want protected.</li>
-          <li><strong>Private by default:</strong> nothing is shared with anyone, not family, not employees, not buyers, unless you choose to.</li>
-          <li><strong>You're in control:</strong> you decide later what, if anything, to share, and with whom.</li>
-          <li><strong>Never used to train AI:</strong> your answers stay yours, we don't use them to train any computer system.</li>
-          <li><strong>Delete anytime:</strong> export or permanently delete everything whenever you want.</li>
+          <li><strong>What we collect:</strong> ranges and your own words. Never exact figures.</li>
+          <li><strong>Why:</strong> so your plan fits your situation and protects what you name.</li>
+          <li><strong>Private by default:</strong> no one sees this. Not family, not employees, not buyers. Not unless you choose.</li>
+          <li><strong>You hold the keys:</strong> you decide later what to share, and with whom.</li>
+          <li><strong>Never used to train AI:</strong> your answers stay yours. We do not feed them to any system.</li>
+          <li><strong>Yours to erase:</strong> export your data or delete it for good, anytime.</li>
         </ul>
-        <p className="trustScope">StewardPath is preparation support, not legal, tax, valuation, or investment advice. You can stop, skip anything, or come back later.</p>
+        <p className="trustScope">StewardPath prepares you. It does not give legal, tax, valuation, or investment advice. Stop, skip, or come back whenever you need.</p>
         <div className="trustActions">
           <button type="button" className="primaryCta" onClick={onBegin} disabled={busy}>
             {busy ? "Setting up…" : "Begin privately"}
