@@ -1320,6 +1320,7 @@ textarea:focus { outline: none; border-color: var(--sp-sage); }
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 24px;
+  margin-top: 40px;
 }
 
 .offerBand span {

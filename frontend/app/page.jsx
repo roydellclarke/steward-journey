@@ -205,11 +205,23 @@ export default function PublicHome() {
         {status ? <p className="leadStatus">{status}</p> : null}
       </section>
 
-      <section className="publicBand offerBand">
-        <article><span>Free</span><strong>Sample report</strong><p>See the questions, the score, and the kind of plan StewardPath builds.</p></article>
-        <article><span>$249</span><strong>Owner readiness report</strong><p>Your private readiness, with the reasoning behind every score, ready before the advisor or buyer call.</p></article>
-        <article><span>$1,500</span><strong>Concierge package</strong><p>A guided intake, a private review with a person, and help preparing the hard conversations.</p></article>
-        <article><span>$199/mo</span><strong>Advisor pilot</strong><p>For CPAs, exit planners, and advisors guiding up to ten owner clients.</p></article>
+      <section className="publicBand">
+        <div>
+          <p className="publicEyebrow">Pricing</p>
+          <h2>You're not buying a report. You're starting something you keep.</h2>
+          <p>
+            Your answers, your progress, and your plan stay private and move as
+            you prepare. Get ready now and the legal, tax, and accounting work
+            later runs faster, which can mean fewer billable hours. The real
+            return is peace of mind for whatever you choose next.
+          </p>
+        </div>
+        <div className="offerBand">
+          <article><span>Free</span><strong>Sample report</strong><p>See the questions, the score, and the plan StewardPath builds with you.</p></article>
+          <article><span>$249</span><strong>Owner readiness report</strong><p>Your private readiness, with the reasoning behind every score. It moves as you prepare, so the advisor or buyer call finds you ready.</p></article>
+          <article><span>$1,500</span><strong>Concierge package</strong><p>A guided intake, a private review with a real person, and help preparing the conversations ahead. You reach the lawyer and accountant organized, which trims their hours.</p></article>
+          <article><span>$199/mo</span><strong>Advisor pilot</strong><p>For CPAs, exit planners, and advisors guiding up to ten owner clients. Each one arrives prepared.</p></article>
+        </div>
       </section>
     </main>
   );
