@@ -177,7 +177,7 @@ SECTIONS: list[dict[str, Any]] = [
         "intro": "Knowledge that lives only in your head is the hardest thing to transfer.",
         "questions": [
             _q("proc_sops", "processDocumentation", "sopsExist",
-               "Do written procedures (SOPs) exist for how work gets done?", "boolean"),
+               "Are there written, step-by-step instructions for how the main work gets done?", "boolean"),
             _q("proc_areas", "processDocumentation", "documentedAreas",
                "Which areas are documented? (add any that apply)", "multi",
                options=_opts(("operations", "Operations"), ("sales", "Sales"),
@@ -210,7 +210,7 @@ SECTIONS: list[dict[str, Any]] = [
             _q("fin_ownercomp", "financialClarity", "ownerCompNormalized",
                "Are personal expenses and owner pay cleanly separated from the business?",
                "boolean", sensitive=True,
-               why="Mixed personal and business spending is common and fixable — naming it early protects your leverage."),
+               why="Mixing personal and business spending is common and fixable — sorting it out early keeps you in a stronger spot when you talk to a buyer."),
         ],
     },
     {

@@ -6,6 +6,16 @@ import "./intake.css";
 
 const STORAGE_KEY = "stewardpath.intake.projectId";
 
+// Plain-language labels for the five readiness drivers, shown in the report.
+// The underlying score keys are unchanged (the backend and classic page use them).
+const DRIVER_LABELS = {
+  financial_clarity: "Financial clarity",
+  operational_transferability: "How well it runs without you",
+  process_documentation: "What's written down",
+  family_alignment: "Family on the same page",
+  owner_emotional_readiness: "Your readiness to step back"
+};
+
 export default function IntakePage() {
   const [step, setStep] = useState("trust"); // trust | intake | report
   const [projectId, setProjectId] = useState("");
@@ -193,7 +203,7 @@ function TrustScreen({ onBegin, onResume, busy, status }) {
           <li><strong>Why:</strong> so the plan reflects your situation and what you want protected.</li>
           <li><strong>Private by default:</strong> nothing is shared with anyone — not family, not employees, not buyers — unless you choose to.</li>
           <li><strong>You're in control:</strong> you decide later what, if anything, to share, and with whom.</li>
-          <li><strong>Not used to train models:</strong> your answers are never used to train AI.</li>
+          <li><strong>Never used to train AI:</strong> your answers stay yours — we don't use them to train any computer system.</li>
           <li><strong>Delete anytime:</strong> export or permanently delete everything whenever you want.</li>
         </ul>
         <p className="trustScope">StewardPath is preparation support — not legal, tax, valuation, or investment advice. You can stop, skip anything, or come back later.</p>
@@ -428,13 +438,13 @@ function DataControlCenter({ projectId, onClose }) {
         </div>
         <p>Everything here stays private by default. Nothing is shared unless you choose to, and your answers are never used to train AI.</p>
         <ul className="dataStats">
-          <li><strong>Intake</strong><span>{data ? `${data.intakeState?.meta?.completionPct || 0}% complete` : "…"}</span></li>
+          <li><strong>Your answers</strong><span>{data ? `${data.intakeState?.meta?.completionPct || 0}% filled in` : "…"}</span></li>
           <li><strong>Saved readiness reports</strong><span>{analyses}</span></li>
-          <li><strong>Default visibility</strong><span>{data?.intakeState?.disclosureControls?.defaultVisibility || "private"}</span></li>
+          <li><strong>Who can see this</strong><span>{(data?.intakeState?.disclosureControls?.defaultVisibility || "private") === "private" ? "Only you" : data.intakeState.disclosureControls.defaultVisibility}</span></li>
         </ul>
         {events.length ? (
           <div className="auditList">
-            <span>Access &amp; activity log</span>
+            <span>Activity log</span>
             <ul>{events.slice(0, 6).map((e) => <li key={e.id}>{new Date(e.at).toLocaleString()} · {prettify(e.action)}</li>)}</ul>
           </div>
         ) : null}
@@ -468,7 +478,7 @@ function ReportView({ report, score, projectId, onBackToIntake }) {
         <h3>Why your score looks like this</h3>
         <div className="driverGrid">
           {Object.entries(score.dimensions).map(([key, value]) => (
-            <DriverCard key={key} label={prettify(key)} value={value} rationale={synthesis.scoreRationale?.[key]} />
+            <DriverCard key={key} label={DRIVER_LABELS[key] || prettify(key)} value={value} rationale={synthesis.scoreRationale?.[key]} />
           ))}
         </div>
       </section>
