@@ -27,7 +27,10 @@ export function SiteHeader() {
     <header className="siteHeader">
       <a className="brand" href="/">
         <BrandMark />
-        <span>StewardPath</span>
+        <span className="brandText">
+          <span className="brandName">StewardPath</span>
+          <span className="brandTag">Protect what you built.</span>
+        </span>
       </a>
       {isMarketing ? (
         <nav className="siteNav" aria-label="Primary">
@@ -54,7 +57,10 @@ export function SiteFooter() {
       <div className="footTop">
         <span className="footBrand">
           <BrandMark />
-          StewardPath
+          <span className="brandText">
+            <span className="brandName">StewardPath</span>
+            <span className="brandTag">Protect what you built.</span>
+          </span>
         </span>
         <nav className="footLinks" aria-label="Footer">
           <a href="/">Home</a>

@@ -87,6 +87,16 @@ h1, h2, h3 {
 }
 .brandMark { width: 26px; height: 26px; display: block; flex: none; }
 
+.brand .brandText,
+.footBrand .brandText { display: inline-flex; flex-direction: column; line-height: 1.12; }
+.brandName { font-weight: 600; }
+.brandTag {
+  font-weight: 500;
+  font-size: 0.7rem;
+  letter-spacing: 0.01em;
+  color: var(--sp-sage);
+}
+
 .siteNav { display: flex; gap: 26px; align-items: center; }
 .siteNav a {
   color: var(--sp-ink);
