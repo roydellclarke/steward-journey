@@ -32,10 +32,12 @@
   --sp-on-dark-eyebrow: #aebcae;
   --sp-gradient: linear-gradient(180deg, #fbfaf7 0%, #f1f0ea 100%);
 
-  /* Type — system sans, treated with discipline (size + tracking + space). */
-  --sp-font: -apple-system, "Helvetica Neue", "Segoe UI", system-ui, Arial, sans-serif;
+  /* Type. Body = Inter, display = Manrope (loaded via next/font), with system
+     fallbacks. Treated with discipline: size + tracking + space. */
+  --sp-font: var(--font-body), -apple-system, "Helvetica Neue", system-ui, Arial, sans-serif;
+  --sp-font-display: var(--font-display), var(--sp-font);
   --sp-tracking-tight: -0.025em;
-  --sp-tracking-eyebrow: 0.18em;
+  --sp-tracking-eyebrow: 0.16em;
 
   /* Scale */
   --sp-radius: 10px;
@@ -56,8 +58,10 @@ body {
   letter-spacing: -0.011em;
 }
 h1, h2, h3 {
+  font-family: var(--sp-font-display);
   letter-spacing: var(--sp-tracking-tight);
   font-weight: 600;
+  text-wrap: balance;
 }
 
 /* ---------------------------------------------------------------- chrome */

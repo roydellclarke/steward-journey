@@ -65,36 +65,38 @@ export default function PublicHome() {
   return (
     <main className="publicShell">
       <section className="publicHero">
-        <div>
-          <p className="publicEyebrow">Private, guided transition readiness for founder-led businesses</p>
-          <h1>Before you sell, decide what must be protected.</h1>
-          <p>
-            You built more than an asset, you built trust with employees,
-            customers, family, and your community. StewardPath walks with you
-            through a once-in-a-lifetime decision: what could be lost, what to
-            prepare, and what kind of next owner would protect what you built.
-            You won't do this alone, and nothing is shared unless you choose to.
-          </p>
-          <div className="publicActions">
-            <a href="/intake" className="primaryCta">Start private readiness check</a>
-            <button type="button" onClick={() => submitLead("sample_report")}>Request sample report</button>
-            <button type="button" onClick={() => submitLead("readiness_call")}>Book a readiness review</button>
+        <p className="publicEyebrow">Private, guided transition readiness for founder-led businesses</p>
+        <h1>Before you sell, decide what must be protected.</h1>
+        <div className="heroLower">
+          <div className="heroLead">
+            <p>
+              You built more than an asset. You built trust with employees,
+              customers, family, and your community. StewardPath walks with you
+              through a once-in-a-lifetime decision: what could be lost, what to
+              prepare, and what kind of next owner would protect it. You won't do
+              this alone, and nothing is shared unless you choose to.
+            </p>
+            <div className="publicActions">
+              <a href="/intake" className="primaryCta">Start private readiness check</a>
+              <button type="button" onClick={() => submitLead("sample_report")}>Request sample report</button>
+              <button type="button" onClick={() => submitLead("readiness_call")}>Book a readiness review</button>
+            </div>
+            <p className="heroAlt">
+              Prefer the classic workbench? <a href="/readiness">Open it here</a>.
+            </p>
           </div>
-          <p style={{ marginTop: "10px", fontSize: "0.85rem" }}>
-            Prefer the classic workbench? <a href="/readiness">Open it here</a>.
-          </p>
+          <aside className="heroReport">
+            <span>StewardPath helps you answer</span>
+            <strong>What should not be lost if you step back?</strong>
+            <ul>
+              <li>Where the business still depends on you</li>
+              <li>What a careful buyer may question</li>
+              <li>Which successor paths fit your values</li>
+              <li>What to keep private until fit is real</li>
+              <li>What to prepare before advisor conversations</li>
+            </ul>
+          </aside>
         </div>
-        <aside className="heroReport">
-          <span>StewardPath helps you answer</span>
-          <strong>What should not be lost if you step back?</strong>
-          <ul>
-            <li>Where the business still depends on you</li>
-            <li>What a careful buyer may question</li>
-            <li>Which successor paths fit your values</li>
-            <li>What to keep private until fit is real</li>
-            <li>What to prepare before advisor conversations</li>
-          </ul>
-        </aside>
       </section>
 
       <section className="publicBand">
