@@ -1,3 +1,5 @@
+import "./styles.css";
+
 export const metadata = {
   title: "StewardPath",
   description: "Legacy transfer readiness workbench"
