@@ -267,14 +267,14 @@ button:focus-visible {
   color: var(--accent-strong);
 }
 
-.progressRail {
+.mvpShell .progressRail {
   height: 8px;
   overflow: hidden;
   border-radius: 999px;
   background: color-mix(in srgb, var(--accent-soft) 70%, #fff 30%);
 }
 
-.progressRail i {
+.mvpShell .progressRail i {
   display: block;
   width: 38%;
   height: 100%;

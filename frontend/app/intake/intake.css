@@ -18,10 +18,13 @@
   font-family: var(--sp-font);
   font-size: 18px;
   line-height: 1.6;
+  padding: 40px clamp(20px, 5vw, 72px);
+}
+
+.conciergeGrid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 340px;
   gap: 28px;
-  padding: 40px clamp(20px, 5vw, 72px);
   align-items: start;
 }
 
@@ -210,7 +213,7 @@ button.danger { color: var(--danger); border-color: #e3c9c9; }
 button.danger:hover { border-color: var(--danger); }
 
 @media (max-width: 880px) {
-  .conciergeShell { grid-template-columns: 1fr; }
+  .conciergeGrid { grid-template-columns: 1fr; }
   .readinessSidebar { position: static; }
 }
 

@@ -158,33 +158,35 @@ export default function IntakePage() {
 
   return (
     <main className="conciergeShell">
-      <div className="conciergeMain">
-        <ProgressHeader completion={completion} score={score} />
-        {reflection ? (
-          <ReflectionMoment reflection={reflection} onContinue={advanceAfterReflection} busy={busy} />
-        ) : activeSection ? (
-          <SectionView
-            section={activeSection}
-            drafts={drafts}
-            onAnswer={setDraft}
-            onContinue={saveAndContinue}
-            onBack={sectionIndex > 0 ? () => setSectionIndex(sectionIndex - 1) : null}
-            busy={busy}
-            isLast={sectionIndex === sections.length - 1}
-          />
-        ) : (
-          <p>Loading…</p>
-        )}
-        {status ? <p className="conciergeStatus" role="status">{status}</p> : null}
+      <ProgressHeader completion={completion} score={score} />
+      <div className="conciergeGrid">
+        <div className="conciergeMain">
+          {reflection ? (
+            <ReflectionMoment reflection={reflection} onContinue={advanceAfterReflection} busy={busy} />
+          ) : activeSection ? (
+            <SectionView
+              section={activeSection}
+              drafts={drafts}
+              onAnswer={setDraft}
+              onContinue={saveAndContinue}
+              onBack={sectionIndex > 0 ? () => setSectionIndex(sectionIndex - 1) : null}
+              busy={busy}
+              isLast={sectionIndex === sections.length - 1}
+            />
+          ) : (
+            <p>Loading…</p>
+          )}
+          {status ? <p className="conciergeStatus" role="status">{status}</p> : null}
+        </div>
+        <ReadinessSidebar
+          score={score}
+          completion={completion}
+          snapshots={intakeState?.meta?.snapshots || []}
+          onOpenData={() => setShowData(true)}
+          onSeeReadiness={finish}
+          busy={busy}
+        />
       </div>
-      <ReadinessSidebar
-        score={score}
-        completion={completion}
-        snapshots={intakeState?.meta?.snapshots || []}
-        onOpenData={() => setShowData(true)}
-        onSeeReadiness={finish}
-        busy={busy}
-      />
       {showData ? (
         <DataControlCenter projectId={projectId} onClose={() => setShowData(false)} />
       ) : null}
