@@ -127,7 +127,26 @@ button:disabled { opacity: 0.55; cursor: default; }
 }
 .questionBlock textarea, .dataPanel textarea { min-height: 88px; resize: vertical; }
 
-.choiceWrap { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+/* Uniform option grid: equal columns sized to hold the longest label, every
+   button the same size, text centered, and the last row snaps to the columns
+   above. The grid spans the full content width, so left and right edges align. */
+.choiceWrap {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+.conciergeShell .choiceWrap .choice {
+  display: flex;
+  width: 100%;
+  min-height: 52px;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  white-space: normal;
+  font-size: 0.95rem;
+  padding: 10px 14px;
+}
 .choiceRow { display: flex; gap: 10px; margin-top: 12px; }
 .choiceRow.scale .choice { width: 52px; text-align: center; font-weight: 700; }
 .choice { background: #fff; }
