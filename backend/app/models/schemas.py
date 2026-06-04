@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
@@ -88,6 +88,30 @@ class ReflectRequest(BaseModel):
     next_question_id: str | None = Field(default=None, alias="nextQuestionId")
 
     model_config = {"populate_by_name": True}
+
+
+# ----------------------------------------------------------- passwordless auth
+class AuthRequestBody(BaseModel):
+    """Ask for a sign-in code + link at one of the two intake gates."""
+
+    email: str = ""
+    project_id: str | None = Field(default=None, alias="projectId")
+    gate: Literal["save", "report"] = "save"
+
+    model_config = {"populate_by_name": True}
+
+
+class AuthVerifyBody(BaseModel):
+    """Verify a one-time code the owner typed in."""
+
+    email: str = ""
+    code: str = ""
+
+
+class AuthConfirmBody(BaseModel):
+    """Confirm a magic link after the explicit click on the landing page."""
+
+    token: str = ""
 
 
 class BookReviewRequest(BaseModel):

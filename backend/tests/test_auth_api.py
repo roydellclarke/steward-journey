@@ -1,0 +1,180 @@
+"""API tests for passwordless email auth (the two intake gates).
+
+Skipped automatically when FastAPI is not installed, matching the existing
+suite. Each test reloads ``app.main`` against a fresh temp data root and a
+recording email sender, so no real mail is sent. Cookies are not marked Secure
+in tests so the TestClient cookie jar carries the session across calls.
+
+Run:  python -m unittest discover -s backend/tests
+"""
+
+from __future__ import annotations
+
+import importlib
+import os
+import re
+import tempfile
+import unittest
+
+
+try:
+    from fastapi.testclient import TestClient  # noqa: F401
+    import slowapi  # noqa: F401
+    import itsdangerous  # noqa: F401
+    HAS_STACK = True
+except Exception:  # pragma: no cover
+    HAS_STACK = False
+
+
+_CODE_RE = re.compile(r"Your code: (\d{6})")
+_TOKEN_RE = re.compile(r"confirm\?token=(\S+)")
+
+
+def _reload_app(ttl_minutes: str = "10"):
+    root = tempfile.mkdtemp()
+    os.environ["STEWARDPATH_DATA_ROOT"] = root
+    os.environ["STEWARDPATH_AUTH_DB_PATH"] = os.path.join(root, "auth", "auth.db")
+    os.environ["STEWARDPATH_SECRET_KEY"] = "test-secret-key"
+    os.environ["STEWARDPATH_COOKIE_SECURE"] = "false"
+    os.environ["STEWARDPATH_FRONTEND_ORIGIN"] = "http://localhost:3000"
+    os.environ["STEWARDPATH_OTP_TTL_MINUTES"] = ttl_minutes
+    import app.main as main_module
+    importlib.reload(main_module)
+    return main_module
+
+
+@unittest.skipUnless(HAS_STACK, "FastAPI/slowapi/itsdangerous not installed in this environment")
+class AuthApiTestCase(unittest.TestCase):
+    def setUp(self):
+        from fastapi.testclient import TestClient
+        self.main = _reload_app()
+        self.client = TestClient(self.main.app)
+        self.sender = self.main.email_sender  # RecordingEmailSender (no Postmark token)
+
+    # --------------------------------------------------------------- helpers
+    def _make_project(self) -> str:
+        return self.client.post("/projects", json={"name": "H", "profile": {"industry": "mfg"}}).json()["project"]["id"]
+
+    def _last_email(self):
+        return self.sender.sent[-1]
+
+    def _code_from_email(self) -> str:
+        return _CODE_RE.search(self._last_email().text_body).group(1)
+
+    def _token_from_email(self) -> str:
+        return _TOKEN_RE.search(self._last_email().text_body).group(1)
+
+    def _request(self, email="owner@example.com", project_id=None, gate="save"):
+        return self.client.post("/auth/request", json={"email": email, "projectId": project_id, "gate": gate})
+
+
+class TestRequestVerifyResume(AuthApiTestCase):
+    def test_request_then_verify_resumes_with_intake_state(self):
+        pid = self._make_project()
+        self.client.put(
+            f"/projects/{pid}/intake",
+            json={"intakeState": {"emotionalReadiness": {"readinessToLetGo": {"value": 4, "status": "answered"}}}},
+        )
+
+        self.assertEqual(self._request(project_id=pid, gate="save").status_code, 200)
+        verify = self.client.post("/auth/verify", json={"email": "owner@example.com", "code": self._code_from_email()})
+        self.assertEqual(verify.status_code, 200)
+        body = verify.json()
+        self.assertTrue(body["authenticated"])
+        self.assertEqual(body["projectId"], pid)
+
+        # Session cookie now carries identity; /auth/me sees the claimed project.
+        me = self.client.get("/auth/me").json()
+        self.assertTrue(me["authenticated"])
+        self.assertEqual(me["email"], "owner@example.com")
+        self.assertIn(pid, me["projects"])
+
+        # The intake the owner filled in anonymously is intact and resumable.
+        state = self.client.get(f"/projects/{pid}/intake").json()["intakeState"]
+        self.assertEqual(state["emotionalReadiness"]["readinessToLetGo"]["value"], 4)
+
+    def test_anonymous_intake_persists_to_owner_on_first_auth(self):
+        pid = self._make_project()
+        self._request(email="new@owner.com", project_id=pid)
+        self.client.post("/auth/verify", json={"email": "new@owner.com", "code": self._code_from_email()})
+        owner_id = self.main.auth_store.owner_for_project(pid)
+        self.assertIsNotNone(owner_id)
+        self.assertEqual(self.main.auth_store.owner_email(owner_id), "new@owner.com")
+
+
+class TestCodeFailures(AuthApiTestCase):
+    def test_wrong_code_rejected(self):
+        self._request()
+        r = self.client.post("/auth/verify", json={"email": "owner@example.com", "code": "000000"})
+        self.assertEqual(r.status_code, 400)
+
+    def test_reused_code_rejected(self):
+        self._request()
+        code = self._code_from_email()
+        first = self.client.post("/auth/verify", json={"email": "owner@example.com", "code": code})
+        self.assertEqual(first.status_code, 200)
+        second = self.client.post("/auth/verify", json={"email": "owner@example.com", "code": code})
+        self.assertEqual(second.status_code, 400)
+
+    def test_expired_code_rejected(self):
+        # Reload with a zero-minute TTL so the freshly minted code is already expired.
+        self.main = _reload_app(ttl_minutes="0")
+        from fastapi.testclient import TestClient
+        self.client = TestClient(self.main.app)
+        self.sender = self.main.email_sender
+        self._request()
+        r = self.client.post("/auth/verify", json={"email": "owner@example.com", "code": self._code_from_email()})
+        self.assertEqual(r.status_code, 400)
+
+
+class TestMagicLink(AuthApiTestCase):
+    def test_get_confirm_does_not_consume_token(self):
+        pid = self._make_project()
+        self._request(project_id=pid, gate="report")
+        token = self._token_from_email()
+
+        peek = self.client.get("/auth/confirm", params={"token": token})
+        self.assertEqual(peek.status_code, 200)
+        self.assertEqual(peek.json()["gate"], "report")
+
+        # The explicit POST still works, proving the GET peek did not burn it.
+        confirm = self.client.post("/auth/confirm", json={"token": token})
+        self.assertEqual(confirm.status_code, 200)
+        self.assertEqual(confirm.json()["projectId"], pid)
+
+    def test_reused_link_rejected(self):
+        self._request()
+        token = self._token_from_email()
+        self.assertEqual(self.client.post("/auth/confirm", json={"token": token}).status_code, 200)
+        self.assertEqual(self.client.post("/auth/confirm", json={"token": token}).status_code, 400)
+
+    def test_tampered_link_rejected(self):
+        self._request()
+        token = self._token_from_email()
+        self.assertEqual(self.client.post("/auth/confirm", json={"token": token + "x"}).status_code, 400)
+
+
+class TestRateLimitAndPrivacy(AuthApiTestCase):
+    def test_per_ip_rate_limit_triggers(self):
+        statuses = [self._request().status_code for _ in range(20)]
+        self.assertIn(429, statuses)
+
+    def test_uniform_response_does_not_reveal_existence(self):
+        # An existing owner and a brand-new email get the identical answer.
+        self._request(email="known@example.com")
+        self.client.post("/auth/verify", json={"email": "known@example.com", "code": self._code_from_email()})
+        known = self._request(email="known@example.com")
+        unknown = self._request(email="stranger@example.com")
+        self.assertEqual(known.status_code, unknown.status_code)
+        self.assertEqual(known.json(), unknown.json())
+
+    def test_logout_clears_session(self):
+        self._request()
+        self.client.post("/auth/verify", json={"email": "owner@example.com", "code": self._code_from_email()})
+        self.assertTrue(self.client.get("/auth/me").json()["authenticated"])
+        self.client.post("/auth/logout")
+        self.assertFalse(self.client.get("/auth/me").json()["authenticated"])
+
+
+if __name__ == "__main__":
+    unittest.main()
