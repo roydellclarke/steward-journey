@@ -37,16 +37,33 @@ class Settings:
     kimi_temperature: float
     deepseek_temperature: float
     request_timeout_seconds: int
+    # Passwordless email auth.
+    secret_key: str
+    frontend_origin: str
+    auth_db_path: Path
+    otp_ttl_minutes: int
+    postmark_token: str
+    postmark_from: str
+    cookie_secure: bool
 
     @classmethod
     def from_env(cls) -> "Settings":
         load_env_file()
+        data_root = Path(os.getenv("STEWARDPATH_DATA_ROOT", "data/stewardpath")).resolve()
+        auth_db_default = data_root / "auth" / "auth.db"
         return cls(
-            data_root=Path(os.getenv("STEWARDPATH_DATA_ROOT", "data/stewardpath")).resolve(),
+            data_root=data_root,
             use_llm=_bool_env("STEWARDPATH_USE_LLM", False),
             kimi_model=os.getenv("STEWARDPATH_KIMI_MODEL", "moonshot/kimi-k2.5"),
             deepseek_model=os.getenv("STEWARDPATH_DEEPSEEK_MODEL", "deepseek/deepseek-reasoner"),
             kimi_temperature=float(os.getenv("STEWARDPATH_KIMI_TEMPERATURE", "1")),
             deepseek_temperature=float(os.getenv("STEWARDPATH_DEEPSEEK_TEMPERATURE", "0.15")),
             request_timeout_seconds=int(os.getenv("STEWARDPATH_LLM_TIMEOUT_SECONDS", "120")),
+            secret_key=os.getenv("STEWARDPATH_SECRET_KEY", "dev-only-insecure-secret-change-me"),
+            frontend_origin=os.getenv("STEWARDPATH_FRONTEND_ORIGIN", "http://localhost:3000"),
+            auth_db_path=Path(os.getenv("STEWARDPATH_AUTH_DB_PATH", str(auth_db_default))).resolve(),
+            otp_ttl_minutes=int(os.getenv("STEWARDPATH_OTP_TTL_MINUTES", "10")),
+            postmark_token=os.getenv("STEWARDPATH_POSTMARK_TOKEN", ""),
+            postmark_from=os.getenv("STEWARDPATH_POSTMARK_FROM", ""),
+            cookie_secure=_bool_env("STEWARDPATH_COOKIE_SECURE", True),
         )
