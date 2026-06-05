@@ -55,6 +55,26 @@ Docker path:
 /data/stewardpath/projects/
 ```
 
+## Passwordless email auth
+
+Owners never set a password. They prove control of an email with a one-time code (primary) or a magic link in the same email (fallback). Two gates in the intake flow trigger it: saving to resume later, and opening the readiness report. On the first successful sign-in, the in-progress (anonymous) intake project is tied to a durable per-owner record, and the browser gets an HttpOnly session cookie.
+
+Auth state (owners, sign-in challenges, sessions) lives in a small SQLite database, separate from the file-based project data. Codes, tokens, and session ids are stored only as keyed HMAC digests. Single-use is enforced atomically. Requests are rate-limited per email and per IP, and the request response is uniform so it never reveals whether an email exists.
+
+Configure it with these variables (see `.env.example`):
+
+```text
+STEWARDPATH_SECRET_KEY        # signs sessions + links; generate a strong value in prod
+STEWARDPATH_FRONTEND_ORIGIN   # exact browser origin; CORS + magic-link base URL
+STEWARDPATH_AUTH_DB_PATH      # defaults to STEWARDPATH_DATA_ROOT/auth/auth.db
+STEWARDPATH_OTP_TTL_MINUTES   # code / link lifetime, default 10
+STEWARDPATH_COOKIE_SECURE     # true in prod (HTTPS); false for local http dev
+STEWARDPATH_POSTMARK_TOKEN    # Postmark server token; omit to record emails in memory
+STEWARDPATH_POSTMARK_FROM     # verified Postmark sender address
+```
+
+Without a Postmark token and sender, sign-in emails are kept in memory only, so local dev and tests never send real mail. In production, set both, point `STEWARDPATH_FRONTEND_ORIGIN` at your real frontend URL, set `STEWARDPATH_COOKIE_SECURE=true`, and serve over HTTPS.
+
 ## Product Language Rule
 
 Internal frameworks and source research should stay internal. The owner-facing UI should say things like `What Matters`, `Business Quality`, `Transfer Risks`, and `Successor Fit`, not methodology labels.
