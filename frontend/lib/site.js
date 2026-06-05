@@ -4,7 +4,7 @@
 // (no domain is assumed to be registered).
 export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://your-domain.example").replace(/\/$/, "");
 export const SITE_NAME = "StewardPath";
-export const TAGLINE = "Protect what you built.";
+export const TAGLINE = "The handoff, on your terms.";
 export const DESCRIPTION =
   "A private, guided readiness program for founder-led business owners preparing a sale, succession, or transition. A person stays with you the whole way, and you control what is ever shared.";
 

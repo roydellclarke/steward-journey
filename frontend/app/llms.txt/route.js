@@ -1,4 +1,4 @@
-import { SITE_URL } from "../../lib/site";
+import { SITE_URL, TAGLINE } from "../../lib/site";
 
 // Serves /llms.txt (the emerging standard at llmstxt.org): a plain-Markdown
 // summary that helps LLMs and AI agents understand the site without parsing
@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 function body() {
   return `# StewardPath
 
-> Protect what you built. StewardPath is a private, guided readiness program for founder-led business owners preparing a sale, succession, or transition. It walks an owner through the decision before anyone else frames it: what they could lose, what to fix first, and which kind of owner would carry the business forward. A real person stays with the owner the whole way, and the owner controls what is ever shared.
+> ${TAGLINE} StewardPath is a private, guided readiness program for founder-led business owners preparing a sale, succession, or transition. It walks an owner through the decision before anyone else frames it: what they could lose, what to fix first, and which kind of owner would carry the business forward. A real person stays with the owner the whole way, and the owner controls what is ever shared.
 
 StewardPath is for owners of founder-led businesses, often older and non-technical, who want to prepare a handoff on their own terms. It is preparation, not advice: it does not give legal, tax, valuation, investment, or brokerage advice, and it routes regulated work to humans.
 

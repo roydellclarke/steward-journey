@@ -2,7 +2,7 @@ import { Inter, Manrope } from "next/font/google";
 import "./theme.css";
 import "./styles.css";
 import { SiteHeader, SiteFooter } from "./Chrome";
-import { SITE_URL, SITE_NAME, DESCRIPTION } from "../lib/site";
+import { SITE_URL, SITE_NAME, DESCRIPTION, TAGLINE } from "../lib/site";
 
 // Body: Inter (modern, familiar, highly legible). Display: Manrope (modern,
 // sleek) for headings. Self-hosted by next/font; exposed as CSS variables.
@@ -55,7 +55,7 @@ const structuredData = {
       "@id": `${SITE_URL}/#organization`,
       name: SITE_NAME,
       url: SITE_URL,
-      slogan: "Protect what you built.",
+      slogan: TAGLINE,
       description: DESCRIPTION
     },
     {
