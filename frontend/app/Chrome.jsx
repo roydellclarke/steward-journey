@@ -29,7 +29,7 @@ export function SiteHeader() {
         <BrandMark />
         <span className="brandText">
           <span className="brandName">StewardPath</span>
-          <span className="brandTag">Protect what you built.</span>
+          <span className="brandTag">The handoff on your terms.</span>
         </span>
       </a>
       {isMarketing ? (
@@ -59,7 +59,7 @@ export function SiteFooter() {
           <BrandMark />
           <span className="brandText">
             <span className="brandName">StewardPath</span>
-            <span className="brandTag">Protect what you built.</span>
+            <span className="brandTag">The handoff on your terms.</span>
           </span>
         </span>
         <nav className="footLinks" aria-label="Footer">
