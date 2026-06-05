@@ -75,6 +75,17 @@ STEWARDPATH_POSTMARK_FROM     # verified Postmark sender address
 
 Without a Postmark token and sender, sign-in emails are kept in memory only, so local dev and tests never send real mail. In production, set both, point `STEWARDPATH_FRONTEND_ORIGIN` at your real frontend URL, set `STEWARDPATH_COOKIE_SECURE=true`, and serve over HTTPS.
 
+## Discoverability (SEO and LLMs)
+
+The public marketing pages are built to be found by search engines and AI assistants, while the sign-in flow and per-owner data stay out of every index.
+
+- `app/robots.js` serves `/robots.txt`: it welcomes search and AI crawlers (GPTBot, OAI-SearchBot, ClaudeBot and anthropic-ai, Google-Extended and Gemini, PerplexityBot, Bingbot, Applebot, Meta-ExternalAgent and FacebookBot, Amazonbot, CCBot, cohere-ai, MistralAI, DeepSeekBot, Bytespider, and more) to public pages, and disallows `/auth/` for every one of them. Unlisted crawlers are covered by the `*` rule.
+- `app/sitemap.js` serves `/sitemap.xml` with the public pages.
+- `app/llms.txt/route.js` serves `/llms.txt` (the llmstxt.org format): a plain-Markdown summary of what StewardPath is, its pages, and notes for AI assistants (it is preparation, not advice; owner data is private and not for training).
+- `app/layout.jsx` carries full metadata (Open Graph, Twitter, canonical, robots) and JSON-LD structured data (Organization, WebSite, Service with pricing offers, and a short FAQ), grounded only in public content.
+
+All of these use `NEXT_PUBLIC_SITE_URL` for absolute links, so set it to the real registered domain in production. Nothing here exposes owner intake data: those routes are client-rendered and behind the session, and the API enforces per-owner access.
+
 ## Product Language Rule
 
 Internal frameworks and source research should stay internal. The owner-facing UI should say things like `What Matters`, `Business Quality`, `Transfer Risks`, and `Successor Fit`, not methodology labels.
