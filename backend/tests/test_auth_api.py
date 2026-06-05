@@ -119,6 +119,47 @@ class TestRequestVerifyResume(AuthApiTestCase):
         self.assertEqual(self.main.auth_store.owner_for_project(pid), owner_a)  # still A
 
 
+class TestProjectAccessControl(AuthApiTestCase):
+    def _sign_in(self, client, email, project_id=None):
+        client.post("/auth/request", json={"email": email, "projectId": project_id, "gate": "save"})
+        code = _CODE_RE.search(self.sender.sent[-1].text_body).group(1)
+        client.post("/auth/verify", json={"email": email, "code": code})
+
+    def test_unclaimed_project_stays_open_for_the_anonymous_flow(self):
+        pid = self._make_project()
+        # No session yet: the anonymous holder can read and write while unclaimed.
+        self.assertEqual(self.client.get(f"/projects/{pid}/intake").status_code, 200)
+        self.assertEqual(self.client.put(f"/projects/{pid}/intake", json={"intakeState": {}}).status_code, 200)
+
+    def test_claimed_project_requires_the_owning_session(self):
+        from fastapi.testclient import TestClient
+        pid = self._make_project()
+        self._sign_in(self.client, "owner@example.com", project_id=pid)
+
+        # The owning session (cookie in this client's jar) still has access.
+        self.assertEqual(self.client.get(f"/projects/{pid}/intake").status_code, 200)
+
+        # A stranger with no session is refused, and the 404 hides existence.
+        anon = TestClient(self.main.app)
+        self.assertEqual(anon.get(f"/projects/{pid}/intake").status_code, 404)
+        self.assertEqual(anon.get(f"/projects/{pid}/export").status_code, 404)
+        self.assertEqual(anon.delete(f"/projects/{pid}").status_code, 404)
+
+        # A different signed-in owner is refused too.
+        other = TestClient(self.main.app)
+        self._sign_in(other, "intruder@example.com")
+        self.assertEqual(other.get(f"/projects/{pid}/intake").status_code, 404)
+
+    def test_list_projects_is_owner_scoped(self):
+        from fastapi.testclient import TestClient
+        pid = self._make_project()
+        self._sign_in(self.client, "owner@example.com", project_id=pid)
+        mine = [p["id"] for p in self.client.get("/projects").json()["projects"]]
+        self.assertEqual(mine, [pid])
+        # Anonymous callers see nothing, not the full list.
+        self.assertEqual(TestClient(self.main.app).get("/projects").json()["projects"], [])
+
+
 class TestCodeFailures(AuthApiTestCase):
     def test_wrong_code_rejected(self):
         self._request()

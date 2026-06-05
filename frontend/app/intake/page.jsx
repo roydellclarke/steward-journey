@@ -34,6 +34,7 @@ export default function IntakePage() {
   const [resumeId, setResumeId] = useState("");
   const [authGate, setAuthGate] = useState(null); // null | "save" | "report"
   const [account, setAccount] = useState({ authenticated: false, email: "" });
+  const [pendingResume, setPendingResume] = useState(""); // a claimed project awaiting sign-in
 
   useEffect(() => {
     const saved = typeof window !== "undefined" ? window.localStorage.getItem(STORAGE_KEY) : "";
@@ -47,6 +48,13 @@ export default function IntakePage() {
   function onSaveGatePassed(result) {
     setAccount({ authenticated: true, email: result.email });
     setAuthGate(null);
+    if (pendingResume) {
+      // Signing in to resume a claimed project: retry the load, now with a session.
+      const id = pendingResume;
+      setPendingResume("");
+      begin(id, true);
+      return;
+    }
     setStatus(`Saved. We emailed ${result.email} a secure link to pick this back up anytime.`);
   }
 
@@ -60,7 +68,7 @@ export default function IntakePage() {
   const activeSection = sections[sectionIndex];
   const completion = intakeState?.meta?.completionPct ?? 0;
 
-  async function begin(existingId) {
+  async function begin(existingId, afterAuth = false) {
     setBusy(true);
     setStatus("Setting up your private space…");
     try {
@@ -79,7 +87,15 @@ export default function IntakePage() {
       setStep("intake");
       setStatus("");
     } catch (error) {
-      setStatus(`Could not start: ${error.message}. Is the backend running on the API URL?`);
+      // A saved project that is claimed needs the owner's session. If resuming
+      // fails and we have not just signed in, prompt sign-in and retry once.
+      if (existingId && !afterAuth) {
+        setPendingResume(existingId);
+        setAuthGate("save");
+        setStatus("");
+      } else {
+        setStatus(`Could not open this readiness: ${error.message}. You may need the secure link from your email.`);
+      }
     } finally {
       setBusy(false);
     }
@@ -167,8 +183,24 @@ export default function IntakePage() {
     }
   }
 
+  // One auth modal, reused across every step (trust screen resume, save, report).
+  const authGateEl = authGate ? (
+    <AuthGate
+      gate={authGate}
+      projectId={projectId || pendingResume}
+      knownEmail={account.email}
+      onClose={() => { setAuthGate(null); setPendingResume(""); }}
+      onAuthenticated={authGate === "report" ? onReportGatePassed : onSaveGatePassed}
+    />
+  ) : null;
+
   if (step === "trust") {
-    return <TrustScreen onBegin={() => begin("")} onResume={resumeId ? () => begin(resumeId) : null} busy={busy} status={status} />;
+    return (
+      <>
+        <TrustScreen onBegin={() => begin("")} onResume={resumeId ? () => begin(resumeId) : null} busy={busy} status={status} />
+        {authGateEl}
+      </>
+    );
   }
 
   if (step === "report" && report) {
@@ -218,15 +250,7 @@ export default function IntakePage() {
       {showData ? (
         <DataControlCenter projectId={projectId} onClose={() => setShowData(false)} />
       ) : null}
-      {authGate ? (
-        <AuthGate
-          gate={authGate}
-          projectId={projectId}
-          knownEmail={account.email}
-          onClose={() => setAuthGate(null)}
-          onAuthenticated={authGate === "report" ? onReportGatePassed : onSaveGatePassed}
-        />
-      ) : null}
+      {authGateEl}
     </main>
   );
 }

@@ -4,13 +4,14 @@ from __future__ import annotations
 
 from dataclasses import asdict
 
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
 from app.api.auth import build_auth_router
+from app.api.session import SessionCookie
 from app.core.config import Settings
 from app.intake import branching, questions as qbank
 from app.intake.handoff import build_handoff
@@ -41,6 +42,7 @@ settings = Settings.from_env()
 store = ProjectStore(settings.data_root)
 auth_store = AuthStore(settings.auth_db_path, settings.secret_key)
 email_sender = build_email_sender(postmark_token=settings.postmark_token, postmark_from=settings.postmark_from)
+session_cookie = SessionCookie(settings.secret_key, settings.cookie_secure)
 limiter = Limiter(key_func=get_remote_address)
 
 app = FastAPI(title="StewardPath API", version="0.3.0")
@@ -62,9 +64,31 @@ app.include_router(
         project_store=store,
         auth_store=auth_store,
         email_sender=email_sender,
+        session_cookie=session_cookie,
         limiter=limiter,
     )
 )
+
+
+def require_project_access(project_id: str, request: Request) -> str | None:
+    """Authorize access to a project-scoped route.
+
+    A project is anonymous until an owner claims it at a gate. While unclaimed,
+    whoever holds the project id may use it (the create-then-fill-then-sign-in
+    flow). Once claimed, only that owner's session may touch it; everyone else
+    gets a 404 so a claimed project's existence is never confirmed to outsiders.
+
+    Returns the resolved owner_id (or None when the project is still anonymous).
+    """
+
+    if not store.get_project(project_id):
+        raise HTTPException(status_code=404, detail="Project not found")
+    owner_of = auth_store.owner_for_project(project_id)
+    if owner_of is None:
+        return None
+    if session_cookie.read_owner(request, auth_store) != owner_of:
+        raise HTTPException(status_code=404, detail="Project not found")
+    return owner_of
 
 
 def _profile_from_request(request: OwnerProfileRequest) -> OwnerProfile:
@@ -136,8 +160,14 @@ def sample() -> dict:
 
 # --------------------------------------------------------------------- projects
 @app.get("/projects")
-def list_projects() -> dict:
-    return {"projects": store.list_projects()}
+def list_projects(request: Request) -> dict:
+    """List only the signed-in owner's projects. Anonymous callers get none."""
+
+    owner_id = session_cookie.read_owner(request, auth_store)
+    if not owner_id:
+        return {"projects": []}
+    projects = [store.get_project(pid) for pid in auth_store.projects_for_owner(owner_id)]
+    return {"projects": [p for p in projects if p]}
 
 
 @app.post("/projects", status_code=201)
@@ -146,7 +176,7 @@ def create_project(request: ProjectCreateRequest) -> dict:
 
 
 @app.get("/projects/{project_id}")
-def get_project(project_id: str) -> dict:
+def get_project(project_id: str, _access: str | None = Depends(require_project_access)) -> dict:
     project = store.get_project(project_id)
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
@@ -154,7 +184,7 @@ def get_project(project_id: str) -> dict:
 
 
 @app.patch("/projects/{project_id}")
-def update_project(project_id: str, request: ProjectUpdateRequest) -> dict:
+def update_project(project_id: str, request: ProjectUpdateRequest, _access: str | None = Depends(require_project_access)) -> dict:
     project = store.update_project(project_id, name=request.name, profile=request.profile, intake_state=request.intake_state)
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
@@ -162,7 +192,7 @@ def update_project(project_id: str, request: ProjectUpdateRequest) -> dict:
 
 
 @app.delete("/projects/{project_id}")
-def delete_project(project_id: str) -> dict:
+def delete_project(project_id: str, _access: str | None = Depends(require_project_access)) -> dict:
     """Hard delete — honors the owner's right to remove their data."""
 
     if not store.delete_project(project_id):
@@ -171,7 +201,7 @@ def delete_project(project_id: str) -> dict:
 
 
 @app.get("/projects/{project_id}/export")
-def export_project(project_id: str) -> dict:
+def export_project(project_id: str, _access: str | None = Depends(require_project_access)) -> dict:
     """'Your data' export — everything stored for this project."""
 
     export = store.export_project(project_id)
@@ -181,12 +211,12 @@ def export_project(project_id: str) -> dict:
 
 
 @app.get("/projects/{project_id}/analyses")
-def list_analyses(project_id: str) -> dict:
+def list_analyses(project_id: str, _access: str | None = Depends(require_project_access)) -> dict:
     return {"analyses": store.list_analyses(project_id)}
 
 
 @app.post("/projects/{project_id}/analyses", status_code=201)
-def append_analysis(project_id: str, request: AnalysisCreateRequest) -> dict:
+def append_analysis(project_id: str, request: AnalysisCreateRequest, _access: str | None = Depends(require_project_access)) -> dict:
     entry = store.append_analysis(
         project_id,
         profile_snapshot=request.profile_snapshot,
@@ -199,7 +229,7 @@ def append_analysis(project_id: str, request: AnalysisCreateRequest) -> dict:
 
 
 @app.get("/projects/{project_id}/analyses/latest")
-def latest_analysis(project_id: str) -> dict:
+def latest_analysis(project_id: str, _access: str | None = Depends(require_project_access)) -> dict:
     entry = store.latest_analysis(project_id)
     if not entry:
         raise HTTPException(status_code=404, detail="No analysis has been saved for this project")
@@ -207,7 +237,7 @@ def latest_analysis(project_id: str) -> dict:
 
 
 @app.get("/projects/{project_id}/snapshots")
-def project_snapshots(project_id: str) -> dict:
+def project_snapshots(project_id: str, _access: str | None = Depends(require_project_access)) -> dict:
     if not store.get_project(project_id):
         raise HTTPException(status_code=404, detail="Project not found")
     return {"snapshots": store.snapshots(project_id)}
@@ -259,7 +289,7 @@ def intake_score(body: IntakeStateBody) -> dict:
 
 # ------------------------------------------------- guided intake (project-scoped)
 @app.get("/projects/{project_id}/intake")
-def get_project_intake(project_id: str) -> dict:
+def get_project_intake(project_id: str, _access: str | None = Depends(require_project_access)) -> dict:
     state = store.read_intake_state(project_id)
     if state is None:
         if not store.get_project(project_id):
@@ -270,7 +300,7 @@ def get_project_intake(project_id: str) -> dict:
 
 
 @app.put("/projects/{project_id}/intake")
-def put_project_intake(project_id: str, request: IntakePatchRequest) -> dict:
+def put_project_intake(project_id: str, request: IntakePatchRequest, _access: str | None = Depends(require_project_access)) -> dict:
     project = store.update_project(project_id, name=None, profile=None, intake_state=request.intake_state)
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
@@ -280,7 +310,7 @@ def put_project_intake(project_id: str, request: IntakePatchRequest) -> dict:
 
 
 @app.post("/projects/{project_id}/intake/analyze", status_code=201)
-def analyze_project_intake(project_id: str) -> dict:
+def analyze_project_intake(project_id: str, _access: str | None = Depends(require_project_access)) -> dict:
     """Score the durable intake state, run grounded synthesis, and save it."""
 
     state = store.read_intake_state(project_id)
@@ -299,7 +329,7 @@ def analyze_project_intake(project_id: str) -> dict:
 
 
 @app.get("/projects/{project_id}/handoff")
-def project_handoff(project_id: str) -> dict:
+def project_handoff(project_id: str, _access: str | None = Depends(require_project_access)) -> dict:
     """The fully-prepped package for the single human readiness review."""
 
     state = store.read_intake_state(project_id)
@@ -311,7 +341,7 @@ def project_handoff(project_id: str) -> dict:
 
 
 @app.post("/projects/{project_id}/book-review", status_code=201)
-def book_review(project_id: str, request: BookReviewRequest) -> dict:
+def book_review(project_id: str, request: BookReviewRequest, _access: str | None = Depends(require_project_access)) -> dict:
     """Book the human readiness review; captures the lead and the handoff package."""
 
     if not store.get_project(project_id):
