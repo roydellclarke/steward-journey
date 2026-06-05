@@ -38,6 +38,13 @@ def _reload_app(ttl_minutes: str = "10"):
     os.environ["STEWARDPATH_COOKIE_SECURE"] = "false"
     os.environ["STEWARDPATH_FRONTEND_ORIGIN"] = "http://localhost:3000"
     os.environ["STEWARDPATH_OTP_TTL_MINUTES"] = ttl_minutes
+    # Stay hermetic: ignore any local backend/.env provider keys so the sender
+    # is always the in-memory RecordingEmailSender (tests read its .sent).
+    os.environ["STEWARDPATH_RESEND_API_KEY"] = ""
+    os.environ["STEWARDPATH_RESEND_FROM"] = ""
+    os.environ["STEWARDPATH_POSTMARK_TOKEN"] = ""
+    os.environ["STEWARDPATH_POSTMARK_FROM"] = ""
+    os.environ["STEWARDPATH_LOG_AUTH_EMAILS"] = "false"
     import app.main as main_module
     importlib.reload(main_module)
     return main_module
