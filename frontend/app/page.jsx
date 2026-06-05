@@ -41,6 +41,7 @@ export default function PublicHome() {
     role: "Owner"
   });
   const [status, setStatus] = useState("");
+  const [busy, setBusy] = useState(false);
 
   function updateLead(field, value) {
     setLead((current) => ({ ...current, [field]: value }));
@@ -48,23 +49,40 @@ export default function PublicHome() {
 
   function scrollToRequest() {
     document.getElementById("request")?.scrollIntoView({ behavior: "smooth", block: "center" });
+    setStatus("Add your details below, then choose an option.");
   }
 
   async function submitLead(intent) {
+    if (busy) return;
     if (!lead.name && !lead.email) {
       scrollToRequest();
       setStatus("Add your name or email below, then we will send it.");
       return;
     }
+    setBusy(true);
     setStatus("Saving your request...");
     try {
       await apiFetch("/leads", {
         method: "POST",
         body: JSON.stringify({ ...lead, intent })
       });
-      setStatus("Saved. Start privately now, or keep this for follow-up.");
+      const confirmation = intent === "readiness_call"
+        ? "Got it. We will reach out privately to set up your readiness review."
+        : "Saved. Check your email, or start the private check now.";
+      setStatus(confirmation);
     } catch (error) {
       setStatus(`Could not save yet: ${error.message}`);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function copyAdvisorMessage() {
+    try {
+      await navigator.clipboard.writeText(advisorMessage);
+      setStatus("Copied. Paste it into an email to your advisor.");
+    } catch {
+      setStatus("Copy is blocked here. Select the message text and copy it manually.");
     }
   }
 
@@ -197,9 +215,9 @@ export default function PublicHome() {
             {advisorTypes.map((role) => <option key={role}>{role}</option>)}
           </select>
           <div className="leadButtons">
-            <button type="button" onClick={() => submitLead("sample_report")}>Request sample report</button>
-            <button type="button" onClick={() => submitLead("readiness_call")}>Book a readiness review</button>
-            <button type="button" onClick={() => navigator.clipboard?.writeText(advisorMessage)}>Copy advisor message</button>
+            <button type="button" onClick={() => submitLead("sample_report")} disabled={busy}>{busy ? "Saving…" : "Request sample report"}</button>
+            <button type="button" onClick={() => submitLead("readiness_call")} disabled={busy}>{busy ? "Saving…" : "Book a readiness review"}</button>
+            <button type="button" onClick={copyAdvisorMessage}>Copy advisor message</button>
           </div>
         </form>
         {status ? <p className="leadStatus">{status}</p> : null}
