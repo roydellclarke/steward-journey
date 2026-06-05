@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { intakeApi, fieldPatch, prettify } from "../../lib/intake";
+import { authApi } from "../../lib/auth";
+import AuthGate from "./AuthGate";
 import "./intake.css";
 
 const STORAGE_KEY = "stewardpath.intake.projectId";
@@ -30,11 +32,29 @@ export default function IntakePage() {
   const [status, setStatus] = useState("");
   const [showData, setShowData] = useState(false);
   const [resumeId, setResumeId] = useState("");
+  const [authGate, setAuthGate] = useState(null); // null | "save" | "report"
+  const [account, setAccount] = useState({ authenticated: false, email: "" });
 
   useEffect(() => {
     const saved = typeof window !== "undefined" ? window.localStorage.getItem(STORAGE_KEY) : "";
     if (saved) setResumeId(saved);
+    // Restore any existing session so we can greet a returning owner by email.
+    authApi.me().then((me) => {
+      if (me.authenticated) setAccount({ authenticated: true, email: me.email });
+    }).catch(() => {});
   }, []);
+
+  function onSaveGatePassed(result) {
+    setAccount({ authenticated: true, email: result.email });
+    setAuthGate(null);
+    setStatus(`Saved. We emailed ${result.email} a secure link to pick this back up anytime.`);
+  }
+
+  function onReportGatePassed(result) {
+    setAccount({ authenticated: true, email: result.email });
+    setAuthGate(null);
+    setStep("report");
+  }
 
   const sections = plan?.sections || [];
   const activeSection = sections[sectionIndex];
@@ -132,7 +152,13 @@ export default function IntakePage() {
       const handoff = await intakeApi.handoff(projectId);
       setReport({ ...result, handoff: handoff.handoff });
       setScore(result.score);
-      setStep("report");
+      // Gate 2: an owner signs in before viewing the report. Already-signed-in
+      // owners go straight through; everyone else passes the report gate first.
+      if (account.authenticated) {
+        setStep("report");
+      } else {
+        setAuthGate("report");
+      }
       setStatus("");
     } catch (error) {
       setStatus(`Could not prepare report: ${error.message}`);
@@ -184,11 +210,22 @@ export default function IntakePage() {
           snapshots={intakeState?.meta?.snapshots || []}
           onOpenData={() => setShowData(true)}
           onSeeReadiness={finish}
+          onSaveForLater={() => setAuthGate("save")}
+          account={account}
           busy={busy}
         />
       </div>
       {showData ? (
         <DataControlCenter projectId={projectId} onClose={() => setShowData(false)} />
+      ) : null}
+      {authGate ? (
+        <AuthGate
+          gate={authGate}
+          projectId={projectId}
+          knownEmail={account.email}
+          onClose={() => setAuthGate(null)}
+          onAuthenticated={authGate === "report" ? onReportGatePassed : onSaveGatePassed}
+        />
       ) : null}
     </main>
   );
@@ -365,7 +402,7 @@ function ReflectionMoment({ reflection, onContinue, busy }) {
   );
 }
 
-function ReadinessSidebar({ score, completion, snapshots, onOpenData, onSeeReadiness, busy }) {
+function ReadinessSidebar({ score, completion, snapshots, onOpenData, onSeeReadiness, onSaveForLater, account, busy }) {
   return (
     <aside className="readinessSidebar">
       <div className="sidebarScore">
@@ -391,8 +428,12 @@ function ReadinessSidebar({ score, completion, snapshots, onOpenData, onSeeReadi
       ) : null}
       <div className="sidebarActions">
         <button type="button" className="primaryCta" onClick={onSeeReadiness} disabled={busy}>See my readiness</button>
+        <button type="button" onClick={onSaveForLater} disabled={busy}>Save &amp; finish later</button>
         <button type="button" onClick={onOpenData}>Your data &amp; privacy</button>
       </div>
+      {account?.authenticated ? (
+        <p className="sidebarSaved">Saved to {account.email}. Resume anytime from the secure link we sent.</p>
+      ) : null}
       <p className="sidebarPrivacy">Private by default. Not legal, tax, valuation, or investment advice.</p>
     </aside>
   );

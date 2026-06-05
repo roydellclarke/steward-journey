@@ -6,7 +6,11 @@ from dataclasses import asdict
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.util import get_remote_address
 
+from app.api.auth import build_auth_router
 from app.core.config import Settings
 from app.intake import branching, questions as qbank
 from app.intake.handoff import build_handoff
@@ -23,24 +27,43 @@ from app.models.schemas import (
     ReflectRequest,
     RunAnalysisRequest,
 )
+from app.services.email import build_email_sender
 from app.services.llm_reasoning import analyze_owner_profile_with_optional_llm
 from app.services.reasoning import OwnerProfile
 from app.services.scoring import score_intake
 from app.services.synthesis import synthesize
+from app.storage.auth_db import AuthStore
 from app.storage.intake_state import merge_intake_patch, migrate_profile_to_intake_state
 from app.storage.projects import ProjectStore
 
 
 settings = Settings.from_env()
 store = ProjectStore(settings.data_root)
+auth_store = AuthStore(settings.auth_db_path, settings.secret_key)
+email_sender = build_email_sender(postmark_token=settings.postmark_token, postmark_from=settings.postmark_from)
+limiter = Limiter(key_func=get_remote_address)
 
 app = FastAPI(title="StewardPath API", version="0.3.0")
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+# Auth uses an HttpOnly session cookie, so the browser must be allowed to send
+# credentials. That rules out the "*" origin: we name the exact frontend origin.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=False,
+    allow_origins=[settings.frontend_origin],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+)
+
+app.include_router(
+    build_auth_router(
+        settings=settings,
+        project_store=store,
+        auth_store=auth_store,
+        email_sender=email_sender,
+        limiter=limiter,
+    )
 )
 
 

@@ -3,6 +3,8 @@ export const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.
 export async function apiFetch(path, options = {}) {
   const response = await fetch(`${apiBaseUrl}${path}`, {
     ...options,
+    // Send the HttpOnly session cookie so authenticated owners stay signed in.
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
       ...(options.headers || {})
