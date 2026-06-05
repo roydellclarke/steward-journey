@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict
+import hmac
 
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -91,6 +92,19 @@ def require_project_access(project_id: str, request: Request) -> str | None:
     return owner_of
 
 
+def require_admin(request: Request) -> None:
+    """Gate ops-only endpoints behind a shared admin token from the environment.
+
+    Disabled by default: with no STEWARDPATH_ADMIN_TOKEN set, the endpoint is
+    unreachable (404), so it can never sit open in production by accident.
+    """
+
+    token = settings.admin_token
+    provided = request.headers.get("X-Admin-Token", "")
+    if not token or not hmac.compare_digest(provided, token):
+        raise HTTPException(status_code=404, detail="Not found")
+
+
 def _profile_from_request(request: OwnerProfileRequest) -> OwnerProfile:
     return OwnerProfile(**request.model_dump())
 
@@ -120,11 +134,14 @@ def health() -> dict:
 
 
 @app.post("/analyze")
-def analyze(request: RunAnalysisRequest) -> dict:
+def analyze(request: RunAnalysisRequest, http_request: Request) -> dict:
     profile = _profile_from_request(request.profile)
     analysis = analyze_owner_profile_with_optional_llm(profile, settings)
     saved_analysis = None
     if request.project_id:
+        # This endpoint can persist to a project, so it must honor the same
+        # ownership rule as the /projects routes (else it is a write bypass).
+        require_project_access(request.project_id, http_request)
         # Persist any intake-state edits the owner made before analyzing.
         if request.intake_state is not None:
             store.update_project(request.project_id, name=None, profile=None, intake_state=request.intake_state)
@@ -354,7 +371,9 @@ def book_review(project_id: str, request: BookReviewRequest, _access: str | None
 
 # ----------------------------------------------------------------------- leads
 @app.get("/leads")
-def list_leads() -> dict:
+def list_leads(_admin: None = Depends(require_admin)) -> dict:
+    """Ops-only: lists captured contact details. Requires the admin token."""
+
     return {"leads": store.list_leads()}
 
 

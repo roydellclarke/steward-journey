@@ -50,6 +50,7 @@ class Settings:
     postmark_token: str
     postmark_from: str
     cookie_secure: bool
+    admin_token: str
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -81,4 +82,5 @@ class Settings:
             postmark_token=os.getenv("STEWARDPATH_POSTMARK_TOKEN", ""),
             postmark_from=os.getenv("STEWARDPATH_POSTMARK_FROM", ""),
             cookie_secure=cookie_secure,
+            admin_token=os.getenv("STEWARDPATH_ADMIN_TOKEN", ""),
         )

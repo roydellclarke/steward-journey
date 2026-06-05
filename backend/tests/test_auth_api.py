@@ -159,6 +159,22 @@ class TestProjectAccessControl(AuthApiTestCase):
         # Anonymous callers see nothing, not the full list.
         self.assertEqual(TestClient(self.main.app).get("/projects").json()["projects"], [])
 
+    def test_analyze_cannot_write_to_a_claimed_project_without_session(self):
+        from fastapi.testclient import TestClient
+        pid = self._make_project()
+        self._sign_in(self.client, "owner@example.com", project_id=pid)
+        # The /analyze write path must honor ownership too, not just /projects/*.
+        anon = TestClient(self.main.app)
+        r = anon.post("/analyze", json={"profile": {"industry": "mfg"}, "project_id": pid})
+        self.assertEqual(r.status_code, 404)
+
+    def test_leads_list_requires_admin_token(self):
+        # No token configured in tests, so the ops endpoint is unreachable.
+        self.assertEqual(self.client.get("/leads").status_code, 404)
+        self.assertEqual(self.client.get("/leads", headers={"X-Admin-Token": "guess"}).status_code, 404)
+        # POST /leads stays public for marketing capture.
+        self.assertEqual(self.client.post("/leads", json={"email": "x@y.com"}).status_code, 201)
+
 
 class TestCodeFailures(AuthApiTestCase):
     def test_wrong_code_rejected(self):
