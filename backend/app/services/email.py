@@ -77,6 +77,54 @@ class RecordingEmailSender:
 
 
 @dataclass
+class ConsoleEmailSender:
+    """Dev-only sender: prints the message to stdout instead of sending it.
+
+    Lets you complete a real sign-in locally without wiring up Postmark. Never
+    enabled by default, and the production-posture secret guard keeps the dev
+    cookie setting (and thus this) out of a secure deployment.
+    """
+
+    def send(self, message: AuthEmail) -> None:
+        print(f"\n[dev-auth-email] to={message.to}\n{message.text_body}\n", flush=True)
+
+
+@dataclass
+class ResendEmailSender:
+    """Sends via the Resend transactional API.
+
+    Resend does not rewrite links unless click tracking is enabled for the
+    domain, so leave that off in the dashboard to keep single-use magic links
+    from being pre-fetched by a scanner.
+    """
+
+    api_key: str
+    sender: str
+    timeout_seconds: float = 10.0
+    api_url: str = "https://api.resend.com/emails"
+
+    def send(self, message: AuthEmail) -> None:
+        import httpx  # imported here so offline test envs without httpx still load this module
+
+        response = httpx.post(
+            self.api_url,
+            headers={
+                "Authorization": f"Bearer {self.api_key}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "from": self.sender,
+                "to": [message.to],
+                "subject": message.subject,
+                "text": message.text_body,
+                "html": message.html_body,
+            },
+            timeout=self.timeout_seconds,
+        )
+        response.raise_for_status()
+
+
+@dataclass
 class PostmarkEmailSender:
     """Sends via the Postmark transactional API.
 
@@ -114,9 +162,26 @@ class PostmarkEmailSender:
         response.raise_for_status()
 
 
-def build_email_sender(*, postmark_token: str, postmark_from: str) -> EmailSender:
-    """Pick a sender from config: Postmark when wired up, recording fake otherwise."""
+def build_email_sender(
+    *,
+    resend_api_key: str = "",
+    resend_from: str = "",
+    postmark_token: str = "",
+    postmark_from: str = "",
+    log_to_console: bool = False,
+) -> EmailSender:
+    """Pick a transactional sender from config.
 
+    Priority: Resend, then Postmark, then (dev) console, then an in-memory fake.
+    ``log_to_console`` prints the email (code + link) so you can sign in locally
+    without a provider. Off by default. With no provider and no console flag,
+    nothing is sent (tests, offline).
+    """
+
+    if resend_api_key and resend_from:
+        return ResendEmailSender(api_key=resend_api_key, sender=resend_from)
     if postmark_token and postmark_from:
         return PostmarkEmailSender(token=postmark_token, sender=postmark_from)
+    if log_to_console:
+        return ConsoleEmailSender()
     return RecordingEmailSender()

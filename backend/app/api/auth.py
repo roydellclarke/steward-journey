@@ -14,6 +14,7 @@ project to a durable per-owner record and hand back a session cookie.
 
 from __future__ import annotations
 
+import logging
 import re
 import secrets
 
@@ -37,6 +38,8 @@ _EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 # Deliberately generic. Never tell the caller why a code or link failed, so it
 # cannot become an oracle for which emails exist or which codes are close.
 _GENERIC_FAILURE = "That code or link did not work. It may have expired or already been used. Please request a new one."
+
+logger = logging.getLogger("stewardpath.auth")
 
 
 def build_auth_router(
@@ -107,7 +110,12 @@ def build_auth_router(
             )
             signed = link_serializer.dumps({"t": token, "g": body.gate, "p": body.project_id})
             link = f"{settings.frontend_origin}/auth/confirm?token={signed}"
-            email_sender.send(build_auth_email(to=email, code=code, link=link, gate=body.gate))
+            try:
+                email_sender.send(build_auth_email(to=email, code=code, link=link, gate=body.gate))
+            except Exception:
+                # A delivery failure must not 500 the request or change the
+                # uniform response. Log it server-side (never the code) and move on.
+                logger.exception("Sign-in email failed to send")
 
         # Uniform response regardless of existence, rate state, or send outcome.
         return {"ok": True, "ttlMinutes": settings.otp_ttl_minutes}

@@ -49,8 +49,11 @@ class Settings:
     otp_ttl_minutes: int
     postmark_token: str
     postmark_from: str
+    resend_api_key: str
+    resend_from: str
     cookie_secure: bool
     admin_token: str
+    log_auth_emails: bool
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -81,6 +84,9 @@ class Settings:
             otp_ttl_minutes=int(os.getenv("STEWARDPATH_OTP_TTL_MINUTES", "10")),
             postmark_token=os.getenv("STEWARDPATH_POSTMARK_TOKEN", ""),
             postmark_from=os.getenv("STEWARDPATH_POSTMARK_FROM", ""),
+            resend_api_key=os.getenv("STEWARDPATH_RESEND_API_KEY", ""),
+            resend_from=os.getenv("STEWARDPATH_RESEND_FROM", ""),
             cookie_secure=cookie_secure,
             admin_token=os.getenv("STEWARDPATH_ADMIN_TOKEN", ""),
+            log_auth_emails=_bool_env("STEWARDPATH_LOG_AUTH_EMAILS", False),
         )

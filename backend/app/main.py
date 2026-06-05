@@ -42,7 +42,13 @@ from app.storage.projects import ProjectStore
 settings = Settings.from_env()
 store = ProjectStore(settings.data_root)
 auth_store = AuthStore(settings.auth_db_path, settings.secret_key)
-email_sender = build_email_sender(postmark_token=settings.postmark_token, postmark_from=settings.postmark_from)
+email_sender = build_email_sender(
+    resend_api_key=settings.resend_api_key,
+    resend_from=settings.resend_from,
+    postmark_token=settings.postmark_token,
+    postmark_from=settings.postmark_from,
+    log_to_console=settings.log_auth_emails,
+)
 session_cookie = SessionCookie(settings.secret_key, settings.cookie_secure)
 limiter = Limiter(key_func=get_remote_address)
 
