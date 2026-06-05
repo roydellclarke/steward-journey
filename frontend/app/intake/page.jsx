@@ -50,6 +50,12 @@ export default function IntakePage() {
     setStatus(`Saved. We emailed ${result.email} a secure link to pick this back up anytime.`);
   }
 
+  function onReportGatePassed(result) {
+    setAccount({ authenticated: true, email: result.email });
+    setAuthGate(null);
+    setStep("report");
+  }
+
   const sections = plan?.sections || [];
   const activeSection = sections[sectionIndex];
   const completion = intakeState?.meta?.completionPct ?? 0;
@@ -146,7 +152,13 @@ export default function IntakePage() {
       const handoff = await intakeApi.handoff(projectId);
       setReport({ ...result, handoff: handoff.handoff });
       setScore(result.score);
-      setStep("report");
+      // Gate 2: an owner signs in before viewing the report. Already-signed-in
+      // owners go straight through; everyone else passes the report gate first.
+      if (account.authenticated) {
+        setStep("report");
+      } else {
+        setAuthGate("report");
+      }
       setStatus("");
     } catch (error) {
       setStatus(`Could not prepare report: ${error.message}`);
@@ -206,13 +218,13 @@ export default function IntakePage() {
       {showData ? (
         <DataControlCenter projectId={projectId} onClose={() => setShowData(false)} />
       ) : null}
-      {authGate === "save" ? (
+      {authGate ? (
         <AuthGate
-          gate="save"
+          gate={authGate}
           projectId={projectId}
           knownEmail={account.email}
           onClose={() => setAuthGate(null)}
-          onAuthenticated={onSaveGatePassed}
+          onAuthenticated={authGate === "report" ? onReportGatePassed : onSaveGatePassed}
         />
       ) : null}
     </main>
