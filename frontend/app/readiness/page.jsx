@@ -195,6 +195,7 @@ export default function StewardPathMvp() {
       const projectId = await ensureProjectForAnalysis();
       const response = await fetch(`${apiBaseUrl}/analyze`, {
         method: "POST",
+        credentials: "include", // carry the session cookie if the project is claimed
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ profile: toSnakeProfile(profile), project_id: projectId || null, intake_state: intakeState })
       });
