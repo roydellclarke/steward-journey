@@ -146,14 +146,16 @@ h1, h2, h3 {
   font-family: var(--sp-font);
   display: grid;
   gap: 8px;
+  justify-items: center;
+  text-align: center;
 }
 .siteFooter p { margin: 0; }
-.siteFooter .footTop { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; justify-content: space-between; }
+.siteFooter .footTop { display: flex; flex-direction: column; align-items: center; gap: 14px; flex-wrap: wrap; justify-content: center; }
 .siteFooter .footBrand { display: inline-flex; align-items: center; gap: 10px; color: var(--sp-ink); font-weight: 600; font-size: 1rem; }
-.siteFooter .footLinks { display: flex; gap: 22px; flex-wrap: wrap; }
-.siteFooter .footLinks a { color: var(--sp-muted); text-decoration: none; }
+.siteFooter .footLinks { display: flex; gap: 22px; flex-wrap: wrap; justify-content: center; }
+.siteFooter .footLinks a { color: var(--sp-ink); text-decoration: none; font-weight: 700; }
 .siteFooter .footLinks a:hover { color: var(--sp-sage); }
-.siteFooter .footFine { max-width: 72ch; line-height: 1.6; }
+.siteFooter .footFine { max-width: 72ch; line-height: 1.6; margin-inline: auto; }
 
 @media (max-width: 620px) {
   .siteHeader { flex-wrap: wrap; }
