@@ -12,7 +12,14 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from app.services.email import RecordingEmailSender, build_auth_email, build_email_sender
+from app.services.email import (
+    ConsoleEmailSender,
+    PostmarkEmailSender,
+    RecordingEmailSender,
+    ResendEmailSender,
+    build_auth_email,
+    build_email_sender,
+)
 from app.storage.auth_db import AuthStore
 
 
@@ -172,11 +179,26 @@ class TestEmailComposer(unittest.TestCase):
         self.assertIn("readiness report", message.text_body)
         self.assertNotIn("—", message.text_body)  # writing law: no em-dashes
 
-    def test_factory_returns_recording_sender_without_token(self) -> None:
-        sender = build_email_sender(postmark_token="", postmark_from="")
+    def test_factory_returns_recording_sender_without_provider(self) -> None:
+        sender = build_email_sender()
         self.assertIsInstance(sender, RecordingEmailSender)
         sender.send(build_auth_email(to="o@example.com", code="1", link="l", gate="save"))
         self.assertEqual(len(sender.sent), 1)
+
+    def test_factory_provider_priority(self) -> None:
+        # Resend wins when configured.
+        self.assertIsInstance(
+            build_email_sender(resend_api_key="re_x", resend_from="a@b.com",
+                               postmark_token="pm", postmark_from="c@d.com"),
+            ResendEmailSender,
+        )
+        # Postmark is the fallback when Resend is absent.
+        self.assertIsInstance(
+            build_email_sender(postmark_token="pm", postmark_from="c@d.com"),
+            PostmarkEmailSender,
+        )
+        # Console only when explicitly enabled and no provider is set.
+        self.assertIsInstance(build_email_sender(log_to_console=True), ConsoleEmailSender)
 
 
 class TestConfigSecretGuard(unittest.TestCase):

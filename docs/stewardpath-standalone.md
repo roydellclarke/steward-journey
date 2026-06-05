@@ -73,7 +73,7 @@ STEWARDPATH_POSTMARK_TOKEN    # Postmark server token; omit to record emails in 
 STEWARDPATH_POSTMARK_FROM     # verified Postmark sender address
 ```
 
-Without a Postmark token and sender, sign-in emails are kept in memory only, so local dev and tests never send real mail. In production, set both, point `STEWARDPATH_FRONTEND_ORIGIN` at your real frontend URL, set `STEWARDPATH_COOKIE_SECURE=true`, and serve over HTTPS.
+Email delivery picks a provider by priority: Resend, then Postmark, then a dev console printer, then an in-memory fake. Set `STEWARDPATH_RESEND_API_KEY` and `STEWARDPATH_RESEND_FROM` to send through Resend (get a key at resend.com; for a first test, send from `onboarding@resend.dev` to your own Resend account email, then verify a domain for real recipients). Keep click tracking off in the dashboard so magic links are not pre-fetched. With no provider set, sign-in emails are kept in memory, so local dev and tests never send real mail; set `STEWARDPATH_LOG_AUTH_EMAILS=true` to print the code and link to the backend log for local testing. In production, configure a provider, point `STEWARDPATH_FRONTEND_ORIGIN` at your real frontend URL, set `STEWARDPATH_COOKIE_SECURE=true`, and serve over HTTPS.
 
 ## Product Language Rule
 
