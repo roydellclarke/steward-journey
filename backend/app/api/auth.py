@@ -32,6 +32,7 @@ SESSION_TTL_DAYS = 30
 MAX_CODE_ATTEMPTS = 5
 EMAIL_RATE_MAX = 5  # sign-in requests per email...
 EMAIL_RATE_WINDOW_MIN = 15  # ...within this window
+EMAIL_VERIFY_MAX = 10  # total code guesses per email per window, across challenges
 _EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 # Deliberately generic. Never tell the caller why a code or link failed, so it
@@ -83,10 +84,15 @@ def build_auth_router(
         owner_id = auth_store.find_or_create_owner(email)
         claimed = False
         if project_id and project_store.get_project(project_id):
-            auth_store.link_project(owner_id, project_id)
-            # Audit stores metadata only, never the email itself.
-            project_store.audit.record("owner_authenticated", project_id=project_id, detail={"gate": gate})
-            claimed = True
+            # Claim-once: an unclaimed project goes to the first owner to sign in
+            # with it. Never reassign a project already held by someone else, so
+            # one owner cannot claim another owner's project by guessing its id.
+            existing_owner = auth_store.owner_for_project(project_id)
+            if existing_owner is None or existing_owner == owner_id:
+                auth_store.link_project(owner_id, project_id)
+                # Audit stores metadata only, never the email itself.
+                project_store.audit.record("owner_authenticated", project_id=project_id, detail={"gate": gate})
+                claimed = True
 
         session_token = secrets.token_urlsafe(32)
         auth_store.create_session(owner_id, session_token, ttl_days=SESSION_TTL_DAYS)
@@ -137,6 +143,11 @@ def build_auth_router(
     @router.post("/verify")
     @limiter.limit("30/minute")
     def verify_code(body: AuthVerifyBody, request: Request, response: Response) -> dict:
+        # Per-email guess ceiling across all of this email's challenges in the
+        # window. This complements the per-IP limit and the per-challenge cap,
+        # and it cannot be reset by requesting a fresh code.
+        if auth_store.recent_attempt_total(body.email, within_minutes=EMAIL_RATE_WINDOW_MIN) >= EMAIL_VERIFY_MAX:
+            raise HTTPException(status_code=400, detail=_GENERIC_FAILURE)
         result = auth_store.verify_code(body.email, body.code)
         if not result.ok:
             raise HTTPException(status_code=400, detail=_GENERIC_FAILURE)

@@ -171,6 +171,22 @@ class AuthStore:
             ).fetchone()
         return int(row["n"])
 
+    def recent_attempt_total(self, email: str, *, within_minutes: int, now: datetime | None = None) -> int:
+        """Total verification attempts against this email's challenges in the window.
+
+        Summing across challenges (not per-row) closes the reset loophole where an
+        attacker mints a fresh challenge to get a new attempt budget.
+        """
+
+        moment = now or _now()
+        since = _iso(moment - timedelta(minutes=within_minutes))
+        with self._connect() as conn:
+            row = conn.execute(
+                "SELECT COALESCE(SUM(attempts), 0) AS n FROM auth_challenges WHERE email = ? AND created_at >= ?",
+                (email.strip().lower(), since),
+            ).fetchone()
+        return int(row["n"])
+
     def verify_code(self, email: str, code: str, *, now: datetime | None = None) -> ConsumeResult:
         """Check a one-time code against the newest open challenge for this email."""
 

@@ -101,6 +101,23 @@ class TestRequestVerifyResume(AuthApiTestCase):
         self.assertIsNotNone(owner_id)
         self.assertEqual(self.main.auth_store.owner_email(owner_id), "new@owner.com")
 
+    def test_other_owner_cannot_claim_an_owned_project(self):
+        from fastapi.testclient import TestClient
+        pid = self._make_project()
+        # Owner A claims the project.
+        self._request(email="a@x.com", project_id=pid)
+        self.client.post("/auth/verify", json={"email": "a@x.com", "code": self._code_from_email()})
+        owner_a = self.main.auth_store.owner_for_project(pid)
+
+        # Owner B, a different browser, tries to claim the same project id.
+        other = TestClient(self.main.app)
+        other.post("/auth/request", json={"email": "b@x.com", "projectId": pid, "gate": "save"})
+        code_b = _CODE_RE.search(self.sender.sent[-1].text_body).group(1)
+        res = other.post("/auth/verify", json={"email": "b@x.com", "code": code_b})
+        self.assertEqual(res.status_code, 200)
+        self.assertIsNone(res.json()["projectId"])  # B is signed in but claims nothing
+        self.assertEqual(self.main.auth_store.owner_for_project(pid), owner_a)  # still A
+
 
 class TestCodeFailures(AuthApiTestCase):
     def test_wrong_code_rejected(self):
@@ -115,6 +132,19 @@ class TestCodeFailures(AuthApiTestCase):
         self.assertEqual(first.status_code, 200)
         second = self.client.post("/auth/verify", json={"email": "owner@example.com", "code": code})
         self.assertEqual(second.status_code, 400)
+
+    def test_per_email_verify_lockout_across_challenges(self):
+        email = "grind@x.com"
+        # Two challenges, each ground to its 5-attempt cap = 10 attempts total.
+        for _ in range(2):
+            self._request(email=email)
+            for _ in range(5):
+                self.client.post("/auth/verify", json={"email": email, "code": "000000"})
+        # A fresh, correct code is now refused: the per-email ceiling is hit and
+        # cannot be reset by requesting again.
+        self._request(email=email)
+        good = self._code_from_email()
+        self.assertEqual(self.client.post("/auth/verify", json={"email": email, "code": good}).status_code, 400)
 
     def test_expired_code_rejected(self):
         # Reload with a zero-minute TTL so the freshly minted code is already expired.

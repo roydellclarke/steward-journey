@@ -7,6 +7,7 @@ deterministic. Run: python -m unittest discover -s backend/tests
 from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
+import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -116,6 +117,18 @@ class TestRateCounting(AuthStoreTestCase):
         )
         self.assertEqual(recent, 2)
 
+    def test_recent_attempt_total_sums_across_challenges(self) -> None:
+        # Two challenges at distinct times (as real requests are), each ground to
+        # its 5-attempt cap. verify_code targets the newest unconsumed challenge.
+        for minute in (0, 1):
+            moment = BASE + timedelta(minutes=minute)
+            self._challenge(max_attempts=5, now=moment)
+            for _ in range(5):
+                self.store.verify_code("owner@example.com", "000000", now=moment)
+        # The per-email total is the sum, so re-requesting did not reset it.
+        total = self.store.recent_attempt_total("owner@example.com", within_minutes=15, now=BASE + timedelta(minutes=2))
+        self.assertEqual(total, 10)
+
 
 class TestOwnersAndProjects(AuthStoreTestCase):
     def test_find_or_create_owner_is_stable(self) -> None:
@@ -164,6 +177,33 @@ class TestEmailComposer(unittest.TestCase):
         self.assertIsInstance(sender, RecordingEmailSender)
         sender.send(build_auth_email(to="o@example.com", code="1", link="l", gate="save"))
         self.assertEqual(len(sender.sent), 1)
+
+
+class TestConfigSecretGuard(unittest.TestCase):
+    """Production posture must refuse the placeholder signing secret."""
+
+    def setUp(self) -> None:
+        self._saved = dict(os.environ)
+        self.addCleanup(lambda: (os.environ.clear(), os.environ.update(self._saved)))
+
+    def test_secure_cookie_requires_real_secret(self) -> None:
+        os.environ["STEWARDPATH_COOKIE_SECURE"] = "true"
+        os.environ["STEWARDPATH_SECRET_KEY"] = ""  # empty defeats setdefault from any .env
+        from app.core.config import Settings
+        with self.assertRaises(RuntimeError):
+            Settings.from_env()
+
+    def test_secure_cookie_with_strong_secret_ok(self) -> None:
+        os.environ["STEWARDPATH_COOKIE_SECURE"] = "true"
+        os.environ["STEWARDPATH_SECRET_KEY"] = "a-strong-unique-secret-value"
+        from app.core.config import Settings
+        self.assertTrue(Settings.from_env().cookie_secure)
+
+    def test_dev_default_allowed_when_not_secure(self) -> None:
+        os.environ["STEWARDPATH_COOKIE_SECURE"] = "false"
+        os.environ["STEWARDPATH_SECRET_KEY"] = ""
+        from app.core.config import Settings
+        self.assertFalse(Settings.from_env().cookie_secure)  # no raise
 
 
 if __name__ == "__main__":

@@ -7,6 +7,11 @@ import os
 from pathlib import Path
 
 
+# Placeholder secret. Usable for local http dev only; refused in production
+# posture (see Settings.from_env). Never sign real sessions/links with this.
+DEV_SECRET_KEY = "dev-only-insecure-secret-change-me"
+
+
 def _bool_env(name: str, default: bool = False) -> bool:
     raw = os.getenv(name)
     if raw is None:
@@ -51,6 +56,16 @@ class Settings:
         load_env_file()
         data_root = Path(os.getenv("STEWARDPATH_DATA_ROOT", "data/stewardpath")).resolve()
         auth_db_default = data_root / "auth" / "auth.db"
+        secret_key = os.getenv("STEWARDPATH_SECRET_KEY", DEV_SECRET_KEY)
+        cookie_secure = _bool_env("STEWARDPATH_COOKIE_SECURE", True)
+        # Production posture (secure cookies) must not run on the placeholder
+        # secret: it signs every session and magic link. Fail loudly at startup.
+        if cookie_secure and (not secret_key or secret_key == DEV_SECRET_KEY):
+            raise RuntimeError(
+                "STEWARDPATH_SECRET_KEY must be set to a strong, unique value when "
+                "STEWARDPATH_COOKIE_SECURE is true. Generate one with: "
+                "python -c \"import secrets; print(secrets.token_urlsafe(48))\""
+            )
         return cls(
             data_root=data_root,
             use_llm=_bool_env("STEWARDPATH_USE_LLM", False),
@@ -59,11 +74,11 @@ class Settings:
             kimi_temperature=float(os.getenv("STEWARDPATH_KIMI_TEMPERATURE", "1")),
             deepseek_temperature=float(os.getenv("STEWARDPATH_DEEPSEEK_TEMPERATURE", "0.15")),
             request_timeout_seconds=int(os.getenv("STEWARDPATH_LLM_TIMEOUT_SECONDS", "120")),
-            secret_key=os.getenv("STEWARDPATH_SECRET_KEY", "dev-only-insecure-secret-change-me"),
+            secret_key=secret_key,
             frontend_origin=os.getenv("STEWARDPATH_FRONTEND_ORIGIN", "http://localhost:3000"),
             auth_db_path=Path(os.getenv("STEWARDPATH_AUTH_DB_PATH", str(auth_db_default))).resolve(),
             otp_ttl_minutes=int(os.getenv("STEWARDPATH_OTP_TTL_MINUTES", "10")),
             postmark_token=os.getenv("STEWARDPATH_POSTMARK_TOKEN", ""),
             postmark_from=os.getenv("STEWARDPATH_POSTMARK_FROM", ""),
-            cookie_secure=_bool_env("STEWARDPATH_COOKIE_SECURE", True),
+            cookie_secure=cookie_secure,
         )

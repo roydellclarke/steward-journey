@@ -11,6 +11,7 @@ frames the account as a security feature, not a marketing ask.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from html import escape
 from typing import Protocol
 
 
@@ -32,6 +33,11 @@ def build_auth_email(*, to: str, code: str, link: str, gate: str) -> AuthEmail:
     """Compose the sign-in email carrying both the code and the link."""
 
     intro = _gate_intro(gate)
+    # Escape everything interpolated into HTML. Today these are server-generated
+    # (numeric code, signed link), but escaping keeps the template safe if a
+    # user-influenced value is ever added.
+    code_html = escape(code)
+    link_html = escape(link, quote=True)
     text_body = (
         f"{intro}\n\n"
         f"Your code: {code}\n\n"
@@ -44,10 +50,10 @@ def build_auth_email(*, to: str, code: str, link: str, gate: str) -> AuthEmail:
     )
     html_body = (
         f"<p>{intro}</p>"
-        f'<p style="font-size:28px;letter-spacing:4px;font-weight:600;margin:24px 0">{code}</p>'
+        f'<p style="font-size:28px;letter-spacing:4px;font-weight:600;margin:24px 0">{code_html}</p>'
         "<p>Enter it on the StewardPath page you came from. The code works once and "
         "expires in a few minutes.</p>"
-        f'<p>Prefer a link? <a href="{link}">Open StewardPath</a>, then click the '
+        f'<p>Prefer a link? <a href="{link_html}">Open StewardPath</a>, then click the '
         "button to confirm it is you.</p>"
         "<p>Your answers stay private to you. If you did not ask to sign in, you can "
         "ignore this email and nothing changes.</p>"
