@@ -152,8 +152,24 @@ button:disabled { opacity: 0.55; cursor: default; }
 .choice { background: #fff; }
 .choice.active { background: var(--green); color: #fdfcf6; border-color: var(--green); }
 
-.skipRow { display: flex; gap: 10px; margin-top: 14px; }
+/* Skip / unknown controls share the option grid so they line up with the
+   columns above and match button size. Dashed style marks them as opt-outs. */
+.skipRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
 .softBtn { background: none; border: 1px dashed var(--line); color: var(--muted); padding: 7px 14px; font-size: 0.88rem; }
+.conciergeShell .skipRow .softBtn {
+  display: flex;
+  width: 100%;
+  min-height: 52px;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-size: 0.95rem;
+}
 .softBtn.active { border-style: solid; border-color: var(--accent); color: var(--accent); }
 
 .sectionActions { display: flex; justify-content: space-between; align-items: center; margin-top: 30px; }
