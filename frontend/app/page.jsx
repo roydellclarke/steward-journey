@@ -92,7 +92,7 @@ export default function PublicHome() {
     <main className="publicShell">
       <section className="publicHero">
         <p className="publicEyebrow">Private, guided transition readiness for founder-led businesses</p>
-        <h1>Before you sell, decide what must be protected.</h1>
+        <h1>Decide what you protect before a buyer decides for you.</h1>
         <div className="heroLower">
           <div className="heroLead">
             <p>

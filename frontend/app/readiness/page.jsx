@@ -230,7 +230,7 @@ export default function StewardPathMvp() {
       <section className="heroBand">
         <div className="heroCopy">
           <p className="mvpEyebrow">StewardPath Readiness · classic workbench</p>
-          <h1>Before you sell, decide what must be protected.</h1>
+          <h1>Decide what you protect before a buyer decides for you.</h1>
           <p>
             You spent years building trust with employees, customers, family,
             and your community. This workbench shows what could be lost, what to
@@ -850,7 +850,7 @@ function buildReportSvg(analysis, profile) {
   <rect x="42" y="42" width="1116" height="154" rx="28" fill="#203a2e"/>
   <text x="84" y="100" fill="#cfe1c9" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="800" letter-spacing="2">STEWARDPATH READINESS CARD</text>
   <text x="84" y="158" fill="#fffaf0" font-family="Arial, Helvetica, sans-serif" font-size="46" font-weight="800">${business}</text>
-  <text x="84" y="260" fill="#5f665f" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="800">Before you sell, decide what must be protected.</text>
+  <text x="84" y="260" fill="#5f665f" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="800">Decide what you protect before a buyer decides for you.</text>
   <circle cx="950" cy="362" r="116" fill="#f3f7f1" stroke="${color}" stroke-width="16"/>
   <text x="950" y="350" text-anchor="middle" fill="${color}" font-family="Arial, Helvetica, sans-serif" font-size="72" font-weight="900">${readiness}</text>
   <text x="950" y="394" text-anchor="middle" fill="#5f665f" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="800">/100 ready</text>
