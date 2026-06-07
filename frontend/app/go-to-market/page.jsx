@@ -9,7 +9,7 @@ const scripts = [
   },
   {
     title: "Seller-facing email",
-    body: "Before you sell, decide what must be protected. StewardPath works through it with you in private: a guided check, a score you can read, a plan you return to. You prepare before a buyer controls the conversation. Private by default. Never used to train AI."
+    body: "Decide what you protect before a buyer decides for you. StewardPath works through it with you in private: a guided check, a score you can read, a plan you return to. You walk in ready, while the terms are still yours to set. Private by default. Never used to train AI."
   },
   {
     title: "LinkedIn DM",
