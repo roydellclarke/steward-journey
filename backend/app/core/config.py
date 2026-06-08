@@ -54,6 +54,12 @@ class Settings:
     cookie_secure: bool
     admin_token: str
     log_auth_emails: bool
+    # Stripe payments.
+    stripe_secret_key: str
+    stripe_webhook_secret: str
+    stripe_price_report: str
+    stripe_price_concierge: str
+    stripe_price_advisor: str
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -89,4 +95,9 @@ class Settings:
             cookie_secure=cookie_secure,
             admin_token=os.getenv("STEWARDPATH_ADMIN_TOKEN", ""),
             log_auth_emails=_bool_env("STEWARDPATH_LOG_AUTH_EMAILS", False),
+            stripe_secret_key=os.getenv("STEWARDPATH_STRIPE_SECRET_KEY", ""),
+            stripe_webhook_secret=os.getenv("STEWARDPATH_STRIPE_WEBHOOK_SECRET", ""),
+            stripe_price_report=os.getenv("STEWARDPATH_STRIPE_PRICE_REPORT", ""),
+            stripe_price_concierge=os.getenv("STEWARDPATH_STRIPE_PRICE_CONCIERGE", ""),
+            stripe_price_advisor=os.getenv("STEWARDPATH_STRIPE_PRICE_ADVISOR", ""),
         )

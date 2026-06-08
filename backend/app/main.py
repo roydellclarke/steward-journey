@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import asdict
 import hmac
 
-from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
@@ -20,6 +20,7 @@ from app.intake.reflection import reflect as build_reflection
 from app.models.schemas import (
     AnalysisCreateRequest,
     BookReviewRequest,
+    CheckoutRequest,
     IntakePatchRequest,
     IntakeStateBody,
     LeadCreateRequest,
@@ -29,7 +30,8 @@ from app.models.schemas import (
     ReflectRequest,
     RunAnalysisRequest,
 )
-from app.services.email import build_email_sender
+from app.services.email import build_email_sender, build_purchase_email
+from app.services.payments import CATALOG, PaymentsError, StripePayments
 from app.services.llm_reasoning import analyze_owner_profile_with_optional_llm
 from app.services.reasoning import OwnerProfile
 from app.services.scoring import score_intake
@@ -50,6 +52,15 @@ email_sender = build_email_sender(
     log_to_console=settings.log_auth_emails,
 )
 session_cookie = SessionCookie(settings.secret_key, settings.cookie_secure)
+payments = StripePayments(
+    secret_key=settings.stripe_secret_key,
+    webhook_secret=settings.stripe_webhook_secret,
+    price_ids={
+        "report": settings.stripe_price_report,
+        "concierge": settings.stripe_price_concierge,
+        "advisor": settings.stripe_price_advisor,
+    },
+)
 limiter = Limiter(key_func=get_remote_address)
 
 app = FastAPI(title="StewardPath API", version="0.3.0")
@@ -388,3 +399,142 @@ def create_lead(request: LeadCreateRequest) -> dict:
     if not request.name and not request.email:
         raise HTTPException(status_code=400, detail="Please include at least a name or email.")
     return {"lead": store.append_lead(request.model_dump())}
+
+
+# -------------------------------------------------------------------- payments
+def _finalize_paid_session(session_id: str, email: str) -> dict | None:
+    """Mark an order paid and send the confirmation once. Safe to call twice."""
+
+    order, newly_paid = store.mark_order_paid(session_id, email=email)
+    if order is None:
+        return None
+    if newly_paid:
+        store.audit.record(
+            "order_paid",
+            project_id=order.get("projectId") or "n/a",
+            detail={"product": order.get("product"), "orderId": order.get("id")},
+        )
+        recipient = email or order.get("email") or ""
+        product = CATALOG.get(order.get("product", ""))
+        if recipient and product is not None:
+            try:
+                email_sender.send(
+                    build_purchase_email(
+                        to=recipient,
+                        product_name=product.name,
+                        amount_display=product.amount_display,
+                    )
+                )
+            except Exception:  # noqa: BLE001 - a receipt failure must not undo a paid order
+                store.audit.record(
+                    "order_email_failed",
+                    project_id=order.get("projectId") or "n/a",
+                    detail={"orderId": order.get("id")},
+                )
+    return order
+
+
+@app.get("/products")
+def list_products() -> dict:
+    """Public catalog so the frontend renders prices from one source of truth."""
+
+    return {
+        "products": [
+            {
+                "key": p.key,
+                "name": p.name,
+                "description": p.description,
+                "amountCents": p.amount_cents,
+                "amountDisplay": p.amount_display,
+                "mode": p.mode,
+            }
+            for p in CATALOG.values()
+        ]
+    }
+
+
+@app.post("/checkout", status_code=201)
+def create_checkout(request: CheckoutRequest) -> dict:
+    """Start a Stripe Checkout for a product and return the redirect URL."""
+
+    product = CATALOG.get(request.product)
+    if product is None:
+        raise HTTPException(status_code=400, detail="Unknown product.")
+    if not payments.configured:
+        raise HTTPException(
+            status_code=503,
+            detail="Payments are not set up yet. Add STEWARDPATH_STRIPE_SECRET_KEY to the backend .env.",
+        )
+    base = settings.frontend_origin.rstrip("/")
+    try:
+        session = payments.create_checkout_session(
+            product,
+            success_url=f"{base}/checkout/success?session_id={{CHECKOUT_SESSION_ID}}",
+            cancel_url=f"{base}/checkout/cancel?product={product.key}",
+            client_reference_id=request.project_id,
+        )
+    except PaymentsError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+    store.append_order(
+        {
+            "product": product.key,
+            "amountCents": product.amount_cents,
+            "mode": product.mode,
+            "status": "pending",
+            "stripeSessionId": session.get("id", ""),
+            "projectId": request.project_id,
+        }
+    )
+    return {"url": session.get("url"), "sessionId": session.get("id")}
+
+
+@app.get("/checkout/session/{session_id}")
+def checkout_session_status(session_id: str) -> dict:
+    """Confirm payment from the success page by retrieving the session from Stripe."""
+
+    if not payments.configured:
+        raise HTTPException(status_code=503, detail="Payments are not set up yet.")
+    try:
+        session = payments.retrieve_session(session_id)
+    except PaymentsError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+    paid = session.get("payment_status") == "paid" or session.get("status") == "complete"
+    email = (session.get("customer_details") or {}).get("email", "")
+    product_key = (session.get("metadata") or {}).get("product", "")
+    if paid:
+        _finalize_paid_session(session_id, email)
+    product = CATALOG.get(product_key)
+    return {
+        "paid": paid,
+        "product": product_key,
+        "productName": product.name if product else "",
+        "amountDisplay": product.amount_display if product else "",
+        "email": email,
+    }
+
+
+@app.post("/stripe/webhook", include_in_schema=False)
+async def stripe_webhook(request: Request, stripe_signature: str = Header(default="")) -> dict:
+    """Server-side payment confirmation. Stripe calls this; the body is raw."""
+
+    payload = await request.body()
+    try:
+        event = payments.parse_webhook_event(payload, stripe_signature)
+    except PaymentsError as exc:
+        # 400 tells Stripe the event failed verification so it retries later.
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    if event.get("type") == "checkout.session.completed":
+        session = event["data"]["object"]
+        email = (session.get("customer_details") or {}).get("email", "")
+        _finalize_paid_session(session.get("id", ""), email)
+    return {"received": True}
+
+
+@app.get("/orders")
+def list_orders(_admin: None = Depends(require_admin)) -> dict:
+    """Ops-only: lists recorded orders. Requires the admin token."""
+
+    return {"orders": store.list_orders()}

@@ -274,3 +274,72 @@ class ProjectStore:
             return []
         entries = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
         return sorted(entries, key=lambda item: item["createdAt"], reverse=True)
+
+    # -------------------------------------------------------------------- orders
+    def _orders_path(self) -> Path:
+        return self.root / "orders" / "orders.jsonl"
+
+    def append_order(self, order: dict[str, Any]) -> dict[str, Any]:
+        """Record a checkout intent. Status starts 'pending' until Stripe confirms."""
+
+        entry = {
+            "id": str(uuid4()),
+            "createdAt": _now(),
+            "product": order.get("product", ""),
+            "amountCents": int(order.get("amountCents", 0)),
+            "mode": order.get("mode", "payment"),
+            "status": order.get("status", "pending"),
+            "stripeSessionId": order.get("stripeSessionId", ""),
+            "email": order.get("email", ""),
+            "projectId": order.get("projectId") or "",
+            "paidAt": order.get("paidAt") or "",
+        }
+        path = self._orders_path()
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with path.open("a", encoding="utf-8") as handle:
+            handle.write(json.dumps(entry) + "\n")
+        return entry
+
+    def list_orders(self) -> list[dict[str, Any]]:
+        path = self._orders_path()
+        if not path.exists():
+            return []
+        entries = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+        return sorted(entries, key=lambda item: item["createdAt"], reverse=True)
+
+    def get_order_by_session(self, session_id: str) -> dict[str, Any] | None:
+        for entry in self.list_orders():
+            if entry.get("stripeSessionId") == session_id:
+                return entry
+        return None
+
+    def mark_order_paid(self, session_id: str, *, email: str = "") -> tuple[dict[str, Any] | None, bool]:
+        """Flip an order to 'paid'. Returns (order, newly_paid).
+
+        Idempotent: a second call on an already-paid order returns
+        ``newly_paid=False`` so the confirmation email is sent only once. The
+        orders file is small, so a read-modify-write rewrite is fine here.
+        """
+
+        path = self._orders_path()
+        if not path.exists():
+            return None, False
+        rows = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+        found: dict[str, Any] | None = None
+        newly_paid = False
+        for row in rows:
+            if row.get("stripeSessionId") == session_id:
+                found = row
+                if row.get("status") != "paid":
+                    row["status"] = "paid"
+                    row["paidAt"] = _now()
+                    newly_paid = True
+                if email and not row.get("email"):
+                    row["email"] = email
+                break
+        if found is None:
+            return None, False
+        with path.open("w", encoding="utf-8") as handle:
+            for row in rows:
+                handle.write(json.dumps(row) + "\n")
+        return found, newly_paid

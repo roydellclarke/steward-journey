@@ -114,6 +114,15 @@ class AuthConfirmBody(BaseModel):
     token: str = ""
 
 
+class CheckoutRequest(BaseModel):
+    """Start a Stripe Checkout for one of the three paid products."""
+
+    product: Literal["report", "concierge", "advisor"]
+    project_id: str | None = Field(default=None, alias="projectId")
+
+    model_config = {"populate_by_name": True}
+
+
 class BookReviewRequest(BaseModel):
     """Request a human readiness review (single human touchpoint)."""
 
