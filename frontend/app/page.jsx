@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { apiFetch } from "../lib/api";
+import { apiFetch, startCheckout } from "../lib/api";
 
 // What you get. Same strategy (JTBD + loss aversion), tighter prose, varied rhythm.
 const sampleSections = [
@@ -73,6 +73,18 @@ export default function PublicHome() {
     } catch (error) {
       setStatus(`Could not save yet: ${error.message}`);
     } finally {
+      setBusy(false);
+    }
+  }
+
+  async function buy(product) {
+    if (busy) return;
+    setBusy(true);
+    setStatus("Opening a secure checkout...");
+    try {
+      await startCheckout(product);
+    } catch (error) {
+      setStatus(`Could not start checkout: ${error.message}`);
       setBusy(false);
     }
   }
@@ -235,10 +247,10 @@ export default function PublicHome() {
           </p>
         </div>
         <div className="offerBand">
-          <article><span>Free</span><strong>Sample report</strong><p>See the questions, the score, and the plan StewardPath builds with you.</p></article>
-          <article><span>$249</span><strong>Owner readiness report</strong><p>Your private readiness, with the reasoning behind every score. It moves as you prepare, so the advisor or buyer call finds you ready.</p></article>
-          <article><span>$1,500</span><strong>Concierge package</strong><p>A guided intake, a private review with a real person, and help preparing the conversations ahead. You reach the lawyer and accountant organized, which trims their hours.</p></article>
-          <article><span>$199/mo</span><strong>Advisor pilot</strong><p>For CPAs, exit planners, and advisors guiding up to ten owner clients. Each one arrives prepared.</p></article>
+          <article><span>Free</span><strong>Sample report</strong><p>See the questions, the score, and the plan StewardPath builds with you.</p><button type="button" className="offerCta ghost" onClick={scrollToRequest}>Start free</button></article>
+          <article><span>$249</span><strong>Owner readiness report</strong><p>Your private readiness, with the reasoning behind every score. It moves as you prepare, so the advisor or buyer call finds you ready.</p><button type="button" className="offerCta" onClick={() => buy("report")} disabled={busy}>Buy the report</button></article>
+          <article><span>$1,500</span><strong>Concierge package</strong><p>A guided intake, a private review with a real person, and help preparing the conversations ahead. You reach the lawyer and accountant organized, which trims their hours.</p><button type="button" className="offerCta" onClick={() => buy("concierge")} disabled={busy}>Get the concierge package</button></article>
+          <article><span>$199/mo</span><strong>Advisor pilot</strong><p>For CPAs, exit planners, and advisors guiding up to ten owner clients. Each one arrives prepared.</p><button type="button" className="offerCta" onClick={() => buy("advisor")} disabled={busy}>Start the advisor pilot</button></article>
         </div>
       </section>
     </main>

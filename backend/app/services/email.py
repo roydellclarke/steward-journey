@@ -62,6 +62,37 @@ def build_auth_email(*, to: str, code: str, link: str, gate: str) -> AuthEmail:
     return AuthEmail(to=to, subject=subject, text_body=text_body, html_body=html_body)
 
 
+def build_purchase_email(*, to: str, product_name: str, amount_display: str) -> AuthEmail:
+    """Compose the receipt-style confirmation after a successful payment.
+
+    AuthEmail is just an email envelope (to, subject, two bodies); reusing it
+    keeps every sender working without new plumbing. Copy follows the writing
+    laws: warm, plain, no em-dashes.
+    """
+
+    product_html = escape(product_name)
+    amount_html = escape(amount_display)
+    text_body = (
+        f"Thank you. Your payment for {product_name} ({amount_display}) is confirmed.\n\n"
+        "We have your order. A person will be in touch with the next step, and your "
+        "answers stay private to you the whole way.\n\n"
+        "If you have a question, just reply to this email.\n"
+    )
+    html_body = (
+        f"<p>Thank you. Your payment for <strong>{product_html}</strong> "
+        f"({amount_html}) is confirmed.</p>"
+        "<p>We have your order. A person will be in touch with the next step, and your "
+        "answers stay private to you the whole way.</p>"
+        "<p>If you have a question, just reply to this email.</p>"
+    )
+    return AuthEmail(
+        to=to,
+        subject=f"Your StewardPath order is confirmed: {product_name}",
+        text_body=text_body,
+        html_body=html_body,
+    )
+
+
 class EmailSender(Protocol):
     def send(self, message: AuthEmail) -> None: ...
 

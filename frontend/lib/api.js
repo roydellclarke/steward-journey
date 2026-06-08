@@ -17,6 +17,17 @@ export async function apiFetch(path, options = {}) {
   return payload;
 }
 
+// Start a Stripe Checkout for one of the three paid products ("report",
+// "concierge", "advisor") and send the browser to Stripe's hosted page.
+export async function startCheckout(product, projectId = null) {
+  const { url } = await apiFetch("/checkout", {
+    method: "POST",
+    body: JSON.stringify({ product, projectId })
+  });
+  if (!url) throw new Error("Checkout could not start. Please try again.");
+  window.location.href = url;
+}
+
 export function toSnakeProfile(profile) {
   return {
     business_name: profile.businessName || "",
