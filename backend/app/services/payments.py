@@ -14,6 +14,18 @@ The frontend pricing copy must match these amounts.
 from __future__ import annotations
 
 from dataclasses import dataclass
+import json
+
+
+def _as_dict(stripe_object) -> dict:
+    """Convert a Stripe SDK object to a plain, fully-nested dict.
+
+    Stripe's objects do not expose dict's ``.get``/iteration the way plain
+    dicts do (attribute access routes through ``__getattr__``), so we serialize
+    to JSON and back. That gives callers ordinary dicts with normal ``.get``.
+    """
+
+    return json.loads(str(stripe_object))
 
 
 @dataclass(frozen=True)
@@ -134,7 +146,7 @@ class StripePayments:
         if product.mode == "payment":
             params["customer_creation"] = "always"
         try:
-            return stripe.checkout.Session.create(**params)
+            return _as_dict(stripe.checkout.Session.create(**params))
         except Exception as exc:  # noqa: BLE001 - surface any Stripe failure as ours
             raise PaymentsError(f"Could not start checkout: {exc}") from exc
 
@@ -143,7 +155,7 @@ class StripePayments:
 
         stripe = self._client()
         try:
-            return stripe.checkout.Session.retrieve(session_id)
+            return _as_dict(stripe.checkout.Session.retrieve(session_id))
         except Exception as exc:  # noqa: BLE001
             raise PaymentsError(f"Could not load checkout session: {exc}") from exc
 
@@ -156,6 +168,6 @@ class StripePayments:
             )
         stripe = self._client()
         try:
-            return stripe.Webhook.construct_event(payload, signature, self.webhook_secret)
+            return _as_dict(stripe.Webhook.construct_event(payload, signature, self.webhook_secret))
         except Exception as exc:  # noqa: BLE001 - includes signature failures
             raise PaymentsError(f"Invalid webhook signature: {exc}") from exc

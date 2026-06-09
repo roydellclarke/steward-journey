@@ -41,6 +41,7 @@ export default function PublicHome() {
     role: "Owner"
   });
   const [status, setStatus] = useState("");
+  const [payStatus, setPayStatus] = useState("");
   const [busy, setBusy] = useState(false);
 
   function updateLead(field, value) {
@@ -80,11 +81,11 @@ export default function PublicHome() {
   async function buy(product) {
     if (busy) return;
     setBusy(true);
-    setStatus("Opening a secure checkout...");
+    setPayStatus("Opening a secure checkout...");
     try {
       await startCheckout(product);
     } catch (error) {
-      setStatus(`Could not start checkout: ${error.message}`);
+      setPayStatus(`Could not start checkout: ${error.message}`);
       setBusy(false);
     }
   }
@@ -252,6 +253,7 @@ export default function PublicHome() {
           <article><span>$1,500</span><strong>Concierge package</strong><p>A guided intake, a private review with a real person, and help preparing the conversations ahead. You reach the lawyer and accountant organized, which trims their hours.</p><button type="button" className="offerCta" onClick={() => buy("concierge")} disabled={busy}>Get the concierge package</button></article>
           <article><span>$199/mo</span><strong>Advisor pilot</strong><p>For CPAs, exit planners, and advisors guiding up to ten owner clients. Each one arrives prepared.</p><button type="button" className="offerCta" onClick={() => buy("advisor")} disabled={busy}>Start the advisor pilot</button></article>
         </div>
+        {payStatus ? <p className="leadStatus" style={{ marginTop: 20 }}>{payStatus}</p> : null}
       </section>
     </main>
   );
