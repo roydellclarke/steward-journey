@@ -291,6 +291,7 @@ class ProjectStore:
             "status": order.get("status", "pending"),
             "stripeSessionId": order.get("stripeSessionId", ""),
             "email": order.get("email", ""),
+            "ownerId": order.get("ownerId") or "",
             "projectId": order.get("projectId") or "",
             "paidAt": order.get("paidAt") or "",
         }

@@ -1386,6 +1386,21 @@ textarea:focus { outline: none; border-color: var(--sp-sage); }
   cursor: default;
 }
 
+/* Returning, signed-in owner: a quiet bar that routes them back to what they
+   bought. Sits above the hero so it is the first thing they see. */
+.resumeBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px clamp(20px, 4vw, 56px);
+  background: var(--sp-green-soft, var(--sp-card));
+  border-bottom: 1px solid var(--sp-line);
+  font-weight: 600;
+  color: var(--sp-ink);
+}
+
 @media (max-width: 980px) {
   .heroLower,
   .split,

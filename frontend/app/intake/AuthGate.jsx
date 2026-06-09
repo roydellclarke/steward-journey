@@ -18,6 +18,13 @@ const GATE_COPY = {
     body: "Your readiness report is ready. Enter your email and we'll send a secure link to open it. It stays private, and you decide if you ever share it.",
     sendCta: "Send my secure code",
     verifyCta: "Open my report"
+  },
+  checkout: {
+    eyebrow: "Secure checkout",
+    title: "Sign in to continue",
+    body: "Enter your email and we'll send a secure code. Signing in first ties your purchase to your account, so you pick up right where you left off next time. No password to remember.",
+    sendCta: "Send my secure code",
+    verifyCta: "Continue to payment"
   }
 };
 

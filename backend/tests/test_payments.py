@@ -11,8 +11,25 @@ from __future__ import annotations
 
 import importlib
 import os
+import re
 import tempfile
 import unittest
+
+
+_CODE_RE = re.compile(r"Your code: (\d{6})")
+
+
+def _sign_in(client, main, email="buyer@example.com"):
+    """Run the real passwordless flow so the TestClient holds a session cookie.
+
+    Returns the owner_id for entitlement assertions. The RecordingEmailSender
+    captures the code in the email body.
+    """
+
+    client.post("/auth/request", json={"email": email, "gate": "save"})
+    code = _CODE_RE.search(main.email_sender.sent[-1].text_body).group(1)
+    client.post("/auth/verify", json={"email": email, "code": code})
+    return main.auth_store.find_or_create_owner(email)
 
 
 try:
@@ -118,7 +135,12 @@ class CheckoutApiTestCase(unittest.TestCase):
         body = self.client.get("/products").json()
         self.assertEqual(len(body["products"]), 3)
 
+    def test_checkout_requires_sign_in(self):
+        response = self.client.post("/checkout", json={"product": "report"})
+        self.assertEqual(response.status_code, 401)
+
     def test_checkout_creates_session_and_records_pending_order(self):
+        owner_id = _sign_in(self.client, self.main)
         response = self.client.post("/checkout", json={"product": "report"})
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.json()["url"], "https://stripe.test/checkout/cs_test_123")
@@ -126,24 +148,39 @@ class CheckoutApiTestCase(unittest.TestCase):
         self.assertEqual(len(orders), 1)
         self.assertEqual(orders[0]["status"], "pending")
         self.assertEqual(orders[0]["product"], "report")
+        self.assertEqual(orders[0]["ownerId"], owner_id)
 
     def test_checkout_rejects_unknown_product(self):
         response = self.client.post("/checkout", json={"product": "nope"})
         self.assertEqual(response.status_code, 422)  # Literal validation fails
 
-    def test_success_finalize_marks_paid_and_emails_once(self):
+    def test_success_finalize_marks_paid_grants_entitlement_emails_once(self):
+        owner_id = _sign_in(self.client, self.main)
         self.client.post("/checkout", json={"product": "report"})
+        before = len(self.main.email_sender.sent)
+
         status = self.client.get("/checkout/session/cs_test_123").json()
         self.assertTrue(status["paid"])
         self.assertEqual(self.main.store.get_order_by_session("cs_test_123")["status"], "paid")
-        # RecordingEmailSender captured exactly one confirmation.
-        self.assertEqual(len(self.main.email_sender.sent), 1)
-        self.assertEqual(self.main.email_sender.sent[0].to, "buyer@example.com")
+        # Entitlement is now recorded against the owner's account.
+        self.assertTrue(self.main.auth_store.has_entitlement(owner_id, "report"))
+        # Exactly one purchase confirmation went out (beyond the sign-in code).
+        self.assertEqual(len(self.main.email_sender.sent), before + 1)
+        self.assertIn("order is confirmed", self.main.email_sender.sent[-1].subject)
         # A second visit to the success page must not send another receipt.
         self.client.get("/checkout/session/cs_test_123")
-        self.assertEqual(len(self.main.email_sender.sent), 1)
+        self.assertEqual(len(self.main.email_sender.sent), before + 1)
+
+    def test_me_exposes_entitlements_after_purchase(self):
+        _sign_in(self.client, self.main)
+        self.client.post("/checkout", json={"product": "report"})
+        self.client.get("/checkout/session/cs_test_123")
+        me = self.client.get("/auth/me").json()
+        products = [e["product"] for e in me.get("entitlements", [])]
+        self.assertIn("report", products)
 
     def test_checkout_503_when_payments_unconfigured(self):
+        _sign_in(self.client, self.main)
         self.main.payments.configured = False
         response = self.client.post("/checkout", json={"product": "report"})
         self.assertEqual(response.status_code, 503)

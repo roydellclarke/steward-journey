@@ -1,7 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { apiFetch, startCheckout } from "../lib/api";
+import { authApi } from "../lib/auth";
+import AuthGate from "./intake/AuthGate";
+import "./intake/intake.css"; // overlay/auth modal styles used by AuthGate
+
+// Where each purchased product sends the owner. Payment is tied to their
+// account, so a later visit lands them on the right path too.
+const PRODUCT_PATH = {
+  report: "/intake",
+  concierge: "/intake",
+  advisor: "/advisor"
+};
+
+const CATALOG_LABEL = {
+  report: "owner readiness report",
+  concierge: "concierge package",
+  advisor: "advisor pilot"
+};
 
 // What you get. Same strategy (JTBD + loss aversion), tighter prose, varied rhythm.
 const sampleSections = [
@@ -43,6 +60,21 @@ export default function PublicHome() {
   const [status, setStatus] = useState("");
   const [payStatus, setPayStatus] = useState("");
   const [busy, setBusy] = useState(false);
+  const [account, setAccount] = useState({ authenticated: false, email: "", entitlements: [] });
+  const [pendingProduct, setPendingProduct] = useState("");
+
+  // On load, see if the owner is already signed in. If so, we can skip the
+  // sign-in step at checkout and show a resume path for what they own.
+  useEffect(() => {
+    authApi.me().then((me) => {
+      if (me.authenticated) {
+        setAccount({ authenticated: true, email: me.email, entitlements: me.entitlements || [] });
+      }
+    }).catch(() => {});
+  }, []);
+
+  // The first product the owner already paid for, used for the resume banner.
+  const ownedProduct = account.entitlements?.find((e) => e.status === "active")?.product || "";
 
   function updateLead(field, value) {
     setLead((current) => ({ ...current, [field]: value }));
@@ -80,6 +112,29 @@ export default function PublicHome() {
 
   async function buy(product) {
     if (busy) return;
+    // Sign in first so the purchase attaches to the owner's account. If they
+    // are not signed in yet, open the gate and resume the purchase after.
+    if (!account.authenticated) {
+      setPendingProduct(product);
+      return;
+    }
+    setBusy(true);
+    setPayStatus("Opening a secure checkout...");
+    try {
+      await startCheckout(product);
+    } catch (error) {
+      setPayStatus(`Could not start checkout: ${error.message}`);
+      setBusy(false);
+    }
+  }
+
+  async function onCheckoutAuthed(result) {
+    setAccount((prev) => ({ ...prev, authenticated: true, email: result.email }));
+    const product = pendingProduct;
+    setPendingProduct("");
+    if (!product) return;
+    // Go straight to Stripe; the session cookie is now set, so /checkout
+    // sees the owner. (Calling buy() here would read stale account state.)
     setBusy(true);
     setPayStatus("Opening a secure checkout...");
     try {
@@ -103,6 +158,22 @@ export default function PublicHome() {
 
   return (
     <main className="publicShell">
+      {pendingProduct ? (
+        <AuthGate
+          gate="checkout"
+          knownEmail={account.email}
+          onClose={() => setPendingProduct("")}
+          onAuthenticated={onCheckoutAuthed}
+        />
+      ) : null}
+
+      {account.authenticated && ownedProduct ? (
+        <div className="resumeBar">
+          <span>Welcome back. You have an active {CATALOG_LABEL[ownedProduct] || "purchase"}.</span>
+          <a className="primaryCta" href={PRODUCT_PATH[ownedProduct] || "/intake"}>Pick up where you left off</a>
+        </div>
+      ) : null}
+
       <section className="publicHero">
         <p className="publicEyebrow">Private, guided transition readiness for founder-led businesses</p>
         <h1>Decide what you protect before a buyer decides for you.</h1>

@@ -170,6 +170,7 @@ def build_auth_router(
             "authenticated": True,
             "email": auth_store.owner_email(owner_id),
             "projects": auth_store.projects_for_owner(owner_id),
+            "entitlements": auth_store.entitlements_for_owner(owner_id),
         }
 
     @router.post("/logout")

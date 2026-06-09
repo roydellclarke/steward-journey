@@ -111,6 +111,15 @@ class AuthStore:
                     expires_at   TEXT NOT NULL,
                     last_seen    TEXT NOT NULL
                 );
+
+                CREATE TABLE IF NOT EXISTS entitlements (
+                    owner_id          TEXT NOT NULL,
+                    product           TEXT NOT NULL,
+                    status            TEXT NOT NULL,
+                    granted_at        TEXT NOT NULL,
+                    stripe_session_id TEXT,
+                    PRIMARY KEY (owner_id, product)
+                );
                 """
             )
 
@@ -297,6 +306,51 @@ class AuthStore:
                 (project_id,),
             ).fetchone()
         return row["owner_id"] if row else None
+
+    # ---------------------------------------------------------- entitlements
+    def grant_entitlement(
+        self,
+        owner_id: str,
+        product: str,
+        *,
+        stripe_session_id: str = "",
+        status: str = "active",
+        now: datetime | None = None,
+    ) -> None:
+        """Record that an owner has paid for a product. Idempotent per (owner, product)."""
+
+        moment = now or _now()
+        with self._connect() as conn:
+            conn.execute(
+                """
+                INSERT INTO entitlements (owner_id, product, status, granted_at, stripe_session_id)
+                VALUES (?, ?, ?, ?, ?)
+                ON CONFLICT (owner_id, product) DO UPDATE SET
+                    status = excluded.status,
+                    granted_at = excluded.granted_at,
+                    stripe_session_id = excluded.stripe_session_id
+                """,
+                (owner_id, product, status, _iso(moment), stripe_session_id),
+            )
+
+    def entitlements_for_owner(self, owner_id: str) -> list[dict]:
+        with self._connect() as conn:
+            rows = conn.execute(
+                "SELECT product, status, granted_at FROM entitlements WHERE owner_id = ? ORDER BY granted_at",
+                (owner_id,),
+            ).fetchall()
+        return [
+            {"product": row["product"], "status": row["status"], "grantedAt": row["granted_at"]}
+            for row in rows
+        ]
+
+    def has_entitlement(self, owner_id: str, product: str) -> bool:
+        with self._connect() as conn:
+            row = conn.execute(
+                "SELECT 1 FROM entitlements WHERE owner_id = ? AND product = ? AND status = 'active' LIMIT 1",
+                (owner_id, product),
+            ).fetchone()
+        return row is not None
 
     # -------------------------------------------------------------- sessions
     def create_session(self, owner_id: str, session_token: str, *, ttl_days: int = 30, now: datetime | None = None) -> None:

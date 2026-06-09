@@ -414,6 +414,13 @@ def _finalize_paid_session(session_id: str, email: str) -> dict | None:
             project_id=order.get("projectId") or "n/a",
             detail={"product": order.get("product"), "orderId": order.get("id")},
         )
+        # Grant the entitlement so the owner's account remembers this purchase
+        # on every later visit, and routing can send them to the right path.
+        owner_id = order.get("ownerId") or ""
+        if owner_id and order.get("product"):
+            auth_store.grant_entitlement(
+                owner_id, order["product"], stripe_session_id=session_id
+            )
         recipient = email or order.get("email") or ""
         product = CATALOG.get(order.get("product", ""))
         if recipient and product is not None:
@@ -454,12 +461,20 @@ def list_products() -> dict:
 
 
 @app.post("/checkout", status_code=201)
-def create_checkout(request: CheckoutRequest) -> dict:
-    """Start a Stripe Checkout for a product and return the redirect URL."""
+def create_checkout(request: CheckoutRequest, http_request: Request) -> dict:
+    """Start a Stripe Checkout for a product and return the redirect URL.
+
+    The owner signs in first, so we tie the order (and the resulting
+    entitlement) to their account. That is what lets a later visit know what
+    they bought and route them to the right path.
+    """
 
     product = CATALOG.get(request.product)
     if product is None:
         raise HTTPException(status_code=400, detail="Unknown product.")
+    owner_id = session_cookie.read_owner(http_request, auth_store)
+    if not owner_id:
+        raise HTTPException(status_code=401, detail="Please sign in before paying.")
     if not payments.configured:
         raise HTTPException(
             status_code=503,
@@ -471,7 +486,7 @@ def create_checkout(request: CheckoutRequest) -> dict:
             product,
             success_url=f"{base}/checkout/success?session_id={{CHECKOUT_SESSION_ID}}",
             cancel_url=f"{base}/checkout/cancel?product={product.key}",
-            client_reference_id=request.project_id,
+            client_reference_id=owner_id,
         )
     except PaymentsError as exc:
         raise HTTPException(status_code=502, detail=str(exc)) from exc
@@ -483,6 +498,8 @@ def create_checkout(request: CheckoutRequest) -> dict:
             "mode": product.mode,
             "status": "pending",
             "stripeSessionId": session.get("id", ""),
+            "ownerId": owner_id,
+            "email": auth_store.owner_email(owner_id) or "",
             "projectId": request.project_id,
         }
     )
