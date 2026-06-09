@@ -60,9 +60,9 @@ A self-serve entry, a one-time owner purchase, a high-touch tier, and recurring 
 
 ## Status (honest cut)
 
-Built and working today: the guided intake, scoring, synthesis and briefs, the longitudinal record, privacy and data-control features, passwordless auth with enforced per-owner access, real transactional email, the marketing site, and search/AI discoverability. The product demos end to end on a real email.
+Built and working today: the guided intake, scoring, synthesis and briefs, the longitudinal record, privacy and data-control features, passwordless auth with enforced per-owner access, real transactional email, owner payments through Stripe Checkout across all four tiers, the marketing site, and search/AI discoverability. The product demos end to end on a real email, including a test-mode purchase.
 
-Not yet in place, and worth naming: a registered domain and production deploy, payment processing, the staffing model behind the human review, and live traction.
+Not yet in place, and worth naming: a registered domain and production deploy, live payment keys in place of test keys, the staffing model behind the human review, and live traction.
 
 ## Slide outline (for a deck)
 
