@@ -32,6 +32,9 @@ export const intakeApi = {
   analyze: (projectId) =>
     apiFetch(`/projects/${projectId}/intake/analyze`, { method: "POST" }),
   handoff: (projectId) => apiFetch(`/projects/${projectId}/handoff`),
+  actionPlan: (projectId) => apiFetch(`/projects/${projectId}/action-plan`),
+  completeAction: (projectId, actionId) =>
+    apiFetch(`/projects/${projectId}/action-plan/${actionId}/complete`, { method: "POST" }),
   bookReview: (projectId, payload) =>
     apiFetch(`/projects/${projectId}/book-review`, { method: "POST", body: JSON.stringify(payload) }),
   exportData: (projectId) => apiFetch(`/projects/${projectId}/export`),

@@ -563,16 +563,7 @@ function ReportView({ report, score, projectId, onBackToIntake }) {
         </div>
       </section>
 
-      {score.topGaps?.length ? (
-        <section className="reportSection">
-          <h3>Where to focus next</h3>
-          <ol className="gapList">
-            {score.topGaps.map((g) => (
-              <li key={g.gap}><strong>{g.gap}</strong><p>{g.nextStep}</p></li>
-            ))}
-          </ol>
-        </section>
-      ) : null}
+      <ActionPlan projectId={projectId} onBackToIntake={onBackToIntake} />
 
       <section className="reportSection">
         <h3>Successor paths, weighed against what you value</h3>
@@ -613,6 +604,75 @@ function ReportView({ report, score, projectId, onBackToIntake }) {
 
       {showBook ? <BookReview projectId={projectId} onClose={() => setShowBook(false)} /> : null}
     </main>
+  );
+}
+
+// The loop that turns the score into progress. Each open step points at one
+// answer; finishing it saves and moves the readiness number on the spot.
+function ActionPlan({ projectId, onBackToIntake }) {
+  const [plan, setPlan] = useState(null);
+  const [busyId, setBusyId] = useState("");
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    intakeApi.actionPlan(projectId).then(setPlan).catch(() => setError("Could not load your plan."));
+  }, [projectId]);
+
+  async function done(action) {
+    if (!action.quickComplete) { onBackToIntake?.(); return; }
+    setBusyId(action.id);
+    setError("");
+    try {
+      setPlan(await intakeApi.completeAction(projectId, action.id));
+    } catch (e) {
+      setError(e.message || "Could not update that step.");
+    } finally {
+      setBusyId("");
+    }
+  }
+
+  if (!plan) {
+    return (
+      <section className="reportSection">
+        <h3>Your plan</h3>
+        <p>{error || "Loading your steps…"}</p>
+      </section>
+    );
+  }
+
+  const open = plan.actions.filter((a) => a.status === "open");
+  const finished = plan.actions.filter((a) => a.status === "done");
+
+  return (
+    <section className="reportSection">
+      <h3>Your plan to a confident handoff</h3>
+      <p className="reportLead">
+        {plan.summary.done} of {plan.summary.total} steps done. Readiness {plan.summary.readiness}/100.
+        Each step you finish moves the number. Work at your pace.
+      </p>
+      {error ? <p className="conciergeStatus" role="alert">{error}</p> : null}
+      <ol className="planList">
+        {open.map((a) => (
+          <li key={a.id} className="planStep">
+            <div className="planStepBody">
+              <span className="planDriver">{a.driverLabel}</span>
+              <strong>{a.title}</strong>
+              <p className="planWhy">{a.why}</p>
+              <p className="planGuide">{a.guidance}</p>
+            </div>
+            <button type="button" onClick={() => done(a)} disabled={busyId === a.id}>
+              {a.quickComplete ? (busyId === a.id ? "Saving…" : "I've done this") : "Update in your answers"}
+            </button>
+          </li>
+        ))}
+      </ol>
+      {finished.length ? (
+        <details className="planDone">
+          <summary>{finished.length} done</summary>
+          <ul>{finished.map((a) => <li key={a.id}>{a.title}</li>)}</ul>
+        </details>
+      ) : null}
+    </section>
   );
 }
 

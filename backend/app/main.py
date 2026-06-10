@@ -30,6 +30,7 @@ from app.models.schemas import (
     ReflectRequest,
     RunAnalysisRequest,
 )
+from app.services.action_plan import build_action_plan, complete_action
 from app.services.email import build_email_sender, build_purchase_email
 from app.services.payments import CATALOG, PaymentsError, StripePayments
 from app.services.llm_reasoning import analyze_owner_profile_with_optional_llm
@@ -372,6 +373,41 @@ def project_handoff(project_id: str, _access: str | None = Depends(require_proje
             raise HTTPException(status_code=404, detail="Project not found")
         state = migrate_profile_to_intake_state(None, None)
     return {"handoff": build_handoff(state)}
+
+
+@app.get("/projects/{project_id}/action-plan")
+def project_action_plan(project_id: str, _access: str | None = Depends(require_project_access)) -> dict:
+    """Prioritized, completable steps from the readiness gaps. The loop that
+    turns a score into progress: each step points at one answer, and finishing
+    it moves the readiness number."""
+
+    state = store.read_intake_state(project_id)
+    if state is None:
+        if not store.get_project(project_id):
+            raise HTTPException(status_code=404, detail="Project not found")
+        state = migrate_profile_to_intake_state(None, None)
+    return build_action_plan(state)
+
+
+@app.post("/projects/{project_id}/action-plan/{action_id}/complete")
+def complete_action_step(project_id: str, action_id: str, _access: str | None = Depends(require_project_access)) -> dict:
+    """Mark a one-click step done: set its field to the good value, save, and
+    return the refreshed plan with the new readiness score."""
+
+    state = store.read_intake_state(project_id)
+    if state is None:
+        if not store.get_project(project_id):
+            raise HTTPException(status_code=404, detail="Project not found")
+        state = migrate_profile_to_intake_state(None, None)
+    updated = complete_action(state, action_id)
+    if updated is None:
+        raise HTTPException(
+            status_code=400,
+            detail="This step needs your own answer. Open the related question to record it.",
+        )
+    saved = store.save_intake_state(project_id, updated)
+    store.audit.record("action_completed", project_id=project_id, detail={"action": action_id})
+    return build_action_plan(saved or updated)
 
 
 @app.post("/projects/{project_id}/book-review", status_code=201)

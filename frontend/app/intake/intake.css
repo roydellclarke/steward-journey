@@ -1,6 +1,37 @@
 /* StewardPath concierge intake — calm, high-readability, low cognitive load.
    Large type and generous spacing for an older, non-technical audience. */
 
+/* Action plan: prioritized, completable steps in the report. */
+.planList { list-style: none; padding: 0; margin: 18px 0 0; display: grid; gap: 12px; }
+.planStep {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px;
+  border: 1px solid var(--sp-line);
+  border-radius: 12px;
+  background: var(--sp-card);
+}
+.planStepBody { min-width: 0; }
+.planDriver {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sp-sage);
+  margin-bottom: 4px;
+}
+.planStep strong { display: block; font-size: 1.05rem; }
+.planWhy { color: var(--sp-muted); margin: 4px 0 0; font-size: 0.95rem; }
+.planGuide { margin: 6px 0 0; font-size: 0.95rem; }
+.planStep button { flex: 0 0 auto; white-space: nowrap; }
+.planDone { margin-top: 16px; color: var(--sp-muted); }
+.planDone summary { cursor: pointer; font-weight: 600; }
+.planDone ul { margin: 10px 0 0; padding-left: 18px; }
+.planDone li { margin: 4px 0; }
+
 .conciergeBanner {
   display: flex;
   flex-wrap: wrap;
