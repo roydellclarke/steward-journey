@@ -1242,8 +1242,11 @@ button:focus-visible,
   line-height: 1.08;
 }
 
-/* Legal/policy pages: narrower measure and roomy headings for easy reading. */
-.legalDoc > div { max-width: 72ch; }
+/* Legal/policy pages: narrower measure, centered on the page, roomy headings. */
+.legalDoc > div { max-width: 72ch; margin-left: auto; margin-right: auto; }
+.legalDoc .publicEyebrow,
+.legalDoc h1,
+.legalDoc .legalMeta { text-align: center; }
 .legalDoc h2 {
   font-size: clamp(18px, 2vw, 22px);
   margin-top: 32px;
