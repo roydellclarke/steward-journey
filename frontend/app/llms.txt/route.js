@@ -34,7 +34,7 @@ Privacy: private by default. Answers are never shared with employees, family, or
 ## Pricing
 
 - Free: a sample report showing the questions, the score, and the plan.
-- $249: the owner readiness report, with the reasoning behind every score.
+- $249: the Owner Readiness Program, a guided walk to a confident handoff, with the reasoning behind every score. Not a static report.
 - $1,500: a concierge package with a guided intake and a private review with a real person.
 - $199/mo: an advisor pilot for CPAs, exit planners, and advisors guiding up to ten owner clients.
 

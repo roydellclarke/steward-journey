@@ -223,6 +223,18 @@ class ProjectStore:
         state = self.read_intake_state(project_id)
         return list((state or {}).get("meta", {}).get("snapshots", []))
 
+    # ---------------------------------------------------------- successors
+    def read_successors(self, project_id: str) -> list[dict[str, Any]]:
+        return _read_json(self.project_dir(project_id) / "successors.json", []) or []
+
+    def write_successors(self, project_id: str, candidates: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        for c in candidates:
+            if not c.get("id"):
+                c["id"] = str(uuid4())
+        _write_json(self.project_dir(project_id) / "successors.json", candidates)
+        self.audit.record("successors_saved", project_id=project_id, detail={"count": len(candidates)})
+        return candidates
+
     # ------------------------------------------------------------- data control
     def export_project(self, project_id: str) -> dict[str, Any] | None:
         """Everything stored for a project, for the owner's "your data" export."""
@@ -291,6 +303,7 @@ class ProjectStore:
             "status": order.get("status", "pending"),
             "stripeSessionId": order.get("stripeSessionId", ""),
             "email": order.get("email", ""),
+            "ownerId": order.get("ownerId") or "",
             "projectId": order.get("projectId") or "",
             "paidAt": order.get("paidAt") or "",
         }

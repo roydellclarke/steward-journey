@@ -1,6 +1,73 @@
 /* StewardPath concierge intake — calm, high-readability, low cognitive load.
    Large type and generous spacing for an older, non-technical audience. */
 
+/* Action plan: prioritized, completable steps in the report. */
+.planList { list-style: none; padding: 0; margin: 18px 0 0; display: grid; gap: 12px; }
+.planStep {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px;
+  border: 1px solid var(--sp-line);
+  border-radius: 12px;
+  background: var(--sp-card);
+}
+.planStepBody { min-width: 0; }
+.planDriver {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sp-sage);
+  margin-bottom: 4px;
+}
+.planStep strong { display: block; font-size: 1.05rem; }
+.planWhy { color: var(--sp-muted); margin: 4px 0 0; font-size: 0.95rem; }
+.planGuide { margin: 6px 0 0; font-size: 0.95rem; }
+.planStep button { flex: 0 0 auto; white-space: nowrap; }
+.planDone { margin-top: 16px; color: var(--sp-muted); }
+.planDone summary { cursor: pointer; font-weight: 600; }
+.planDone ul { margin: 10px 0 0; padding-left: 18px; }
+.planDone li { margin: 4px 0; }
+
+/* Successor-fit scorecard */
+.scoreList { list-style: none; padding: 0; margin: 18px 0; display: grid; gap: 10px; }
+.scoreCard { border: 1px solid var(--sp-line); border-radius: 12px; padding: 14px 18px; background: var(--sp-card); }
+.scoreCard.ruled { opacity: 0.6; }
+.scoreHead { display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; }
+.scoreHead strong { font-size: 1.05rem; }
+.scoreKind { display: block; color: var(--sp-muted); font-size: 0.85rem; }
+.scoreNums { display: flex; align-items: center; gap: 10px; }
+.fitTag { font-weight: 800; color: var(--sp-green); }
+.ruledTag { font-weight: 800; color: var(--sp-danger); }
+.offerTag { color: var(--sp-muted); font-size: 0.85rem; }
+.scoreForm { border-top: 1px solid var(--sp-line); padding-top: 18px; display: grid; gap: 14px; }
+.scoreFormRow { display: flex; gap: 12px; flex-wrap: wrap; }
+.scoreFormRow input { flex: 2 1 200px; }
+.scoreFormRow select { flex: 1 1 160px; }
+.scoreRatings { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+.ratingField { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 0.92rem; }
+.ratingField select { width: 64px; }
+.scoreDealbreaker { display: flex; gap: 10px; align-items: center; color: var(--sp-muted); font-size: 0.92rem; }
+.scoreDealbreaker input { width: auto; }
+
+.conciergeBanner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 0 20px;
+  padding: 14px 18px;
+  border: 1px solid var(--sp-line);
+  border-radius: 12px;
+  background: var(--sp-soft);
+  color: var(--sp-ink);
+  font-weight: 600;
+}
+
 .conciergeShell {
   /* Consume the shared StewardPath tokens (theme.css) for one consistent look. */
   --ink: var(--sp-ink);

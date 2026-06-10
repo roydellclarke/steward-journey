@@ -113,11 +113,19 @@ def build_auth_router(
             try:
                 email_sender.send(build_auth_email(to=email, code=code, link=link, gate=body.gate))
             except Exception:
-                # A delivery failure must not 500 the request or change the
-                # uniform response. Log it server-side (never the code) and move on.
+                # A provider delivery failure is server/config state, not account
+                # state: the send is attempted for every email under the cap, so
+                # surfacing it leaks nothing about whether an owner exists. Tell
+                # the user plainly instead of a false "code sent". Never log the code.
                 logger.exception("Sign-in email failed to send")
+                raise HTTPException(
+                    status_code=502,
+                    detail="We could not send your code right now. Please try again in a moment.",
+                )
 
-        # Uniform response regardless of existence, rate state, or send outcome.
+        # Uniform response regardless of existence or rate state. (A real
+        # delivery failure above is reported; a throttled, not-sent request
+        # still answers ok so the throttle stays invisible.)
         return {"ok": True, "ttlMinutes": settings.otp_ttl_minutes}
 
     # --------------------------------------------------------------- verify
@@ -170,6 +178,7 @@ def build_auth_router(
             "authenticated": True,
             "email": auth_store.owner_email(owner_id),
             "projects": auth_store.projects_for_owner(owner_id),
+            "entitlements": auth_store.entitlements_for_owner(owner_id),
         }
 
     @router.post("/logout")

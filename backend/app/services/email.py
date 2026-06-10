@@ -26,6 +26,8 @@ class AuthEmail:
 def _gate_intro(gate: str) -> str:
     if gate == "report":
         return "Here is your secure code to open your readiness report."
+    if gate == "checkout":
+        return "Here is your secure code to sign in and continue to payment."
     return "Here is your secure code to pick your StewardPath answers back up."
 
 

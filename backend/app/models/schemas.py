@@ -96,7 +96,7 @@ class AuthRequestBody(BaseModel):
 
     email: str = ""
     project_id: str | None = Field(default=None, alias="projectId")
-    gate: Literal["save", "report"] = "save"
+    gate: Literal["save", "report", "checkout"] = "save"
 
     model_config = {"populate_by_name": True}
 
@@ -121,6 +121,24 @@ class CheckoutRequest(BaseModel):
     project_id: str | None = Field(default=None, alias="projectId")
 
     model_config = {"populate_by_name": True}
+
+
+class SuccessorCandidate(BaseModel):
+    """One candidate weighed on the successor-fit scorecard."""
+
+    id: str = ""
+    name: str = ""
+    kind: str = "outside_buyer"
+    ratings: dict[str, int] = Field(default_factory=dict)
+    offer_strength: int = Field(default=3, alias="offerStrength")
+    dealbreaker: bool = False
+    notes: str = ""
+
+    model_config = {"populate_by_name": True}
+
+
+class SuccessorsBody(BaseModel):
+    candidates: list[SuccessorCandidate] = Field(default_factory=list)
 
 
 class BookReviewRequest(BaseModel):

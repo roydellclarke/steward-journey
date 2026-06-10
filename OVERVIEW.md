@@ -29,7 +29,7 @@ Privacy is the product, not a footnote. Everything stays private by default. The
 | What | Price | For whom |
 | --- | --- | --- |
 | Sample report | Free | Anyone curious, to see how it works |
-| Owner readiness report | $249 | An owner who wants their private readiness |
+| Owner Readiness Program | $249 | An owner who wants a guided walk to a confident handoff |
 | Concierge package | $1,500 | An owner who wants a guided check and a real review |
 | Advisor pilot | $199 a month | CPAs and planners guiding up to ten owner clients |
 

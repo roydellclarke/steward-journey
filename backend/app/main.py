@@ -29,7 +29,10 @@ from app.models.schemas import (
     ProjectUpdateRequest,
     ReflectRequest,
     RunAnalysisRequest,
+    SuccessorsBody,
 )
+from app.services.action_plan import build_action_plan, complete_action
+from app.services.successor_scorecard import build_scorecard
 from app.services.email import build_email_sender, build_purchase_email
 from app.services.payments import CATALOG, PaymentsError, StripePayments
 from app.services.llm_reasoning import analyze_owner_profile_with_optional_llm
@@ -374,6 +377,62 @@ def project_handoff(project_id: str, _access: str | None = Depends(require_proje
     return {"handoff": build_handoff(state)}
 
 
+@app.get("/projects/{project_id}/action-plan")
+def project_action_plan(project_id: str, _access: str | None = Depends(require_project_access)) -> dict:
+    """Prioritized, completable steps from the readiness gaps. The loop that
+    turns a score into progress: each step points at one answer, and finishing
+    it moves the readiness number."""
+
+    state = store.read_intake_state(project_id)
+    if state is None:
+        if not store.get_project(project_id):
+            raise HTTPException(status_code=404, detail="Project not found")
+        state = migrate_profile_to_intake_state(None, None)
+    return build_action_plan(state)
+
+
+@app.post("/projects/{project_id}/action-plan/{action_id}/complete")
+def complete_action_step(project_id: str, action_id: str, _access: str | None = Depends(require_project_access)) -> dict:
+    """Mark a one-click step done: set its field to the good value, save, and
+    return the refreshed plan with the new readiness score."""
+
+    state = store.read_intake_state(project_id)
+    if state is None:
+        if not store.get_project(project_id):
+            raise HTTPException(status_code=404, detail="Project not found")
+        state = migrate_profile_to_intake_state(None, None)
+    updated = complete_action(state, action_id)
+    if updated is None:
+        raise HTTPException(
+            status_code=400,
+            detail="This step needs your own answer. Open the related question to record it.",
+        )
+    saved = store.save_intake_state(project_id, updated)
+    store.audit.record("action_completed", project_id=project_id, detail={"action": action_id})
+    return build_action_plan(saved or updated)
+
+
+@app.get("/projects/{project_id}/successors")
+def get_successors(project_id: str, _access: str | None = Depends(require_project_access)) -> dict:
+    """The successor-fit scorecard: candidates ranked by fit to what the owner
+    values, never by the size of the offer."""
+
+    if not store.get_project(project_id):
+        raise HTTPException(status_code=404, detail="Project not found")
+    return build_scorecard(store.read_successors(project_id))
+
+
+@app.put("/projects/{project_id}/successors")
+def put_successors(project_id: str, body: SuccessorsBody, _access: str | None = Depends(require_project_access)) -> dict:
+    """Save the candidate list (full replace) and return the ranked scorecard."""
+
+    if not store.get_project(project_id):
+        raise HTTPException(status_code=404, detail="Project not found")
+    candidates = [c.model_dump(by_alias=True) for c in body.candidates]
+    saved = store.write_successors(project_id, candidates)
+    return build_scorecard(saved)
+
+
 @app.post("/projects/{project_id}/book-review", status_code=201)
 def book_review(project_id: str, request: BookReviewRequest, _access: str | None = Depends(require_project_access)) -> dict:
     """Book the human readiness review; captures the lead and the handoff package."""
@@ -402,7 +461,7 @@ def create_lead(request: LeadCreateRequest) -> dict:
 
 
 # -------------------------------------------------------------------- payments
-def _finalize_paid_session(session_id: str, email: str) -> dict | None:
+def _finalize_paid_session(session_id: str, email: str, subscription_id: str = "") -> dict | None:
     """Mark an order paid and send the confirmation once. Safe to call twice."""
 
     order, newly_paid = store.mark_order_paid(session_id, email=email)
@@ -414,6 +473,18 @@ def _finalize_paid_session(session_id: str, email: str) -> dict | None:
             project_id=order.get("projectId") or "n/a",
             detail={"product": order.get("product"), "orderId": order.get("id")},
         )
+        # Grant the entitlement so the owner's account remembers this purchase
+        # on every later visit, and routing can send them to the right path.
+        # For subscriptions we store the Stripe subscription id so a later
+        # cancellation or failed renewal can revoke access.
+        owner_id = order.get("ownerId") or ""
+        if owner_id and order.get("product"):
+            auth_store.grant_entitlement(
+                owner_id,
+                order["product"],
+                stripe_session_id=session_id,
+                stripe_subscription_id=subscription_id,
+            )
         recipient = email or order.get("email") or ""
         product = CATALOG.get(order.get("product", ""))
         if recipient and product is not None:
@@ -454,12 +525,20 @@ def list_products() -> dict:
 
 
 @app.post("/checkout", status_code=201)
-def create_checkout(request: CheckoutRequest) -> dict:
-    """Start a Stripe Checkout for a product and return the redirect URL."""
+def create_checkout(request: CheckoutRequest, http_request: Request) -> dict:
+    """Start a Stripe Checkout for a product and return the redirect URL.
+
+    The owner signs in first, so we tie the order (and the resulting
+    entitlement) to their account. That is what lets a later visit know what
+    they bought and route them to the right path.
+    """
 
     product = CATALOG.get(request.product)
     if product is None:
         raise HTTPException(status_code=400, detail="Unknown product.")
+    owner_id = session_cookie.read_owner(http_request, auth_store)
+    if not owner_id:
+        raise HTTPException(status_code=401, detail="Please sign in before paying.")
     if not payments.configured:
         raise HTTPException(
             status_code=503,
@@ -471,7 +550,7 @@ def create_checkout(request: CheckoutRequest) -> dict:
             product,
             success_url=f"{base}/checkout/success?session_id={{CHECKOUT_SESSION_ID}}",
             cancel_url=f"{base}/checkout/cancel?product={product.key}",
-            client_reference_id=request.project_id,
+            client_reference_id=owner_id,
         )
     except PaymentsError as exc:
         raise HTTPException(status_code=502, detail=str(exc)) from exc
@@ -483,6 +562,8 @@ def create_checkout(request: CheckoutRequest) -> dict:
             "mode": product.mode,
             "status": "pending",
             "stripeSessionId": session.get("id", ""),
+            "ownerId": owner_id,
+            "email": auth_store.owner_email(owner_id) or "",
             "projectId": request.project_id,
         }
     )
@@ -504,7 +585,7 @@ def checkout_session_status(session_id: str) -> dict:
     email = (session.get("customer_details") or {}).get("email", "")
     product_key = (session.get("metadata") or {}).get("product", "")
     if paid:
-        _finalize_paid_session(session_id, email)
+        _finalize_paid_session(session_id, email, session.get("subscription") or "")
     product = CATALOG.get(product_key)
     return {
         "paid": paid,
@@ -526,10 +607,28 @@ async def stripe_webhook(request: Request, stripe_signature: str = Header(defaul
         # 400 tells Stripe the event failed verification so it retries later.
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
-    if event.get("type") == "checkout.session.completed":
-        session = event["data"]["object"]
-        email = (session.get("customer_details") or {}).get("email", "")
-        _finalize_paid_session(session.get("id", ""), email)
+    event_type = event.get("type")
+    obj = (event.get("data") or {}).get("object") or {}
+
+    if event_type == "checkout.session.completed":
+        email = (obj.get("customer_details") or {}).get("email", "")
+        _finalize_paid_session(obj.get("id", ""), email, obj.get("subscription") or "")
+    elif event_type == "customer.subscription.deleted":
+        # The owner (or Stripe) ended the subscription. Revoke access.
+        changed = auth_store.set_status_by_subscription(obj.get("id", ""), "canceled")
+        if changed:
+            store.audit.record("subscription_canceled", project_id="n/a",
+                               detail={"subscription": obj.get("id", "")})
+    elif event_type == "invoice.payment_failed":
+        # A renewal charge failed. Suspend access until payment recovers.
+        changed = auth_store.set_status_by_subscription(obj.get("subscription") or "", "past_due")
+        if changed:
+            store.audit.record("subscription_past_due", project_id="n/a",
+                               detail={"subscription": obj.get("subscription") or ""})
+    elif event_type == "customer.subscription.updated":
+        # Stripe flips status to active again after a successful recovery.
+        if obj.get("status") == "active":
+            auth_store.set_status_by_subscription(obj.get("id", ""), "active")
     return {"received": True}
 
 

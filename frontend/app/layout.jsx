@@ -78,7 +78,7 @@ const structuredData = {
         "A private, guided readiness program: a readiness score across five areas, named protections, successor paths weighed against your values, and briefs you can hand to an advisor or family.",
       offers: [
         { "@type": "Offer", name: "Sample report", price: "0", priceCurrency: "USD" },
-        { "@type": "Offer", name: "Owner readiness report", price: "249", priceCurrency: "USD" },
+        { "@type": "Offer", name: "Owner Readiness Program", price: "249", priceCurrency: "USD" },
         { "@type": "Offer", name: "Concierge package", price: "1500", priceCurrency: "USD" },
         { "@type": "Offer", name: "Advisor pilot", price: "199", priceCurrency: "USD" }
       ]

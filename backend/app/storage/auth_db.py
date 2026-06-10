@@ -111,8 +111,23 @@ class AuthStore:
                     expires_at   TEXT NOT NULL,
                     last_seen    TEXT NOT NULL
                 );
+
+                CREATE TABLE IF NOT EXISTS entitlements (
+                    owner_id               TEXT NOT NULL,
+                    product                TEXT NOT NULL,
+                    status                 TEXT NOT NULL,
+                    granted_at             TEXT NOT NULL,
+                    stripe_session_id      TEXT,
+                    stripe_subscription_id TEXT,
+                    PRIMARY KEY (owner_id, product)
+                );
                 """
             )
+            # Forward migration for databases created before the subscription
+            # column existed. ADD COLUMN is a no-op once present.
+            cols = {row["name"] for row in conn.execute("PRAGMA table_info(entitlements)").fetchall()}
+            if "stripe_subscription_id" not in cols:
+                conn.execute("ALTER TABLE entitlements ADD COLUMN stripe_subscription_id TEXT")
 
     # --------------------------------------------------------------- hashing
     def _digest(self, value: str) -> str:
@@ -297,6 +312,70 @@ class AuthStore:
                 (project_id,),
             ).fetchone()
         return row["owner_id"] if row else None
+
+    # ---------------------------------------------------------- entitlements
+    def grant_entitlement(
+        self,
+        owner_id: str,
+        product: str,
+        *,
+        stripe_session_id: str = "",
+        stripe_subscription_id: str = "",
+        status: str = "active",
+        now: datetime | None = None,
+    ) -> None:
+        """Record that an owner has paid for a product. Idempotent per (owner, product)."""
+
+        moment = now or _now()
+        with self._connect() as conn:
+            conn.execute(
+                """
+                INSERT INTO entitlements
+                    (owner_id, product, status, granted_at, stripe_session_id, stripe_subscription_id)
+                VALUES (?, ?, ?, ?, ?, ?)
+                ON CONFLICT (owner_id, product) DO UPDATE SET
+                    status = excluded.status,
+                    granted_at = excluded.granted_at,
+                    stripe_session_id = excluded.stripe_session_id,
+                    stripe_subscription_id = COALESCE(NULLIF(excluded.stripe_subscription_id, ''), entitlements.stripe_subscription_id)
+                """,
+                (owner_id, product, status, _iso(moment), stripe_session_id, stripe_subscription_id),
+            )
+
+    def set_status_by_subscription(self, subscription_id: str, status: str) -> int:
+        """Flip the status of any entitlement tied to a Stripe subscription.
+
+        Used by webhook events (cancellation, failed renewal) to revoke access.
+        Returns the number of rows changed.
+        """
+
+        if not subscription_id:
+            return 0
+        with self._connect() as conn:
+            cur = conn.execute(
+                "UPDATE entitlements SET status = ? WHERE stripe_subscription_id = ?",
+                (status, subscription_id),
+            )
+            return cur.rowcount
+
+    def entitlements_for_owner(self, owner_id: str) -> list[dict]:
+        with self._connect() as conn:
+            rows = conn.execute(
+                "SELECT product, status, granted_at FROM entitlements WHERE owner_id = ? ORDER BY granted_at",
+                (owner_id,),
+            ).fetchall()
+        return [
+            {"product": row["product"], "status": row["status"], "grantedAt": row["granted_at"]}
+            for row in rows
+        ]
+
+    def has_entitlement(self, owner_id: str, product: str) -> bool:
+        with self._connect() as conn:
+            row = conn.execute(
+                "SELECT 1 FROM entitlements WHERE owner_id = ? AND product = ? AND status = 'active' LIMIT 1",
+                (owner_id, product),
+            ).fetchone()
+        return row is not None
 
     # -------------------------------------------------------------- sessions
     def create_session(self, owner_id: str, session_token: str, *, ttl_days: int = 30, now: datetime | None = None) -> None:

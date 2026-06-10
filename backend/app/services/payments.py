@@ -51,8 +51,8 @@ class Product:
 CATALOG: dict[str, Product] = {
     "report": Product(
         key="report",
-        name="Owner readiness report",
-        description="Your private readiness, with the reasoning behind every score.",
+        name="Owner Readiness Program",
+        description="A guided program you walk through to a confident handoff on your terms, with the reasoning behind every score.",
         amount_cents=24900,
         mode="payment",
     ),

@@ -33,17 +33,22 @@ export default function IntakePage() {
   const [showData, setShowData] = useState(false);
   const [resumeId, setResumeId] = useState("");
   const [authGate, setAuthGate] = useState(null); // null | "save" | "report"
-  const [account, setAccount] = useState({ authenticated: false, email: "" });
+  const [account, setAccount] = useState({ authenticated: false, email: "", entitlements: [] });
   const [pendingResume, setPendingResume] = useState(""); // a claimed project awaiting sign-in
+  const [showBook, setShowBook] = useState(false);
 
   useEffect(() => {
     const saved = typeof window !== "undefined" ? window.localStorage.getItem(STORAGE_KEY) : "";
     if (saved) setResumeId(saved);
     // Restore any existing session so we can greet a returning owner by email.
     authApi.me().then((me) => {
-      if (me.authenticated) setAccount({ authenticated: true, email: me.email });
+      if (me.authenticated) setAccount({ authenticated: true, email: me.email, entitlements: me.entitlements || [] });
     }).catch(() => {});
   }, []);
+
+  // Concierge buyers paid for a private review with a person. Surface it as a
+  // clear step inside the program, not just a line on the receipt.
+  const hasConcierge = (account.entitlements || []).some((e) => e.product === "concierge" && e.status === "active");
 
   function onSaveGatePassed(result) {
     setAccount({ authenticated: true, email: result.email });
@@ -217,6 +222,12 @@ export default function IntakePage() {
   return (
     <main className="conciergeShell">
       <ProgressHeader completion={completion} score={score} />
+      {hasConcierge ? (
+        <div className="conciergeBanner">
+          <span>Your concierge package includes a private review with a real person.</span>
+          <button type="button" className="primaryCta" onClick={() => setShowBook(true)}>Book your review</button>
+        </div>
+      ) : null}
       <div className="conciergeGrid">
         <div className="conciergeMain">
           {reflection ? (
@@ -250,6 +261,7 @@ export default function IntakePage() {
       {showData ? (
         <DataControlCenter projectId={projectId} onClose={() => setShowData(false)} />
       ) : null}
+      {showBook ? <BookReview projectId={projectId} onClose={() => setShowBook(false)} /> : null}
       {authGateEl}
     </main>
   );
@@ -551,16 +563,7 @@ function ReportView({ report, score, projectId, onBackToIntake }) {
         </div>
       </section>
 
-      {score.topGaps?.length ? (
-        <section className="reportSection">
-          <h3>Where to focus next</h3>
-          <ol className="gapList">
-            {score.topGaps.map((g) => (
-              <li key={g.gap}><strong>{g.gap}</strong><p>{g.nextStep}</p></li>
-            ))}
-          </ol>
-        </section>
-      ) : null}
+      <ActionPlan projectId={projectId} onBackToIntake={onBackToIntake} />
 
       <section className="reportSection">
         <h3>Successor paths, weighed against what you value</h3>
@@ -577,6 +580,8 @@ function ReportView({ report, score, projectId, onBackToIntake }) {
           <p className="excludedNote">Excluded at your request: {synthesis.buyerFit.excluded.map((e) => e.path).join(", ")}.</p>
         ) : null}
       </section>
+
+      <SuccessorScorecard projectId={projectId} />
 
       <section className="reportSection">
         <h3>Briefs you can use</h3>
@@ -601,6 +606,199 @@ function ReportView({ report, score, projectId, onBackToIntake }) {
 
       {showBook ? <BookReview projectId={projectId} onClose={() => setShowBook(false)} /> : null}
     </main>
+  );
+}
+
+// Weigh real candidates against what the owner values. Ranked by fit, never by
+// offer. A blank rating starts neutral (3); the owner adjusts what matters.
+const FIT_CRITERIA = [
+  ["keepsPeople", "Protects your employees"],
+  ["keepsCustomers", "Keeps customers cared for"],
+  ["keepsName", "Honors your name"],
+  ["readyToLead", "Ready to lead"],
+  ["sharesValues", "Shares your values"],
+  ["acceptsTerms", "Accepts your terms"]
+];
+const KINDS = [
+  ["family", "Family member"],
+  ["employee", "Key employee"],
+  ["manager", "Manager / team"],
+  ["outside_buyer", "Outside buyer"],
+  ["other", "Other"]
+];
+const blankCandidate = () => ({
+  name: "", kind: "outside_buyer",
+  ratings: Object.fromEntries(FIT_CRITERIA.map(([k]) => [k, 3])),
+  offerStrength: 3, dealbreaker: false
+});
+
+function SuccessorScorecard({ projectId }) {
+  const [card, setCard] = useState(null);
+  const [draft, setDraft] = useState(blankCandidate());
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    intakeApi.successors(projectId).then(setCard).catch(() => setError("Could not load your scorecard."));
+  }, [projectId]);
+
+  async function save(nextCandidates) {
+    setBusy(true);
+    setError("");
+    try {
+      setCard(await intakeApi.saveSuccessors(projectId, nextCandidates));
+    } catch (e) {
+      setError(e.message || "Could not save.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function addCandidate() {
+    if (!draft.name.trim()) { setError("Give the candidate a name first."); return; }
+    const existing = (card?.candidates || []).map((c) => ({
+      name: c.name, kind: c.kind, ratings: c.ratings, offerStrength: c.offerStrength, dealbreaker: c.dealbreaker, id: c.id
+    }));
+    save([...existing, { ...draft, name: draft.name.trim() }]);
+    setDraft(blankCandidate());
+  }
+
+  function removeCandidate(id) {
+    const kept = (card?.candidates || []).filter((c) => c.id !== id).map((c) => ({
+      name: c.name, kind: c.kind, ratings: c.ratings, offerStrength: c.offerStrength, dealbreaker: c.dealbreaker, id: c.id
+    }));
+    save(kept);
+  }
+
+  return (
+    <section className="reportSection">
+      <h3>Weigh your successors, on your terms</h3>
+      <p className="reportLead">
+        Rate each candidate on what matters to you. We rank by fit, not by the size of the offer.
+      </p>
+      {error ? <p className="conciergeStatus" role="alert">{error}</p> : null}
+
+      {card?.candidates?.length ? (
+        <ol className="scoreList">
+          {card.candidates.map((c) => (
+            <li key={c.id} className={c.ruledOut ? "scoreCard ruled" : "scoreCard"}>
+              <div className="scoreHead">
+                <div>
+                  <strong>{c.name}</strong>
+                  <span className="scoreKind">{(KINDS.find((k) => k[0] === c.kind) || [])[1] || c.kind}</span>
+                </div>
+                <div className="scoreNums">
+                  {c.ruledOut ? <span className="ruledTag">Ruled out</span> : <span className="fitTag">Fit {c.fitScore}</span>}
+                  <span className="offerTag">Offer {c.offerStrength}/5</span>
+                  <button type="button" className="softBtn" onClick={() => removeCandidate(c.id)} disabled={busy}>Remove</button>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ol>
+      ) : (
+        <p className="reportLead">No candidates yet. Add the people, or buyers, you are weighing.</p>
+      )}
+
+      <div className="scoreForm">
+        <div className="scoreFormRow">
+          <input placeholder="Candidate name" value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
+          <select value={draft.kind} onChange={(e) => setDraft({ ...draft, kind: e.target.value })}>
+            {KINDS.map(([v, label]) => <option key={v} value={v}>{label}</option>)}
+          </select>
+        </div>
+        <div className="scoreRatings">
+          {FIT_CRITERIA.map(([k, label]) => (
+            <label key={k} className="ratingField">
+              <span>{label}</span>
+              <select value={draft.ratings[k]} onChange={(e) => setDraft({ ...draft, ratings: { ...draft.ratings, [k]: Number(e.target.value) } })}>
+                {[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n}</option>)}
+              </select>
+            </label>
+          ))}
+          <label className="ratingField">
+            <span>Offer strength</span>
+            <select value={draft.offerStrength} onChange={(e) => setDraft({ ...draft, offerStrength: Number(e.target.value) })}>
+              {[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n}</option>)}
+            </select>
+          </label>
+        </div>
+        <label className="scoreDealbreaker">
+          <input type="checkbox" checked={draft.dealbreaker} onChange={(e) => setDraft({ ...draft, dealbreaker: e.target.checked })} />
+          This candidate crosses a non-negotiable (rule them out)
+        </label>
+        <button type="button" className="primaryCta" onClick={addCandidate} disabled={busy}>{busy ? "Saving…" : "Add candidate"}</button>
+      </div>
+    </section>
+  );
+}
+
+// The loop that turns the score into progress. Each open step points at one
+// answer; finishing it saves and moves the readiness number on the spot.
+function ActionPlan({ projectId, onBackToIntake }) {
+  const [plan, setPlan] = useState(null);
+  const [busyId, setBusyId] = useState("");
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    intakeApi.actionPlan(projectId).then(setPlan).catch(() => setError("Could not load your plan."));
+  }, [projectId]);
+
+  async function done(action) {
+    if (!action.quickComplete) { onBackToIntake?.(); return; }
+    setBusyId(action.id);
+    setError("");
+    try {
+      setPlan(await intakeApi.completeAction(projectId, action.id));
+    } catch (e) {
+      setError(e.message || "Could not update that step.");
+    } finally {
+      setBusyId("");
+    }
+  }
+
+  if (!plan) {
+    return (
+      <section className="reportSection">
+        <h3>Your plan</h3>
+        <p>{error || "Loading your steps…"}</p>
+      </section>
+    );
+  }
+
+  const open = plan.actions.filter((a) => a.status === "open");
+  const finished = plan.actions.filter((a) => a.status === "done");
+
+  return (
+    <section className="reportSection">
+      <h3>Your plan to a confident handoff</h3>
+      <p className="reportLead">
+        {plan.summary.done} of {plan.summary.total} steps done. Readiness {plan.summary.readiness}/100.
+        Each step you finish moves the number. Work at your pace.
+      </p>
+      {error ? <p className="conciergeStatus" role="alert">{error}</p> : null}
+      <ol className="planList">
+        {open.map((a) => (
+          <li key={a.id} className="planStep">
+            <div className="planStepBody">
+              <span className="planDriver">{a.driverLabel}</span>
+              <strong>{a.title}</strong>
+              <p className="planWhy">{a.why}</p>
+              <p className="planGuide">{a.guidance}</p>
+            </div>
+            <button type="button" onClick={() => done(a)} disabled={busyId === a.id}>
+              {a.quickComplete ? (busyId === a.id ? "Saving…" : "I've done this") : "Update in your answers"}
+            </button>
+          </li>
+        ))}
+      </ol>
+      {finished.length ? (
+        <details className="planDone">
+          <summary>{finished.length} done</summary>
+          <ul>{finished.map((a) => <li key={a.id}>{a.title}</li>)}</ul>
+        </details>
+      ) : null}
+    </section>
   );
 }
 
