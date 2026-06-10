@@ -581,6 +581,8 @@ function ReportView({ report, score, projectId, onBackToIntake }) {
         ) : null}
       </section>
 
+      <SuccessorScorecard projectId={projectId} />
+
       <section className="reportSection">
         <h3>Briefs you can use</h3>
         <p className="reportLead">Hand these to your advisor or your family. Arriving organized makes their work faster, and lighter on the bill.</p>
@@ -604,6 +606,130 @@ function ReportView({ report, score, projectId, onBackToIntake }) {
 
       {showBook ? <BookReview projectId={projectId} onClose={() => setShowBook(false)} /> : null}
     </main>
+  );
+}
+
+// Weigh real candidates against what the owner values. Ranked by fit, never by
+// offer. A blank rating starts neutral (3); the owner adjusts what matters.
+const FIT_CRITERIA = [
+  ["keepsPeople", "Protects your employees"],
+  ["keepsCustomers", "Keeps customers cared for"],
+  ["keepsName", "Honors your name"],
+  ["readyToLead", "Ready to lead"],
+  ["sharesValues", "Shares your values"],
+  ["acceptsTerms", "Accepts your terms"]
+];
+const KINDS = [
+  ["family", "Family member"],
+  ["employee", "Key employee"],
+  ["manager", "Manager / team"],
+  ["outside_buyer", "Outside buyer"],
+  ["other", "Other"]
+];
+const blankCandidate = () => ({
+  name: "", kind: "outside_buyer",
+  ratings: Object.fromEntries(FIT_CRITERIA.map(([k]) => [k, 3])),
+  offerStrength: 3, dealbreaker: false
+});
+
+function SuccessorScorecard({ projectId }) {
+  const [card, setCard] = useState(null);
+  const [draft, setDraft] = useState(blankCandidate());
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    intakeApi.successors(projectId).then(setCard).catch(() => setError("Could not load your scorecard."));
+  }, [projectId]);
+
+  async function save(nextCandidates) {
+    setBusy(true);
+    setError("");
+    try {
+      setCard(await intakeApi.saveSuccessors(projectId, nextCandidates));
+    } catch (e) {
+      setError(e.message || "Could not save.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function addCandidate() {
+    if (!draft.name.trim()) { setError("Give the candidate a name first."); return; }
+    const existing = (card?.candidates || []).map((c) => ({
+      name: c.name, kind: c.kind, ratings: c.ratings, offerStrength: c.offerStrength, dealbreaker: c.dealbreaker, id: c.id
+    }));
+    save([...existing, { ...draft, name: draft.name.trim() }]);
+    setDraft(blankCandidate());
+  }
+
+  function removeCandidate(id) {
+    const kept = (card?.candidates || []).filter((c) => c.id !== id).map((c) => ({
+      name: c.name, kind: c.kind, ratings: c.ratings, offerStrength: c.offerStrength, dealbreaker: c.dealbreaker, id: c.id
+    }));
+    save(kept);
+  }
+
+  return (
+    <section className="reportSection">
+      <h3>Weigh your successors, on your terms</h3>
+      <p className="reportLead">
+        Rate each candidate on what matters to you. We rank by fit, not by the size of the offer.
+      </p>
+      {error ? <p className="conciergeStatus" role="alert">{error}</p> : null}
+
+      {card?.candidates?.length ? (
+        <ol className="scoreList">
+          {card.candidates.map((c) => (
+            <li key={c.id} className={c.ruledOut ? "scoreCard ruled" : "scoreCard"}>
+              <div className="scoreHead">
+                <div>
+                  <strong>{c.name}</strong>
+                  <span className="scoreKind">{(KINDS.find((k) => k[0] === c.kind) || [])[1] || c.kind}</span>
+                </div>
+                <div className="scoreNums">
+                  {c.ruledOut ? <span className="ruledTag">Ruled out</span> : <span className="fitTag">Fit {c.fitScore}</span>}
+                  <span className="offerTag">Offer {c.offerStrength}/5</span>
+                  <button type="button" className="softBtn" onClick={() => removeCandidate(c.id)} disabled={busy}>Remove</button>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ol>
+      ) : (
+        <p className="reportLead">No candidates yet. Add the people, or buyers, you are weighing.</p>
+      )}
+
+      <div className="scoreForm">
+        <div className="scoreFormRow">
+          <input placeholder="Candidate name" value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
+          <select value={draft.kind} onChange={(e) => setDraft({ ...draft, kind: e.target.value })}>
+            {KINDS.map(([v, label]) => <option key={v} value={v}>{label}</option>)}
+          </select>
+        </div>
+        <div className="scoreRatings">
+          {FIT_CRITERIA.map(([k, label]) => (
+            <label key={k} className="ratingField">
+              <span>{label}</span>
+              <select value={draft.ratings[k]} onChange={(e) => setDraft({ ...draft, ratings: { ...draft.ratings, [k]: Number(e.target.value) } })}>
+                {[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n}</option>)}
+              </select>
+            </label>
+          ))}
+          <label className="ratingField">
+            <span>Offer strength</span>
+            <select value={draft.offerStrength} onChange={(e) => setDraft({ ...draft, offerStrength: Number(e.target.value) })}>
+              {[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n}</option>)}
+            </select>
+          </label>
+        </div>
+        <label className="scoreDealbreaker">
+          <input type="checkbox" checked={draft.dealbreaker} onChange={(e) => setDraft({ ...draft, dealbreaker: e.target.checked })} />
+          This candidate crosses a non-negotiable (rule them out)
+        </label>
+        <button type="button" className="primaryCta" onClick={addCandidate} disabled={busy}>{busy ? "Saving…" : "Add candidate"}</button>
+      </div>
+    </section>
   );
 }
 

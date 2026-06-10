@@ -29,8 +29,10 @@ from app.models.schemas import (
     ProjectUpdateRequest,
     ReflectRequest,
     RunAnalysisRequest,
+    SuccessorsBody,
 )
 from app.services.action_plan import build_action_plan, complete_action
+from app.services.successor_scorecard import build_scorecard
 from app.services.email import build_email_sender, build_purchase_email
 from app.services.payments import CATALOG, PaymentsError, StripePayments
 from app.services.llm_reasoning import analyze_owner_profile_with_optional_llm
@@ -408,6 +410,27 @@ def complete_action_step(project_id: str, action_id: str, _access: str | None = 
     saved = store.save_intake_state(project_id, updated)
     store.audit.record("action_completed", project_id=project_id, detail={"action": action_id})
     return build_action_plan(saved or updated)
+
+
+@app.get("/projects/{project_id}/successors")
+def get_successors(project_id: str, _access: str | None = Depends(require_project_access)) -> dict:
+    """The successor-fit scorecard: candidates ranked by fit to what the owner
+    values, never by the size of the offer."""
+
+    if not store.get_project(project_id):
+        raise HTTPException(status_code=404, detail="Project not found")
+    return build_scorecard(store.read_successors(project_id))
+
+
+@app.put("/projects/{project_id}/successors")
+def put_successors(project_id: str, body: SuccessorsBody, _access: str | None = Depends(require_project_access)) -> dict:
+    """Save the candidate list (full replace) and return the ranked scorecard."""
+
+    if not store.get_project(project_id):
+        raise HTTPException(status_code=404, detail="Project not found")
+    candidates = [c.model_dump(by_alias=True) for c in body.candidates]
+    saved = store.write_successors(project_id, candidates)
+    return build_scorecard(saved)
 
 
 @app.post("/projects/{project_id}/book-review", status_code=201)

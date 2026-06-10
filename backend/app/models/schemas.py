@@ -123,6 +123,24 @@ class CheckoutRequest(BaseModel):
     model_config = {"populate_by_name": True}
 
 
+class SuccessorCandidate(BaseModel):
+    """One candidate weighed on the successor-fit scorecard."""
+
+    id: str = ""
+    name: str = ""
+    kind: str = "outside_buyer"
+    ratings: dict[str, int] = Field(default_factory=dict)
+    offer_strength: int = Field(default=3, alias="offerStrength")
+    dealbreaker: bool = False
+    notes: str = ""
+
+    model_config = {"populate_by_name": True}
+
+
+class SuccessorsBody(BaseModel):
+    candidates: list[SuccessorCandidate] = Field(default_factory=list)
+
+
 class BookReviewRequest(BaseModel):
     """Request a human readiness review (single human touchpoint)."""
 

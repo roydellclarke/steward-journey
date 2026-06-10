@@ -32,6 +32,27 @@
 .planDone ul { margin: 10px 0 0; padding-left: 18px; }
 .planDone li { margin: 4px 0; }
 
+/* Successor-fit scorecard */
+.scoreList { list-style: none; padding: 0; margin: 18px 0; display: grid; gap: 10px; }
+.scoreCard { border: 1px solid var(--sp-line); border-radius: 12px; padding: 14px 18px; background: var(--sp-card); }
+.scoreCard.ruled { opacity: 0.6; }
+.scoreHead { display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; }
+.scoreHead strong { font-size: 1.05rem; }
+.scoreKind { display: block; color: var(--sp-muted); font-size: 0.85rem; }
+.scoreNums { display: flex; align-items: center; gap: 10px; }
+.fitTag { font-weight: 800; color: var(--sp-green); }
+.ruledTag { font-weight: 800; color: var(--sp-danger); }
+.offerTag { color: var(--sp-muted); font-size: 0.85rem; }
+.scoreForm { border-top: 1px solid var(--sp-line); padding-top: 18px; display: grid; gap: 14px; }
+.scoreFormRow { display: flex; gap: 12px; flex-wrap: wrap; }
+.scoreFormRow input { flex: 2 1 200px; }
+.scoreFormRow select { flex: 1 1 160px; }
+.scoreRatings { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+.ratingField { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 0.92rem; }
+.ratingField select { width: 64px; }
+.scoreDealbreaker { display: flex; gap: 10px; align-items: center; color: var(--sp-muted); font-size: 0.92rem; }
+.scoreDealbreaker input { width: auto; }
+
 .conciergeBanner {
   display: flex;
   flex-wrap: wrap;

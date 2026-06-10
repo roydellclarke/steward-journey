@@ -35,6 +35,9 @@ export const intakeApi = {
   actionPlan: (projectId) => apiFetch(`/projects/${projectId}/action-plan`),
   completeAction: (projectId, actionId) =>
     apiFetch(`/projects/${projectId}/action-plan/${actionId}/complete`, { method: "POST" }),
+  successors: (projectId) => apiFetch(`/projects/${projectId}/successors`),
+  saveSuccessors: (projectId, candidates) =>
+    apiFetch(`/projects/${projectId}/successors`, { method: "PUT", body: JSON.stringify({ candidates }) }),
   bookReview: (projectId, payload) =>
     apiFetch(`/projects/${projectId}/book-review`, { method: "POST", body: JSON.stringify(payload) }),
   exportData: (projectId) => apiFetch(`/projects/${projectId}/export`),
