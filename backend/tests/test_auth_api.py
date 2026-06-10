@@ -270,5 +270,21 @@ class TestRateLimitAndPrivacy(AuthApiTestCase):
         self.assertFalse(self.client.get("/auth/me").json()["authenticated"])
 
 
+class TestSendFailureSurfaced(AuthApiTestCase):
+    def test_request_reports_error_when_provider_send_fails(self):
+        # The route closure holds this exact sender object, so patching its
+        # send method exercises the real delivery-failure path.
+        def boom(_message):
+            raise RuntimeError("provider down")
+
+        self.main.email_sender.send = boom
+        resp = self._request()
+        self.assertEqual(resp.status_code, 502)
+        self.assertIn("could not send your code", resp.json()["detail"].lower())
+
+    def test_request_still_ok_when_send_succeeds(self):
+        self.assertEqual(self._request().status_code, 200)
+
+
 if __name__ == "__main__":
     unittest.main()
