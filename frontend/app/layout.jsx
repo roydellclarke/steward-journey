@@ -56,7 +56,17 @@ const structuredData = {
       name: SITE_NAME,
       url: SITE_URL,
       slogan: TAGLINE,
-      description: DESCRIPTION
+      description: DESCRIPTION,
+      knowsAbout: [
+        "business succession planning",
+        "exit planning",
+        "selling a business",
+        "business transition readiness",
+        "family business succession",
+        "successor selection",
+        "founder dependency",
+        "business handoff preparation"
+      ]
     },
     {
       "@type": "WebSite",
@@ -108,6 +118,46 @@ const structuredData = {
           acceptedAnswer: {
             "@type": "Answer",
             text: "Five areas: financial clarity, how well the business runs without you, what is written down, family alignment, and your readiness to step back. Each comes with the reasoning behind it."
+          }
+        },
+        {
+          "@type": "Question",
+          name: "How do I prepare to sell my business?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "Start before a broker or buyer sets the terms. StewardPath gives a private readiness score across five areas, a prioritized action plan that lifts the score as you finish steps, and briefs to hand your advisor, so you walk in ready."
+          }
+        },
+        {
+          "@type": "Question",
+          name: "Who should take over my family business?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "StewardPath includes a successor-fit scorecard that ranks family members, key employees, managers, and outside buyers by how well they fit your values, not by the size of their offer. A candidate who crosses a non-negotiable is ruled out."
+          }
+        },
+        {
+          "@type": "Question",
+          name: "How do I sell my business without hurting my employees?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "StewardPath helps you name what you refuse to lose, your people's jobs, your customers' trust, and your name, then weigh buyers and successors against it, so you choose by fit and not only by price."
+          }
+        },
+        {
+          "@type": "Question",
+          name: "How much does StewardPath cost?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "A free sample, the Owner Readiness Program at $249, a $1,500 concierge package with a private review by a real person, and a $199 per month advisor pilot for CPAs, exit planners, and advisors."
+          }
+        },
+        {
+          "@type": "Question",
+          name: "How is StewardPath different from a business broker?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "A broker sells the business and optimizes for price. StewardPath helps the owner get ready first and choose the next owner by fit to their values, in private, before any broker or buyer sets the terms. It is preparation, not brokerage."
           }
         }
       ]
