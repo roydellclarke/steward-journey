@@ -96,7 +96,7 @@ class AuthRequestBody(BaseModel):
 
     email: str = ""
     project_id: str | None = Field(default=None, alias="projectId")
-    gate: Literal["save", "report"] = "save"
+    gate: Literal["save", "report", "checkout"] = "save"
 
     model_config = {"populate_by_name": True}
 
