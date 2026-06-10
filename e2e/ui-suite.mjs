@@ -209,6 +209,16 @@ async function main() {
 
   await auditPage(browser, "/advisor", "advisor");
 
+  // Legal/trust pages must exist and be linked from the footer.
+  await auditPage(browser, "/privacy", "privacy", async (page) => {
+    const linked = await page.$$eval(".footLinks a", (els) => els.some((a) => a.getAttribute("href") === "/privacy"));
+    linked ? pass("privacy: linked in footer") : warn("privacy: not linked in footer");
+  });
+  await auditPage(browser, "/terms", "terms", async (page) => {
+    const linked = await page.$$eval(".footLinks a", (els) => els.some((a) => a.getAttribute("href") === "/terms"));
+    linked ? pass("terms: linked in footer") : warn("terms: not linked in footer");
+  });
+
   await testBuyReachesStripe(browser);
 
   await browser.close();

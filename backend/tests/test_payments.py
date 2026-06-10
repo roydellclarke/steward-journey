@@ -10,6 +10,7 @@ Run:  python -m unittest discover -s backend/tests
 from __future__ import annotations
 
 import importlib
+import json
 import os
 import re
 import tempfile
@@ -41,8 +42,31 @@ except Exception:  # pragma: no cover
     HAS_STACK = False
 
 
+from pathlib import Path
+
 from app.services.payments import CATALOG
+from app.storage.auth_db import AuthStore
 from app.storage.projects import ProjectStore
+
+
+class EntitlementLifecycleTestCase(unittest.TestCase):
+    def setUp(self):
+        self.auth = AuthStore(Path(tempfile.mkdtemp()) / "auth.db", "secret")
+
+    def test_subscription_revoked_on_cancel(self):
+        owner = self.auth.find_or_create_owner("advisor@example.com")
+        self.auth.grant_entitlement(owner, "advisor", stripe_subscription_id="sub_123")
+        self.assertTrue(self.auth.has_entitlement(owner, "advisor"))
+        self.assertEqual(self.auth.set_status_by_subscription("sub_123", "canceled"), 1)
+        self.assertFalse(self.auth.has_entitlement(owner, "advisor"))
+
+    def test_failed_payment_suspends_then_recovers(self):
+        owner = self.auth.find_or_create_owner("advisor2@example.com")
+        self.auth.grant_entitlement(owner, "advisor", stripe_subscription_id="sub_9")
+        self.auth.set_status_by_subscription("sub_9", "past_due")
+        self.assertFalse(self.auth.has_entitlement(owner, "advisor"))
+        self.auth.set_status_by_subscription("sub_9", "active")
+        self.assertTrue(self.auth.has_entitlement(owner, "advisor"))
 
 
 class CatalogTestCase(unittest.TestCase):
@@ -123,6 +147,10 @@ class _FakePayments:
             metadata={"product": "report"},
         )
 
+    def parse_webhook_event(self, payload, signature):
+        import json
+        return json.loads(payload)
+
 
 @unittest.skipUnless(HAS_STACK, "FastAPI/slowapi/itsdangerous not installed in this environment")
 class CheckoutApiTestCase(unittest.TestCase):
@@ -184,6 +212,15 @@ class CheckoutApiTestCase(unittest.TestCase):
         self.main.payments.configured = False
         response = self.client.post("/checkout", json={"product": "report"})
         self.assertEqual(response.status_code, 503)
+
+    def test_webhook_cancellation_revokes_entitlement(self):
+        owner = self.main.auth_store.find_or_create_owner("adv@example.com")
+        self.main.auth_store.grant_entitlement(owner, "advisor", stripe_subscription_id="sub_abc")
+        self.assertTrue(self.main.auth_store.has_entitlement(owner, "advisor"))
+        body = json.dumps({"type": "customer.subscription.deleted", "data": {"object": {"id": "sub_abc"}}})
+        resp = self.client.post("/stripe/webhook", content=body, headers={"stripe-signature": "x"})
+        self.assertEqual(resp.status_code, 200)
+        self.assertFalse(self.main.auth_store.has_entitlement(owner, "advisor"))
 
 
 if __name__ == "__main__":

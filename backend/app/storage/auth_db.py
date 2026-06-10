@@ -113,15 +113,21 @@ class AuthStore:
                 );
 
                 CREATE TABLE IF NOT EXISTS entitlements (
-                    owner_id          TEXT NOT NULL,
-                    product           TEXT NOT NULL,
-                    status            TEXT NOT NULL,
-                    granted_at        TEXT NOT NULL,
-                    stripe_session_id TEXT,
+                    owner_id               TEXT NOT NULL,
+                    product                TEXT NOT NULL,
+                    status                 TEXT NOT NULL,
+                    granted_at             TEXT NOT NULL,
+                    stripe_session_id      TEXT,
+                    stripe_subscription_id TEXT,
                     PRIMARY KEY (owner_id, product)
                 );
                 """
             )
+            # Forward migration for databases created before the subscription
+            # column existed. ADD COLUMN is a no-op once present.
+            cols = {row["name"] for row in conn.execute("PRAGMA table_info(entitlements)").fetchall()}
+            if "stripe_subscription_id" not in cols:
+                conn.execute("ALTER TABLE entitlements ADD COLUMN stripe_subscription_id TEXT")
 
     # --------------------------------------------------------------- hashing
     def _digest(self, value: str) -> str:
@@ -314,6 +320,7 @@ class AuthStore:
         product: str,
         *,
         stripe_session_id: str = "",
+        stripe_subscription_id: str = "",
         status: str = "active",
         now: datetime | None = None,
     ) -> None:
@@ -323,15 +330,33 @@ class AuthStore:
         with self._connect() as conn:
             conn.execute(
                 """
-                INSERT INTO entitlements (owner_id, product, status, granted_at, stripe_session_id)
-                VALUES (?, ?, ?, ?, ?)
+                INSERT INTO entitlements
+                    (owner_id, product, status, granted_at, stripe_session_id, stripe_subscription_id)
+                VALUES (?, ?, ?, ?, ?, ?)
                 ON CONFLICT (owner_id, product) DO UPDATE SET
                     status = excluded.status,
                     granted_at = excluded.granted_at,
-                    stripe_session_id = excluded.stripe_session_id
+                    stripe_session_id = excluded.stripe_session_id,
+                    stripe_subscription_id = COALESCE(NULLIF(excluded.stripe_subscription_id, ''), entitlements.stripe_subscription_id)
                 """,
-                (owner_id, product, status, _iso(moment), stripe_session_id),
+                (owner_id, product, status, _iso(moment), stripe_session_id, stripe_subscription_id),
             )
+
+    def set_status_by_subscription(self, subscription_id: str, status: str) -> int:
+        """Flip the status of any entitlement tied to a Stripe subscription.
+
+        Used by webhook events (cancellation, failed renewal) to revoke access.
+        Returns the number of rows changed.
+        """
+
+        if not subscription_id:
+            return 0
+        with self._connect() as conn:
+            cur = conn.execute(
+                "UPDATE entitlements SET status = ? WHERE stripe_subscription_id = ?",
+                (status, subscription_id),
+            )
+            return cur.rowcount
 
     def entitlements_for_owner(self, owner_id: str) -> list[dict]:
         with self._connect() as conn:

@@ -43,11 +43,11 @@ export default function CheckoutSuccess() {
       <section className="publicBand">
         <div>
           <p className="publicEyebrow">Payment</p>
-          {state.phase === "checking" && <h2>Confirming your payment...</h2>}
+          {state.phase === "checking" && <h1>Confirming your payment...</h1>}
 
           {state.phase === "paid" && (
             <>
-              <h2>Thank you. Your payment is confirmed.</h2>
+              <h1>Thank you. Your payment is confirmed.</h1>
               <p>
                 You bought {state.productName}
                 {state.amount ? ` (${state.amount})` : ""}. We sent a confirmation to
@@ -71,7 +71,7 @@ export default function CheckoutSuccess() {
 
           {state.phase === "pending" && (
             <>
-              <h2>We are still confirming this payment.</h2>
+              <h1>We are still confirming this payment.</h1>
               <p>
                 Stripe has not marked it complete yet. Give it a moment and refresh.
                 If it does not clear, no charge was made and you can try again.
@@ -81,7 +81,7 @@ export default function CheckoutSuccess() {
 
           {state.phase === "error" && (
             <>
-              <h2>We could not confirm this payment.</h2>
+              <h1>We could not confirm this payment.</h1>
               <p>
                 If you were charged, you will still get a confirmation email. You can
                 also reach us and we will sort it out.

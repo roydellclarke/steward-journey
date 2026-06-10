@@ -9,7 +9,7 @@ export default function CheckoutCancel() {
       <section className="publicBand">
         <div>
           <p className="publicEyebrow">Payment</p>
-          <h2>No charge was made.</h2>
+          <h1>No charge was made.</h1>
           <p>
             You left checkout before paying, so nothing happened. You can pick the
             option again whenever you are ready, or start the free check first.

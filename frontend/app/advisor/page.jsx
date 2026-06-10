@@ -24,7 +24,7 @@ export default function AdvisorArea() {
 
           {account.active ? (
             <>
-              <h2>You're in. Your advisor pilot is active.</h2>
+              <h1>You're in. Your advisor pilot is active.</h1>
               <p>
                 Thank you for joining. Your pilot covers up to ten owner clients,
                 each one arriving prepared with their own private readiness.
@@ -41,7 +41,7 @@ export default function AdvisorArea() {
             </>
           ) : (
             <>
-              <h2>The advisor pilot</h2>
+              <h1>The advisor pilot</h1>
               <p>
                 For CPAs, exit planners, and advisors guiding up to ten owner
                 clients. Each one arrives prepared. Start the pilot from the

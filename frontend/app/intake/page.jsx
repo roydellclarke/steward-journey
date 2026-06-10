@@ -33,17 +33,22 @@ export default function IntakePage() {
   const [showData, setShowData] = useState(false);
   const [resumeId, setResumeId] = useState("");
   const [authGate, setAuthGate] = useState(null); // null | "save" | "report"
-  const [account, setAccount] = useState({ authenticated: false, email: "" });
+  const [account, setAccount] = useState({ authenticated: false, email: "", entitlements: [] });
   const [pendingResume, setPendingResume] = useState(""); // a claimed project awaiting sign-in
+  const [showBook, setShowBook] = useState(false);
 
   useEffect(() => {
     const saved = typeof window !== "undefined" ? window.localStorage.getItem(STORAGE_KEY) : "";
     if (saved) setResumeId(saved);
     // Restore any existing session so we can greet a returning owner by email.
     authApi.me().then((me) => {
-      if (me.authenticated) setAccount({ authenticated: true, email: me.email });
+      if (me.authenticated) setAccount({ authenticated: true, email: me.email, entitlements: me.entitlements || [] });
     }).catch(() => {});
   }, []);
+
+  // Concierge buyers paid for a private review with a person. Surface it as a
+  // clear step inside the program, not just a line on the receipt.
+  const hasConcierge = (account.entitlements || []).some((e) => e.product === "concierge" && e.status === "active");
 
   function onSaveGatePassed(result) {
     setAccount({ authenticated: true, email: result.email });
@@ -217,6 +222,12 @@ export default function IntakePage() {
   return (
     <main className="conciergeShell">
       <ProgressHeader completion={completion} score={score} />
+      {hasConcierge ? (
+        <div className="conciergeBanner">
+          <span>Your concierge package includes a private review with a real person.</span>
+          <button type="button" className="primaryCta" onClick={() => setShowBook(true)}>Book your review</button>
+        </div>
+      ) : null}
       <div className="conciergeGrid">
         <div className="conciergeMain">
           {reflection ? (
@@ -250,6 +261,7 @@ export default function IntakePage() {
       {showData ? (
         <DataControlCenter projectId={projectId} onClose={() => setShowData(false)} />
       ) : null}
+      {showBook ? <BookReview projectId={projectId} onClose={() => setShowBook(false)} /> : null}
       {authGateEl}
     </main>
   );

@@ -1,6 +1,21 @@
 /* StewardPath concierge intake — calm, high-readability, low cognitive load.
    Large type and generous spacing for an older, non-technical audience. */
 
+.conciergeBanner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 0 20px;
+  padding: 14px 18px;
+  border: 1px solid var(--sp-line);
+  border-radius: 12px;
+  background: var(--sp-soft);
+  color: var(--sp-ink);
+  font-weight: 600;
+}
+
 .conciergeShell {
   /* Consume the shared StewardPath tokens (theme.css) for one consistent look. */
   --ink: var(--sp-ink);

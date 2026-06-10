@@ -65,7 +65,8 @@ export function SiteFooter() {
         <nav className="footLinks" aria-label="Footer">
           <a href="/">Home</a>
           <a href="/intake">Readiness program</a>
-          <a href="/#confidentiality">Privacy</a>
+          <a href="/privacy">Privacy</a>
+          <a href="/terms">Terms</a>
         </nav>
       </div>
       <p className="footFine">

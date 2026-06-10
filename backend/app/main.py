@@ -402,7 +402,7 @@ def create_lead(request: LeadCreateRequest) -> dict:
 
 
 # -------------------------------------------------------------------- payments
-def _finalize_paid_session(session_id: str, email: str) -> dict | None:
+def _finalize_paid_session(session_id: str, email: str, subscription_id: str = "") -> dict | None:
     """Mark an order paid and send the confirmation once. Safe to call twice."""
 
     order, newly_paid = store.mark_order_paid(session_id, email=email)
@@ -416,10 +416,15 @@ def _finalize_paid_session(session_id: str, email: str) -> dict | None:
         )
         # Grant the entitlement so the owner's account remembers this purchase
         # on every later visit, and routing can send them to the right path.
+        # For subscriptions we store the Stripe subscription id so a later
+        # cancellation or failed renewal can revoke access.
         owner_id = order.get("ownerId") or ""
         if owner_id and order.get("product"):
             auth_store.grant_entitlement(
-                owner_id, order["product"], stripe_session_id=session_id
+                owner_id,
+                order["product"],
+                stripe_session_id=session_id,
+                stripe_subscription_id=subscription_id,
             )
         recipient = email or order.get("email") or ""
         product = CATALOG.get(order.get("product", ""))
@@ -521,7 +526,7 @@ def checkout_session_status(session_id: str) -> dict:
     email = (session.get("customer_details") or {}).get("email", "")
     product_key = (session.get("metadata") or {}).get("product", "")
     if paid:
-        _finalize_paid_session(session_id, email)
+        _finalize_paid_session(session_id, email, session.get("subscription") or "")
     product = CATALOG.get(product_key)
     return {
         "paid": paid,
@@ -543,10 +548,28 @@ async def stripe_webhook(request: Request, stripe_signature: str = Header(defaul
         # 400 tells Stripe the event failed verification so it retries later.
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
-    if event.get("type") == "checkout.session.completed":
-        session = event["data"]["object"]
-        email = (session.get("customer_details") or {}).get("email", "")
-        _finalize_paid_session(session.get("id", ""), email)
+    event_type = event.get("type")
+    obj = (event.get("data") or {}).get("object") or {}
+
+    if event_type == "checkout.session.completed":
+        email = (obj.get("customer_details") or {}).get("email", "")
+        _finalize_paid_session(obj.get("id", ""), email, obj.get("subscription") or "")
+    elif event_type == "customer.subscription.deleted":
+        # The owner (or Stripe) ended the subscription. Revoke access.
+        changed = auth_store.set_status_by_subscription(obj.get("id", ""), "canceled")
+        if changed:
+            store.audit.record("subscription_canceled", project_id="n/a",
+                               detail={"subscription": obj.get("id", "")})
+    elif event_type == "invoice.payment_failed":
+        # A renewal charge failed. Suspend access until payment recovers.
+        changed = auth_store.set_status_by_subscription(obj.get("subscription") or "", "past_due")
+        if changed:
+            store.audit.record("subscription_past_due", project_id="n/a",
+                               detail={"subscription": obj.get("subscription") or ""})
+    elif event_type == "customer.subscription.updated":
+        # Stripe flips status to active again after a successful recovery.
+        if obj.get("status") == "active":
+            auth_store.set_status_by_subscription(obj.get("id", ""), "active")
     return {"received": True}
 
 
