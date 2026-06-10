@@ -22,12 +22,12 @@ const CATALOG_LABEL = {
 
 // What you get. Same strategy (JTBD + loss aversion), tighter prose, varied rhythm.
 const sampleSections = [
-  ["A guided check that listens", "It asks at your pace and shows you what it heard. No blank forms. No jargon."],
-  ["A readiness score you can read", "One number across five areas, each with the reason behind it. You see exactly where you stand."],
-  ["What you refuse to lose", "Name the people, standards, and reputation that must survive the handoff. We keep it private."],
-  ["Successor paths, your way", "Weigh family, employees, managers, and outside buyers against what you value. Rule out the ones you would never accept."],
-  ["Briefs you can hand over", "An advisor summary, a family guide, a successor brief. Drawn only from what you told us."],
-  ["A plan you return to", "Save it. Come back. Watch the score climb as you prepare."]
+  ["A guided check that listens", "It asks at your pace and shows you what it heard. No blank forms. No big words."],
+  ["A readiness score you can read", "One number across five areas, each with the reason behind it. You see right where you stand."],
+  ["What you refuse to lose", "Name the people, standards, and good name that must make it through the handoff. We keep it private."],
+  ["The right next owner, your way", "Weigh family, workers, managers, and outside buyers against what matters to you. Rule out any you would never accept."],
+  ["Notes you can hand over", "A summary for your advisor, a guide for your family, a note on the right next owner. All built only from what you told us."],
+  ["A plan you come back to", "Save it. Come back. Watch the score go up as you get ready."]
 ];
 
 // What it feels like to use, in plain owner's language. Grade-7 reading level.
@@ -41,13 +41,13 @@ const outcomes = [
 ];
 
 const journeySteps = [
-  ["1", "Begin privately", "A short trust step comes first: what we collect, why, and how you stay in control. Then you start when you are ready."],
-  ["2", "Share at your pace", "Easy questions first. The hard ones come later, with a word of reassurance before each. \"I don't know\" counts as an answer."],
-  ["3", "See where you stand", "A readiness score with its reasoning, your biggest openings, and successor paths weighed your way."],
-  ["4", "Bring in a person", "Book a private review. A human picks up where you left off, with only what you chose to share."]
+  ["1", "Begin privately", "First we show you what we collect, why, and how you stay in control. Then you begin when you are ready."],
+  ["2", "Share at your pace", "Easy questions first. Harder ones come later, with a kind word before each. \"I don't know\" is a fine answer."],
+  ["3", "See where you stand", "You get a clear score, the reasons behind it, your biggest gaps, and who could take over, weighed your way."],
+  ["4", "Bring in a person", "Book a private review. A real person picks up where you left off, and sees only what you chose to share."]
 ];
 
-const advisorTypes = ["Owner", "CPA", "Exit planner", "Wealth advisor", "Estate attorney", "Community bank", "Other advisor"];
+const advisorTypes = ["Owner", "CPA", "Exit planner", "Wealth advisor", "Estate lawyer", "Community bank", "Other advisor"];
 
 export default function PublicHome() {
   const [lead, setLead] = useState({
@@ -175,17 +175,17 @@ export default function PublicHome() {
       ) : null}
 
       <section className="publicHero">
-        <p className="publicEyebrow">Private, guided transition readiness for founder-led businesses</p>
+        <p className="publicEyebrow">A private, guided way to get ready to hand off your business</p>
         <h1>Decide what you protect before a buyer decides for you.</h1>
         <div className="heroLower">
           <div className="heroLead">
             <p>
-              You built more than an asset. You built trust with the people who
+              You built more than a business. You built trust with the people who
               work for you, the customers who count on you, and the town that
-              knows your name. StewardPath walks you through the decision before
-              anyone else frames it: what you could lose, what to fix first, and
-              which kind of owner would carry it forward. You won't do this
-              alone. Nothing leaves this space unless you say so.
+              knows your name. StewardPath helps you make the big choice before
+              anyone else makes it for you: what you could lose, what to fix
+              first, and who should run it next. You will not do this alone.
+              Nothing leaves this page unless you say so.
             </p>
             <div className="publicActions">
               <a href="/intake" className="primaryCta">Start private readiness check</a>
@@ -200,11 +200,11 @@ export default function PublicHome() {
             <span>StewardPath helps you answer</span>
             <strong>What should not be lost if you step back?</strong>
             <ul>
-              <li>Where the business still leans on you</li>
-              <li>What a careful buyer will question</li>
-              <li>Which successor paths fit your values</li>
-              <li>What to keep private until fit is real</li>
-              <li>What to prepare before the advisor call</li>
+              <li>Where the business still needs you</li>
+              <li>What a careful buyer will ask about</li>
+              <li>Who could take over and fit your values</li>
+              <li>What to keep private until a buyer earns it</li>
+              <li>What to get ready before you call your advisor</li>
             </ul>
           </aside>
         </div>
@@ -218,7 +218,7 @@ export default function PublicHome() {
         <div className="publicGrid three">
           <article><strong>No clear successor.</strong><p>Your children may not want it. Your team may not be ready. An outside buyer may never understand what makes it work.</p></article>
           <article><strong>The wrong buyer worries you.</strong><p>You want a fair price. You do not want it paid for with your people's jobs, your customers' trust, or your name.</p></article>
-          <article><strong>Your advisor needs the full picture.</strong><p>Give your CPA, attorney, or banker the whole story before a broker tells it for them.</p></article>
+          <article><strong>Your advisor needs the full picture.</strong><p>Give your CPA, lawyer, or banker the whole story before a broker tells it for them.</p></article>
         </div>
       </section>
 
@@ -226,7 +226,7 @@ export default function PublicHome() {
         <div>
           <p className="publicEyebrow">How it works</p>
           <h2>We stay with you. It is not just a report.</h2>
-          <p>StewardPath is something you return to: a guided check, a plan, and a score that moves as you prepare. Not a report you file and forget.</p>
+          <p>StewardPath is something you come back to. You get a guided check, a plan, and a score that goes up as you get ready. It is not a report you file and forget.</p>
         </div>
         <div className="publicGrid">
           {journeySteps.map(([step, title, body]) => (
@@ -273,10 +273,11 @@ export default function PublicHome() {
           <p className="publicEyebrow">Confidentiality first</p>
           <h2>You decide what stays private until a buyer earns it.</h2>
           <p>
-            Share ranges and your own words, never exact figures. Revenue band,
-            customer concentration, how much rides on you, whether the work is
-            written down. It all starts private. Mark anything advisor-only, or
-            share it later with a buyer who has proven they fit.
+            Share ranges and your own words, never exact numbers. How big the
+            sales are, how many customers you lean on, how much rides on you,
+            whether the work is written down. It all starts private. Mark
+            anything for your advisor only, or share it later with a buyer who
+            has shown they fit.
           </p>
         </div>
         <div className="privacyBox">
@@ -312,16 +313,16 @@ export default function PublicHome() {
           <p className="publicEyebrow">Pricing</p>
           <h2>You're not buying a report. You're starting something you keep.</h2>
           <p>
-            Your answers, your progress, and your plan stay private and move as
-            you prepare. Get ready now and the legal, tax, and accounting work
-            later runs faster, which can mean fewer billable hours. The real
-            return is peace of mind for whatever you choose next.
+            Your answers, your progress, and your plan stay private, and they
+            grow as you get ready. Get ready now and the legal, tax, and
+            accounting work later goes faster. That can mean fewer billable
+            hours. The real payoff is peace of mind, whatever you choose next.
           </p>
         </div>
         <div className="offerBand">
           <article><span>Free</span><strong>Sample report</strong><p>See the questions, the score, and the plan StewardPath builds with you.</p><button type="button" className="offerCta ghost" onClick={scrollToRequest}>Start free</button></article>
           <article><span>$249</span><strong>Owner Readiness Program</strong><p>A guided program you walk through to a confident handoff, on your terms. Find your clarity, name what you refuse to lose, and weigh the successors who fit your values, not only the highest bidder. It grows as you prepare.</p><button type="button" className="offerCta" onClick={() => buy("report")} disabled={busy}>Start the program</button></article>
-          <article><span>$1,500</span><strong>Concierge package</strong><p>A guided intake, a private review with a real person, and help preparing the conversations ahead. You reach the lawyer and accountant organized, which trims their hours.</p><button type="button" className="offerCta" onClick={() => buy("concierge")} disabled={busy}>Get the concierge package</button></article>
+          <article><span>$1,500</span><strong>Concierge package</strong><p>A guided check, a private review with a real person, and help getting ready for the talks ahead. You show up to the lawyer and accountant organized, which cuts their hours.</p><button type="button" className="offerCta" onClick={() => buy("concierge")} disabled={busy}>Get the concierge package</button></article>
           <article><span>$199/mo</span><strong>Advisor pilot</strong><p>For CPAs, exit planners, and advisors guiding up to ten owner clients. Each one arrives prepared.</p><button type="button" className="offerCta" onClick={() => buy("advisor")} disabled={busy}>Start the advisor pilot</button></article>
         </div>
         {payStatus ? <p className="leadStatus" style={{ marginTop: 20 }}>{payStatus}</p> : null}
