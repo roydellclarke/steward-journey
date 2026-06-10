@@ -37,7 +37,7 @@ Owners of founder-led businesses are unprepared for the largest financial event 
 | Tier | Price | What it is |
 | --- | --- | --- |
 | Sample report | Free | Shows the questions, the score, and the plan. Top of funnel. |
-| Owner readiness report | $249 | The owner's private readiness, with the reasoning behind every score. |
+| Owner Readiness Program | $249 | A guided program the owner walks through to a confident handoff, with the reasoning behind every score. |
 | Concierge package | $1,500 | Guided intake plus a private review with a real person. |
 | Advisor pilot | $199/mo | For CPAs, exit planners, and advisors guiding up to ten owner clients. |
 

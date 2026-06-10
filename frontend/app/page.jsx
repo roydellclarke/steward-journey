@@ -15,7 +15,7 @@ const PRODUCT_PATH = {
 };
 
 const CATALOG_LABEL = {
-  report: "owner readiness report",
+  report: "Owner Readiness Program",
   concierge: "concierge package",
   advisor: "advisor pilot"
 };
@@ -320,7 +320,7 @@ export default function PublicHome() {
         </div>
         <div className="offerBand">
           <article><span>Free</span><strong>Sample report</strong><p>See the questions, the score, and the plan StewardPath builds with you.</p><button type="button" className="offerCta ghost" onClick={scrollToRequest}>Start free</button></article>
-          <article><span>$249</span><strong>Owner readiness report</strong><p>Your private readiness, with the reasoning behind every score. It moves as you prepare, so the advisor or buyer call finds you ready.</p><button type="button" className="offerCta" onClick={() => buy("report")} disabled={busy}>Buy the report</button></article>
+          <article><span>$249</span><strong>Owner Readiness Program</strong><p>A guided program you walk through to a confident handoff, on your terms. Find your clarity, name what you refuse to lose, and weigh the successors who fit your values, not only the highest bidder. It grows as you prepare.</p><button type="button" className="offerCta" onClick={() => buy("report")} disabled={busy}>Start the program</button></article>
           <article><span>$1,500</span><strong>Concierge package</strong><p>A guided intake, a private review with a real person, and help preparing the conversations ahead. You reach the lawyer and accountant organized, which trims their hours.</p><button type="button" className="offerCta" onClick={() => buy("concierge")} disabled={busy}>Get the concierge package</button></article>
           <article><span>$199/mo</span><strong>Advisor pilot</strong><p>For CPAs, exit planners, and advisors guiding up to ten owner clients. Each one arrives prepared.</p><button type="button" className="offerCta" onClick={() => buy("advisor")} disabled={busy}>Start the advisor pilot</button></article>
         </div>

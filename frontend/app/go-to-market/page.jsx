@@ -29,7 +29,7 @@ const scripts = [
   },
   {
     title: "Pricing test",
-    body: "Free sample report. $249 owner readiness report. $1,500 concierge package with a guided intake and a private review. $199 a month for an advisor pilot of up to ten clients."
+    body: "Free sample. $249 Owner Readiness Program, a guided walk to a confident handoff. $1,500 concierge package with a guided intake and a private review. $199 a month for an advisor pilot of up to ten clients."
   }
 ];
 
