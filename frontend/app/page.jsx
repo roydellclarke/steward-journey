@@ -22,7 +22,7 @@ const CATALOG_LABEL = {
 
 // What you get. Same strategy (JTBD + loss aversion), tighter prose, varied rhythm.
 const sampleSections = [
-  ["A guided check that listens", "It asks at your pace and reflects back what you said. No blank forms. No jargon."],
+  ["A guided check that listens", "It asks at your pace and shows you what it heard. No blank forms. No jargon."],
   ["A readiness score you can read", "One number across five areas, each with the reason behind it. You see exactly where you stand."],
   ["What you refuse to lose", "Name the people, standards, and reputation that must survive the handoff. We keep it private."],
   ["Successor paths, your way", "Weigh family, employees, managers, and outside buyers against what you value. Rule out the ones you would never accept."],
@@ -30,14 +30,14 @@ const sampleSections = [
   ["A plan you return to", "Save it. Come back. Watch the score climb as you prepare."]
 ];
 
-// The JTBD outcomes, owner's language, deliberately uneven lengths.
+// What it feels like to use, in plain owner's language. Grade-7 reading level.
 const outcomes = [
-  ["Heard, not processed", "Every step reflects your words back. You are talked with, not handed software."],
-  ["In control of what's shared", "Private by default. You decide what leaves this space, and who ever sees it."],
-  ["Less overwhelmed", "A staged plan and a score you can read turn a heavy decision into a next step."],
-  ["Ready for the advisor", "Walk into the CPA or attorney meeting prepared, with a brief in hand."],
-  ["Not left to software", "When you want a person, a private review is one click away."],
-  ["Clear on where you stand", "An honest score across five areas, and the reasoning behind each one."]
+  ["It listens to you", "It asks one question at a time and shows you what it heard. It feels like a talk, not a form."],
+  ["You decide what to share", "Your answers stay private. You choose what to share, and who gets to see it."],
+  ["One step at a time", "A clear score and a simple plan turn a big decision into small, doable steps."],
+  ["Ready to meet your advisor", "You walk into the CPA or lawyer meeting prepared, with a short summary in hand."],
+  ["A real person when you want one", "Ask for a private review and a person takes it from there. You are never left alone with an app."],
+  ["You know where you stand", "A clear score in five areas, with the reason behind each one."]
 ];
 
 const journeySteps = [
