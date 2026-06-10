@@ -274,8 +274,8 @@ function TrustScreen({ onBegin, onResume, busy, status }) {
         <p className="conciergeEyebrow">Private readiness</p>
         <h1>First, how this stays private.</h1>
         <ul className="trustList">
-          <li><strong>What we collect:</strong> ranges and your own words. Never exact figures.</li>
-          <li><strong>Why:</strong> so your plan fits your situation and protects what you name.</li>
+          <li><strong>What we collect:</strong> ranges and your own words. Never exact numbers.</li>
+          <li><strong>Why:</strong> so your plan fits you and guards what you name.</li>
           <li><strong>Private by default:</strong> no one sees this. Not family, not employees, not buyers. Not unless you choose.</li>
           <li><strong>You hold the keys:</strong> you decide later what to share, and with whom.</li>
           <li><strong>Never used to train AI:</strong> your answers stay yours. We do not feed them to any system.</li>

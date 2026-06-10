@@ -1,11 +1,11 @@
 const scripts = [
   {
     title: "Ideal customer",
-    body: "Founder-led businesses with 10 to 100 employees. The owner is 55 or older, cares about employees and reputation, has no clear successor, and guards their privacy. They want to prepare before a buyer sets the terms."
+    body: "Founder-led businesses with 10 to 100 workers. The owner is 55 or older, cares about their people and their good name, has no clear next owner, and values privacy. They want to get ready before a buyer sets the terms."
   },
   {
     title: "Advisor outreach",
-    body: "I built a private readiness program for owner clients who aren't ready for a broker yet. It walks them through what must be protected and where the business leans too much on them, then hands you an advisor-ready brief. Could I show you a sample for one owner profile?"
+    body: "I built a private readiness program for owner clients who aren't ready for a broker yet. It walks them through what to protect and where the business leans too much on them, then hands you a ready-to-use summary. Could I show you a sample?"
   },
   {
     title: "Seller-facing email",
@@ -13,7 +13,7 @@ const scripts = [
   },
   {
     title: "LinkedIn DM",
-    body: "I'm testing a private readiness program for founder-led owners. It's built for people who care about their team, their customers, and their legacy, not just price. It listens, reflects back what you share, and leaves you in control of what anyone sees. Useful for you or a client?"
+    body: "I'm testing a private readiness program for founder-led owners. It's built for people who care about their team, their customers, and their legacy, not just price. It listens, shows you what it heard, and keeps you in control of what anyone sees. Useful for you or a client?"
   },
   {
     title: "Local workshop title",
@@ -41,11 +41,11 @@ export default function GoToMarketPage() {
           <p className="publicEyebrow">Go-to-market support</p>
           <h1>Start where trust already lives. Let the program prepare the owner.</h1>
           <p>
-            On a tight budget, begin where trust already exists: CPAs, exit
-            planners, estate attorneys, wealth advisors, community banks. The
+            On a tight budget, start where trust already exists: CPAs, exit
+            planners, estate lawyers, wealth advisors, and community banks. The
             pitch is not a report. It is a private program that listens, keeps
-            the owner in control of what they share, and readies them for the
-            advisor conversation. Use the public page as proof they can forward.
+            the owner in control of what they share, and gets them ready for the
+            advisor meeting. Use the public page as proof they can forward.
           </p>
           <div className="publicActions">
             <a href="/" className="primaryCta">View public page</a>
