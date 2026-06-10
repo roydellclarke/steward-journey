@@ -228,6 +228,16 @@ export default function PublicHome() {
           <h2>We stay with you. It is not just a report.</h2>
           <p>StewardPath is something you come back to. You get a guided check, a plan, and a score that goes up as you get ready. It is not a report you file and forget.</p>
         </div>
+        <figure className="bandImage">
+          <img
+            src="/img/Roadmap_to_a_Graceful_Exit.png"
+            alt="A roadmap to a graceful exit: get ready in private, see where you stand, weigh the right next owner, and walk into the advisor meeting prepared."
+            loading="lazy"
+            width="2752"
+            height="1536"
+          />
+          <figcaption>Your path to a graceful exit, one step at a time.</figcaption>
+        </figure>
         <div className="publicGrid">
           {journeySteps.map(([step, title, body]) => (
             <article key={step}>

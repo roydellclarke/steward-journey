@@ -1276,6 +1276,24 @@ button:focus-visible,
   margin-top: 40px;
 }
 
+/* Full-width supporting image inside a content band. */
+.bandImage {
+  margin: 36px 0 0;
+}
+.bandImage img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--sp-line);
+  border-radius: var(--sp-radius-lg);
+}
+.bandImage figcaption {
+  margin-top: 12px;
+  color: var(--sp-muted);
+  font-size: 0.92rem;
+  text-align: center;
+}
+
 .publicGrid.three {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
