@@ -1174,13 +1174,19 @@ button:focus-visible,
   margin-top: 32px;
 }
 
-.publicActions button {
+/* In the hero, all three actions read the same: solid off-white, dark text,
+   hairline border. The muted-green CTA washed out against the pale scrim. */
+.publicActions button,
+.publicActions .primaryCta {
   border-color: var(--sp-line-strong);
   background: var(--sp-card);
   color: var(--sp-ink);
   -webkit-text-fill-color: var(--sp-ink);
 }
-.publicActions button:hover {
+.publicActions button:hover,
+.publicActions button:focus-visible,
+.publicActions .primaryCta:hover,
+.publicActions .primaryCta:focus-visible {
   border-color: var(--sp-ink);
   background: var(--sp-card);
   color: var(--sp-ink);
