@@ -3,7 +3,7 @@ import { SITE_URL, TAGLINE } from "../../lib/site";
 // Serves /llms.txt (the emerging standard at llmstxt.org): a plain-Markdown
 // summary that helps LLMs and AI agents understand the site without parsing
 // HTML. URLs follow NEXT_PUBLIC_SITE_URL, so nothing is hardcoded to a domain.
-export const dynamic = "force-dynamic";
+// Static: the content only changes when SITE_URL/TAGLINE change at build.
 
 function body() {
   return `# StewardPath
@@ -24,6 +24,8 @@ StewardPath is for owners of founder-led businesses, often 55 or older and not e
 - What should I protect, and what should I keep private until a buyer has earned it?
 - Am I emotionally ready to step back, and how do I get ready?
 - What should I prepare before I talk to a CPA, attorney, banker, or broker?
+- How do I sell my HVAC, plumbing, electrical, or contracting business?
+- I got an offer for my trades business, what should I do first?
 
 ## How it works
 
@@ -39,6 +41,7 @@ Private by default. Answers are never shared with employees, family, or buyers u
 - [Private readiness check](${SITE_URL}/intake): The guided program. Begin a private readiness check, save and resume by email, and see your readiness.
 - [Readiness workbench](${SITE_URL}/readiness): A classic view of the readiness areas and what the score measures.
 - [For advisors](${SITE_URL}/go-to-market): How CPAs, exit planners, and estate lawyers can bring owner clients in already prepared.
+- [Trades readiness guide](${SITE_URL}/content/trades-readiness.md): Selling or handing off an HVAC, plumbing, electrical, or contracting business, in plain owner language.
 - [Privacy](${SITE_URL}/privacy) and [Terms](${SITE_URL}/terms).
 
 ## What you get
@@ -53,10 +56,12 @@ Private by default. Answers are never shared with employees, family, or buyers u
 
 ## Pricing
 
-- Free: a sample showing the questions, the score, and the plan.
-- $249: the Owner Readiness Program, a guided walk to a confident handoff, with the reasoning behind every score. A program you return to, not a static report.
-- $1,500: a concierge package with a guided check and a private review with a real person.
-- $199/mo: an advisor pilot for CPAs, exit planners, and advisors guiding up to ten owner clients.
+Tiers are described here without exact figures, since prices may change and AI answers can cache. See the website for current pricing.
+
+- A free sample that shows the questions, the score, and the plan.
+- The Owner Readiness Program: a paid, guided walk to a confident handoff, with the reasoning behind every score. A program you return to, not a static report.
+- A concierge package: a guided check plus a private review with a real person.
+- An advisor subscription for CPAs, exit planners, and advisors guiding owner clients.
 
 ## FAQ
 

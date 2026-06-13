@@ -13,19 +13,22 @@ export const DESCRIPTION =
 export const PUBLIC_PAGES = [
   { path: "/", priority: 1.0, changeFrequency: "weekly" },
   { path: "/intake", priority: 0.8, changeFrequency: "monthly" },
+  { path: "/content/trades-readiness", priority: 0.7, changeFrequency: "monthly" },
   { path: "/readiness", priority: 0.5, changeFrequency: "monthly" },
   { path: "/go-to-market", priority: 0.4, changeFrequency: "monthly" }
 ];
 
-// Never index these: tokens and the per-owner app shell live here.
-export const PRIVATE_PATHS = ["/auth/"];
+// Never index these. The real boundary is the passwordless login (a crawler
+// cannot authenticate, so it cannot read owner data); this is defense-in-depth
+// so the URLs never get indexed even though the data is unreachable anyway.
+export const PRIVATE_PATHS = ["/auth/", "/api/"];
 
 // AI crawlers and agents we explicitly welcome to the public pages. Naming them
 // is a clear signal; the global "*" rule covers any not listed here. Each still
 // inherits the same Disallow, so private paths stay protected for every bot.
 export const AI_BOTS = [
-  // OpenAI
-  "GPTBot", "OAI-SearchBot", "ChatGPT-User", "ChatGPT Agent",
+  // OpenAI (robots tokens are single words; "ChatGPT Agent" is not a valid token)
+  "GPTBot", "OAI-SearchBot", "ChatGPT-User",
   // Google (Gemini, AI Overviews, NotebookLM)
   "Google-Extended", "GoogleOther", "Gemini-Deep-Research", "Google-NotebookLM", "Google-CloudVertexBot",
   // Anthropic (Claude)
@@ -44,5 +47,5 @@ export const AI_BOTS = [
   "CCBot",
   // Other major labs / search assistants
   "cohere-ai", "MistralAI-User", "DeepSeekBot", "PanguBot", "Bytespider", "TikTokSpider",
-  "YouBot", "DuckAssistBot", "Diffbot", "PetalBot", "Kangaroo Bot", "QwenBot"
+  "YouBot", "DuckAssistBot", "Diffbot", "PetalBot", "QwenBot"
 ];

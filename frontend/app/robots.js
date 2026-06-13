@@ -11,7 +11,7 @@ export default function robots() {
       { userAgent: "*", ...rule },
       ...AI_BOTS.map((userAgent) => ({ userAgent, ...rule }))
     ],
-    sitemap: `${SITE_URL}/sitemap.xml`,
-    host: SITE_URL
+    // No Host directive: it is non-standard and ignored by most crawlers.
+    sitemap: `${SITE_URL}/sitemap.xml`
   };
 }
