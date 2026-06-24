@@ -3,8 +3,21 @@
 import { useEffect, useState } from "react";
 import { apiFetch, startCheckout } from "../lib/api";
 import { authApi } from "../lib/auth";
+import { FAQ } from "../lib/site";
 import AuthGate from "./intake/AuthGate";
 import "./intake/intake.css"; // overlay/auth modal styles used by AuthGate
+
+// Site-wide FAQ structured data, built from the same FAQ array the page renders
+// visibly below, so the schema.org FAQPage always matches on-page text.
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: FAQ.map(({ q, a }) => ({
+    "@type": "Question",
+    name: q,
+    acceptedAnswer: { "@type": "Answer", text: a }
+  }))
+};
 
 // Where each purchased product sends the owner. Payment is tied to their
 // account, so a later visit lands them on the right path too.
@@ -337,6 +350,26 @@ export default function PublicHome() {
         </div>
         {payStatus ? <p className="leadStatus" style={{ marginTop: 20 }}>{payStatus}</p> : null}
       </section>
+
+      <section className="publicBand" id="faq">
+        <div>
+          <p className="publicEyebrow">Questions owners ask</p>
+          <h2>Straight answers before you start.</h2>
+        </div>
+        <div className="publicGrid faq">
+          {FAQ.map(({ q, a }) => (
+            <article key={q}>
+              <strong>{q}</strong>
+              <p>{a}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
     </main>
   );
 }

@@ -1320,6 +1320,12 @@ button:focus-visible,
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+/* FAQ: one readable column. Answers run long, so a wide single column reads
+   better than a cramped multi-column grid. */
+.publicGrid.faq {
+  grid-template-columns: minmax(0, 760px);
+}
+
 .publicGrid article,
 .offerBand article,
 .privacyBox {

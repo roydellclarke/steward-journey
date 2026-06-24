@@ -21,6 +21,46 @@ export const TAGLINE = "The handoff on your terms.";
 export const DESCRIPTION =
   "A private, guided readiness program for founder-led business owners preparing a sale, succession, or transition. A person stays with you the whole way, and you control what is ever shared.";
 
+// Site-level brand/product FAQ. Single source: the homepage renders these as
+// visible text AND emits them as a schema.org FAQPage from this same array, so
+// the structured data always matches what is on the page (Google's FAQ rich
+// result requires the answers to be visible). Guide pages emit their own
+// FAQPage from lib/content.js; this is only the site-wide one.
+export const FAQ = [
+  {
+    q: "Is StewardPath legal, tax, or valuation advice?",
+    a: "No. StewardPath prepares you for a sale, succession, or transition. It does not give legal, tax, valuation, investment, or brokerage advice, and it routes regulated work to a qualified person."
+  },
+  {
+    q: "Is my information private?",
+    a: "Yes. Your answers are private by default, never shared with employees, family, or buyers unless you choose, and never used to train AI. You can export or delete your data at any time."
+  },
+  {
+    q: "What does the readiness score measure?",
+    a: "Five areas: financial clarity, how well the business runs without you, what is written down, family alignment, and your readiness to step back. Each comes with the reasoning behind it."
+  },
+  {
+    q: "How do I prepare to sell my business?",
+    a: "Start before a broker or buyer sets the terms. StewardPath gives a private readiness score across five areas, a prioritized action plan that lifts the score as you finish steps, and briefs to hand your advisor, so you walk in ready."
+  },
+  {
+    q: "Who should take over my family business?",
+    a: "StewardPath includes a successor-fit scorecard that ranks family members, key employees, managers, and outside buyers by how well they fit your values, not by the size of their offer. A candidate who crosses a non-negotiable is ruled out."
+  },
+  {
+    q: "How do I sell my business without hurting my employees?",
+    a: "StewardPath helps you name what you refuse to lose, your people's jobs, your customers' trust, and your name, then weigh buyers and successors against it, so you choose by fit and not only by price."
+  },
+  {
+    q: "How much does StewardPath cost?",
+    a: "A free sample, the Owner Readiness Program at $249, a $1,500 concierge package with a private review by a real person, and a $199 per month advisor pilot for CPAs, exit planners, and advisors."
+  },
+  {
+    q: "How is StewardPath different from a business broker?",
+    a: "A broker sells the business and optimizes for price. StewardPath helps the owner get ready first and choose the next owner by fit to their values, in private, before any broker or buyer sets the terms. It is preparation, not brokerage."
+  }
+];
+
 // Public, crawlable app/marketing pages. Private app surfaces (sign-in, owner
 // data) are kept out of search and AI indexes on purpose. Guide pages under
 // /content are NOT listed here: the sitemap derives them from CONTENT_SLUGS so
