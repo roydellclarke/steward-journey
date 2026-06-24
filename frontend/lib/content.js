@@ -7,6 +7,10 @@
 export const CONTENT = {
   "trades-readiness": {
     slug: "trades-readiness",
+    // ISO dates feed Article datePublished/dateModified. Bump dateModified
+    // when you revise the guide so search and AI engines see it as current.
+    datePublished: "2026-06-24",
+    dateModified: "2026-06-24",
     title: "Selling or handing off a trades business, on your terms",
     description:
       "A plain guide for owners of HVAC, plumbing, electrical, and contracting businesses getting ready to sell, pass on, or step back. What buyers ask, how to reduce how much rides on you, and how to protect your crew and customers.",
@@ -67,6 +71,21 @@ export const CONTENT_SLUGS = Object.keys(CONTENT);
 
 export function getContent(slug) {
   return CONTENT[slug] || null;
+}
+
+// FAQ entities for a schema.org FAQPage, built from the question-shaped
+// section headings. The guides are authored as the questions owners ask, so
+// every section maps cleanly to a Question/Answer pair for AI extraction.
+export function faqEntities(slug) {
+  const c = getContent(slug);
+  if (!c) return [];
+  return c.sections
+    .filter((s) => (s.body || []).length)
+    .map((s) => ({
+      "@type": "Question",
+      name: s.heading,
+      acceptedAnswer: { "@type": "Answer", text: (s.body || []).join(" ") }
+    }));
 }
 
 // Render the same structured content to clean Markdown for the .md mirror.

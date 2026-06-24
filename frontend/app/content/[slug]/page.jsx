@@ -1,7 +1,38 @@
 import { notFound } from "next/navigation";
-import { getContent, CONTENT_SLUGS } from "../../../lib/content";
+import { getContent, CONTENT_SLUGS, faqEntities } from "../../../lib/content";
 import { SITE_URL } from "../../../lib/site";
 import "./content.css";
+
+// Per-page structured data: an Article (so the guide is eligible as a cited
+// source with authorship and freshness) plus a FAQPage built from the same
+// question-shaped sections the page renders. Author/publisher reference the
+// Organization @id defined once in the root layout, so the graph stays linked.
+function buildJsonLd(c) {
+  const path = `/content/${c.slug}`;
+  const url = `${SITE_URL}${path}`;
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Article",
+        "@id": `${url}#article`,
+        headline: c.title,
+        description: c.description,
+        mainEntityOfPage: url,
+        inLanguage: "en-US",
+        ...(c.datePublished ? { datePublished: c.datePublished } : {}),
+        ...(c.dateModified ? { dateModified: c.dateModified } : {}),
+        author: { "@id": `${SITE_URL}/#organization` },
+        publisher: { "@id": `${SITE_URL}/#organization` }
+      },
+      {
+        "@type": "FAQPage",
+        "@id": `${url}#faq`,
+        mainEntity: faqEntities(c.slug)
+      }
+    ]
+  };
+}
 
 // Pre-render every guide at build time.
 export function generateStaticParams() {
@@ -32,6 +63,10 @@ export default async function ContentPage({ params }) {
 
   return (
     <main className="publicShell">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(buildJsonLd(c)) }}
+      />
       <article className="contentArticle">
         <p className="publicEyebrow">Guide for trades owners</p>
         <h1>{c.title}</h1>
