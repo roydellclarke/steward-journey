@@ -14,9 +14,11 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 import json
+import os
 from pathlib import Path
 import re
 import shutil
+import tempfile
 from typing import Any
 from uuid import uuid4
 
@@ -43,9 +45,32 @@ def _read_json(path: Path, fallback: Any = None) -> Any:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def _write_json(path: Path, value: Any) -> None:
+def _atomic_write_text(path: Path, text: str) -> None:
+    """Write text durably: temp file in the same dir, then atomic rename.
+
+    A crash or concurrent reader mid-write never sees a truncated file. The
+    owner's source of truth (intake_state.json) and the orders ledger both
+    depend on this: os.replace is atomic on the same filesystem.
+    """
+
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(value, indent=2) + "\n", encoding="utf-8")
+    fd, tmp = tempfile.mkstemp(dir=path.parent, prefix=f".{path.name}.", suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as handle:
+            handle.write(text)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(tmp, path)
+    except BaseException:
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
+        raise
+
+
+def _write_json(path: Path, value: Any) -> None:
+    _atomic_write_text(path, json.dumps(value, indent=2) + "\n")
 
 
 @dataclass
@@ -352,7 +377,6 @@ class ProjectStore:
                 break
         if found is None:
             return None, False
-        with path.open("w", encoding="utf-8") as handle:
-            for row in rows:
-                handle.write(json.dumps(row) + "\n")
+        # Atomic rewrite: a crash here must not truncate the whole orders ledger.
+        _atomic_write_text(path, "".join(json.dumps(row) + "\n" for row in rows))
         return found, newly_paid

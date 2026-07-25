@@ -34,6 +34,8 @@ def _reload_app(ttl_minutes: str = "10"):
     root = tempfile.mkdtemp()
     os.environ["STEWARDPATH_DATA_ROOT"] = root
     os.environ["STEWARDPATH_AUTH_DB_PATH"] = os.path.join(root, "auth", "auth.db")
+    # Never call real LLM providers from tests, even if backend/.env enables them.
+    os.environ["STEWARDPATH_USE_LLM"] = "false"
     os.environ["STEWARDPATH_SECRET_KEY"] = "test-secret-key"
     os.environ["STEWARDPATH_COOKIE_SECURE"] = "false"
     os.environ["STEWARDPATH_FRONTEND_ORIGIN"] = "http://localhost:3000"

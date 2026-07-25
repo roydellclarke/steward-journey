@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useModalA11y } from "./useModalA11y";
 import { intakeApi, fieldPatch, prettify } from "../../lib/intake";
 import { authApi } from "../../lib/auth";
 import AuthGate from "./AuthGate";
@@ -36,6 +37,7 @@ export default function IntakePage() {
   const [account, setAccount] = useState({ authenticated: false, email: "", entitlements: [] });
   const [pendingResume, setPendingResume] = useState(""); // a claimed project awaiting sign-in
   const [showBook, setShowBook] = useState(false);
+  const [saveState, setSaveState] = useState("idle"); // idle | saving | saved
 
   useEffect(() => {
     const saved = typeof window !== "undefined" ? window.localStorage.getItem(STORAGE_KEY) : "";
@@ -50,8 +52,20 @@ export default function IntakePage() {
   // clear step inside the program, not just a line on the receipt.
   const hasConcierge = (account.entitlements || []).some((e) => e.product === "concierge" && e.status === "active");
 
+  // After a gate passes we have a live session but not the owner's paid
+  // entitlements. Pull them so concierge/advisor features survive sign-in
+  // (the verify result carries only the email).
+  function refreshEntitlements(email) {
+    authApi.me().then((me) => {
+      if (me.authenticated) {
+        setAccount({ authenticated: true, email: me.email || email, entitlements: me.entitlements || [] });
+      }
+    }).catch(() => {});
+  }
+
   function onSaveGatePassed(result) {
-    setAccount({ authenticated: true, email: result.email });
+    setAccount((a) => ({ ...a, authenticated: true, email: result.email }));
+    refreshEntitlements(result.email);
     setAuthGate(null);
     if (pendingResume) {
       // Signing in to resume a claimed project: retry the load, now with a session.
@@ -64,14 +78,38 @@ export default function IntakePage() {
   }
 
   function onReportGatePassed(result) {
-    setAccount({ authenticated: true, email: result.email });
+    setAccount((a) => ({ ...a, authenticated: true, email: result.email }));
+    refreshEntitlements(result.email);
     setAuthGate(null);
     setStep("report");
   }
 
   const sections = plan?.sections || [];
   const activeSection = sections[sectionIndex];
-  const completion = intakeState?.meta?.completionPct ?? 0;
+
+  // Live completion: the saved percent, nudged by the answers in progress so the
+  // bar moves as the owner picks, not only after Continue saves. It uses the same
+  // field counts the backend computes (meta.completeFields/totalFields), so the
+  // number never snaps back once the section saves. Falls back to the saved
+  // percent for older records that predate the counts.
+  const completion = useMemo(() => {
+    const meta = intakeState?.meta;
+    if (!meta) return 0;
+    const total = meta.totalFields || 0;
+    if (!total) return meta.completionPct ?? 0;
+    const done = new Set(["answered", "estimated", "skipped"]);
+    let complete = meta.completeFields || 0;
+    (activeSection?.questions || []).forEach((q) => {
+      const draft = drafts[q.id];
+      if (!draft) return;
+      const was = done.has(q.status);
+      const now = done.has(draft.status);
+      if (now && !was) complete += 1;
+      else if (!now && was) complete -= 1;
+    });
+    complete = Math.max(0, Math.min(total, complete));
+    return Math.round((complete / total) * 100);
+  }, [intakeState, drafts, activeSection]);
 
   async function begin(existingId, afterAuth = false) {
     setBusy(true);
@@ -114,6 +152,8 @@ export default function IntakePage() {
   }
 
   function setDraft(questionId, value, statusOverride) {
+    // A fresh answer means there is unsaved work; the debounce will save it.
+    setSaveState("saving");
     setDrafts((current) => ({
       ...current,
       [questionId]: { value, status: statusOverride || "answered" }
@@ -144,6 +184,7 @@ export default function IntakePage() {
       const patch = mergePatches();
       const saved = await intakeApi.putIntake(projectId, patch);
       applyLoaded(saved);
+      setSaveState("saved");
       // Reflective-summary moment grounded in what was just shared.
       const next = saved.plan.nextQuestionId;
       const ref = await intakeApi.reflect(saved.intakeState, activeSection.key, next);
@@ -155,6 +196,38 @@ export default function IntakePage() {
       setBusy(false);
     }
   }
+
+  // Autosave: persist answers in the background so closing the tab mid-section
+  // never loses work. It keeps the drafts (so the fields being edited are not
+  // disturbed) and refreshes score/plan; the completion delta lands at zero
+  // because the saved plan now marks these answered. Explicit Continue still
+  // drives the reflection and section advance.
+  async function autosave() {
+    if (busy || !projectId || !activeSection) return;
+    if (!Object.keys(drafts).length) return;
+    setSaveState("saving");
+    try {
+      const saved = await intakeApi.putIntake(projectId, mergePatches());
+      setIntakeState(saved.intakeState);
+      setPlan(saved.plan);
+      if (saved.score) setScore(saved.score);
+      setSaveState("saved");
+    } catch {
+      // Silent: the owner can still click Continue to save explicitly.
+      setSaveState("idle");
+    }
+  }
+
+  // Debounce: save 1.5s after the last change, resetting on each new answer.
+  useEffect(() => {
+    if (step !== "intake" || reflection) return;
+    if (!Object.keys(drafts).length) return;
+    const timer = setTimeout(() => { autosave(); }, 1500);
+    return () => clearTimeout(timer);
+    // autosave is intentionally excluded; the effect re-runs on every draft
+    // change, which is exactly when a fresh save should be scheduled.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [drafts, step, reflection]);
 
   function advanceAfterReflection() {
     setReflection(null);
@@ -240,6 +313,7 @@ export default function IntakePage() {
               onContinue={saveAndContinue}
               onBack={sectionIndex > 0 ? () => setSectionIndex(sectionIndex - 1) : null}
               busy={busy}
+              saveState={saveState}
               isLast={sectionIndex === sections.length - 1}
             />
           ) : (
@@ -310,11 +384,24 @@ function ProgressHeader({ completion, score }) {
   );
 }
 
-function SectionView({ section, drafts, onAnswer, onContinue, onBack, busy, isLast }) {
+function SectionView({ section, drafts, onAnswer, onContinue, onBack, busy, saveState, isLast }) {
+  // Live per-section count so the owner sees each answer register right away.
+  const done = new Set(["answered", "estimated", "skipped"]);
+  const total = section.questions.length;
+  const answered = section.questions.filter((q) => {
+    const status = drafts[q.id]?.status ?? q.status;
+    return done.has(status);
+  }).length;
+  const saveNote = saveState === "saving"
+    ? "Saving…"
+    : saveState === "saved"
+      ? "Saved. Your answers save as you go."
+      : "Your answers save as you go, so you can stop anytime.";
   return (
     <section className="sectionCard">
       <p className="conciergeEyebrow">{section.title}</p>
       <p className="sectionIntro">{section.intro}</p>
+      <p className="sectionProgress" aria-live="polite">{answered} of {total} answered in this section</p>
       {section.securityGate && section.reassurance ? (
         <div className="reassureBanner">
           <span aria-hidden="true">🔒</span>
@@ -326,6 +413,7 @@ function SectionView({ section, drafts, onAnswer, onContinue, onBack, busy, isLa
           <QuestionInput key={q.id} question={q} draft={drafts[q.id]} onAnswer={onAnswer} />
         ))}
       </div>
+      <p className="autosaveNote" aria-live="polite">{saveNote}</p>
       <div className="sectionActions">
         {onBack ? <button type="button" onClick={onBack} disabled={busy}>Back</button> : <span />}
         <button type="button" className="primaryCta" onClick={onContinue} disabled={busy}>
@@ -358,7 +446,7 @@ function QuestionInput({ question, draft, onAnswer }) {
   return (
     <div className={`questionBlock${question.sensitive ? " sensitive" : ""}`}>
       <div className="questionPrompt">
-        <label>{question.prompt}</label>
+        <label id={`${question.id}-label`} htmlFor={question.id}>{question.prompt}</label>
         {question.why ? (
           <button type="button" className="whyLink" onClick={() => setShowWhy((s) => !s)}>
             {showWhy ? "Hide" : "Why we ask"}
@@ -369,13 +457,13 @@ function QuestionInput({ question, draft, onAnswer }) {
       {question.helpText ? <p className="helpText">{question.helpText}</p> : null}
 
       {(question.kind === "text") && (
-        <input value={value || ""} placeholder={question.placeholder} onChange={(e) => setValue(e.target.value)} />
+        <input id={question.id} value={value || ""} placeholder={question.placeholder} onChange={(e) => setValue(e.target.value)} />
       )}
       {(question.kind === "longtext") && (
-        <textarea value={value || ""} placeholder={question.placeholder} onChange={(e) => setValue(e.target.value)} />
+        <textarea id={question.id} value={value || ""} placeholder={question.placeholder} onChange={(e) => setValue(e.target.value)} />
       )}
       {question.kind === "boolean" && (
-        <div className="choiceRow">
+        <div className="choiceRow" role="group" aria-labelledby={`${question.id}-label`}>
           {[["yes", true], ["no", false]].map(([label, v]) => (
             <button type="button" key={label} className={value === v ? "choice active" : "choice"} onClick={() => setValue(v)}>
               {label === "yes" ? "Yes" : "No"}
@@ -384,7 +472,7 @@ function QuestionInput({ question, draft, onAnswer }) {
         </div>
       )}
       {(question.kind === "single" || question.kind === "band") && (
-        <div className="choiceWrap">
+        <div className="choiceWrap" role="group" aria-labelledby={`${question.id}-label`}>
           {question.options.map((opt) => (
             <button type="button" key={opt.value} className={value === opt.value ? "choice active" : "choice"} onClick={() => setValue(opt.value)}>
               {opt.label}
@@ -393,7 +481,7 @@ function QuestionInput({ question, draft, onAnswer }) {
         </div>
       )}
       {question.kind === "multi" && (
-        <div className="choiceWrap">
+        <div className="choiceWrap" role="group" aria-labelledby={`${question.id}-label`}>
           {question.options.map((opt) => {
             const list = Array.isArray(value) ? value : [];
             return (
@@ -405,7 +493,7 @@ function QuestionInput({ question, draft, onAnswer }) {
         </div>
       )}
       {question.kind === "scale" && (
-        <div className="choiceRow scale">
+        <div className="choiceRow scale" role="group" aria-labelledby={`${question.id}-label`}>
           {[1, 2, 3, 4, 5].map((n) => (
             <button type="button" key={n} className={value === n ? "choice active" : "choice"} onClick={() => setValue(n)}>{n}</button>
           ))}
@@ -443,8 +531,9 @@ function ReadinessSidebar({ score, completion, snapshots, onOpenData, onSeeReadi
     <aside className="readinessSidebar">
       <div className="sidebarScore">
         <span>Readiness so far</span>
-        <strong>{score ? `${score.overall}/100` : ", "}</strong>
+        <strong>{score ? `${score.overall}/100` : "Not yet"}</strong>
         <small>{completion}% of intake complete</small>
+        <small className="scoreHint">This score climbs as you answer the questions about your money and how the business runs.</small>
       </div>
       {score?.topGaps?.length ? (
         <div className="sidebarGaps">
@@ -478,6 +567,8 @@ function ReadinessSidebar({ score, completion, snapshots, onOpenData, onSeeReadi
 function DataControlCenter({ projectId, onClose }) {
   const [data, setData] = useState(null);
   const [status, setStatus] = useState("");
+  const panelRef = useRef(null);
+  useModalA11y(panelRef, onClose);
 
   useEffect(() => {
     intakeApi.exportData(projectId).then(setData).catch((e) => setStatus(e.message));
@@ -509,7 +600,7 @@ function DataControlCenter({ projectId, onClose }) {
   const events = data?.auditEvents || [];
 
   return (
-    <div className="dataOverlay" role="dialog" aria-modal="true">
+    <div className="dataOverlay" role="dialog" aria-modal="true" aria-label="Your data and privacy" ref={panelRef}>
       <div className="dataPanel">
         <div className="dataHead">
           <h2>Your data &amp; privacy</h2>
@@ -820,6 +911,8 @@ function DriverCard({ label, value, rationale }) {
 function BookReview({ projectId, onClose }) {
   const [form, setForm] = useState({ name: "", email: "", preferredTime: "", note: "" });
   const [status, setStatus] = useState("");
+  const panelRef = useRef(null);
+  useModalA11y(panelRef, onClose);
 
   async function submit() {
     setStatus("Requesting your review…");
@@ -832,14 +925,14 @@ function BookReview({ projectId, onClose }) {
   }
 
   return (
-    <div className="dataOverlay" role="dialog" aria-modal="true">
+    <div className="dataOverlay" role="dialog" aria-modal="true" aria-label="Private readiness review" ref={panelRef}>
       <div className="dataPanel">
         <div className="dataHead"><h2>Private readiness review</h2><button type="button" onClick={onClose} aria-label="Close">×</button></div>
         <p>A real person reviews what you've prepared and helps shape a clear, paced plan. You reach your lawyer and accountant organized, which lightens their work. We see only what you choose to share, and your progress stays here, private and saved.</p>
-        <input placeholder="Your name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-        <input placeholder="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-        <input placeholder="Preferred time, e.g. next week mornings" value={form.preferredTime} onChange={(e) => setForm({ ...form, preferredTime: e.target.value })} />
-        <textarea placeholder="Anything you'd like us to know first (optional)" value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} />
+        <input aria-label="Your name" placeholder="Your name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+        <input aria-label="Email" type="email" placeholder="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+        <input aria-label="Preferred time" placeholder="Preferred time, e.g. next week mornings" value={form.preferredTime} onChange={(e) => setForm({ ...form, preferredTime: e.target.value })} />
+        <textarea aria-label="Anything you'd like us to know first" placeholder="Anything you'd like us to know first (optional)" value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} />
         <div className="dataActions">
           <button type="button" className="primaryCta" onClick={submit}>Request review</button>
         </div>

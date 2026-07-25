@@ -79,7 +79,7 @@ class Settings:
         return cls(
             data_root=data_root,
             use_llm=_bool_env("STEWARDPATH_USE_LLM", False),
-            kimi_model=os.getenv("STEWARDPATH_KIMI_MODEL", "moonshot/kimi-k2.5"),
+            kimi_model=os.getenv("STEWARDPATH_KIMI_MODEL", "moonshot/kimi-k2.6"),
             deepseek_model=os.getenv("STEWARDPATH_DEEPSEEK_MODEL", "deepseek/deepseek-reasoner"),
             kimi_temperature=float(os.getenv("STEWARDPATH_KIMI_TEMPERATURE", "1")),
             deepseek_temperature=float(os.getenv("STEWARDPATH_DEEPSEEK_TEMPERATURE", "0.15")),

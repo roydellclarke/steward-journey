@@ -14,10 +14,15 @@ services:
   frontend:
     build:
       context: ./frontend
+      # NEXT_PUBLIC_* are inlined by Next at BUILD time, so they must be build
+      # args, not runtime env. Set both in the root .env (or shell) for a real
+      # deploy; the defaults below only suit local compose. A production build
+      # fails loudly if NEXT_PUBLIC_SITE_URL is left as the placeholder.
+      args:
+        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8000}
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
     ports:
       - "3000:3000"
-    environment:
-      NEXT_PUBLIC_API_BASE_URL: http://localhost:8000
     depends_on:
       - backend
 

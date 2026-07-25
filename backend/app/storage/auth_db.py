@@ -121,6 +121,14 @@ class AuthStore:
                     stripe_subscription_id TEXT,
                     PRIMARY KEY (owner_id, product)
                 );
+
+                -- One row per finalized checkout session. The PRIMARY KEY makes
+                -- claiming a session atomic, so the webhook and the success page
+                -- cannot both run the one-time side effects (receipt email).
+                CREATE TABLE IF NOT EXISTS finalized_orders (
+                    stripe_session_id TEXT PRIMARY KEY,
+                    finalized_at      TEXT NOT NULL
+                );
                 """
             )
             # Forward migration for databases created before the subscription
@@ -128,6 +136,24 @@ class AuthStore:
             cols = {row["name"] for row in conn.execute("PRAGMA table_info(entitlements)").fetchall()}
             if "stripe_subscription_id" not in cols:
                 conn.execute("ALTER TABLE entitlements ADD COLUMN stripe_subscription_id TEXT")
+
+    # ---------------------------------------------------------------- orders
+    def claim_finalization(self, session_id: str, *, now: datetime | None = None) -> bool:
+        """Atomically claim the one-time finalization of a paid checkout session.
+
+        Returns True for the first caller only. The Stripe webhook and the
+        success page can both fire for the same session; this guarantees the
+        one-time side effects (receipt email, audit event) run exactly once.
+        """
+
+        if not session_id:
+            return False
+        with self._connect() as conn:
+            cursor = conn.execute(
+                "INSERT OR IGNORE INTO finalized_orders (stripe_session_id, finalized_at) VALUES (?, ?)",
+                (session_id, _iso(now or _now())),
+            )
+            return cursor.rowcount == 1
 
     # --------------------------------------------------------------- hashing
     def _digest(self, value: str) -> str:

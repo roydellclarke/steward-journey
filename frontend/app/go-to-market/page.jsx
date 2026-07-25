@@ -50,7 +50,6 @@ export default function GoToMarketPage() {
           <div className="publicActions">
             <a href="/" className="primaryCta">View public page</a>
             <a href="/intake" className="primaryCta">Open the readiness program</a>
-            <a href="/readiness">Classic workbench</a>
           </div>
         </div>
       </section>

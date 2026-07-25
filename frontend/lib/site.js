@@ -65,11 +65,12 @@ export const FAQ = [
 // data) are kept out of search and AI indexes on purpose. Guide pages under
 // /content are NOT listed here: the sitemap derives them from CONTENT_SLUGS so
 // a new guide is indexed the moment it is authored, with no second edit.
+// /go-to-market is intentionally NOT listed: it holds internal sales scripts
+// and pricing tests, so it is noindex'd (see app/go-to-market/layout.jsx) and
+// kept out of the sitemap and llms.txt.
 export const PUBLIC_PAGES = [
   { path: "/", priority: 1.0, changeFrequency: "weekly" },
-  { path: "/intake", priority: 0.8, changeFrequency: "monthly" },
-  { path: "/readiness", priority: 0.5, changeFrequency: "monthly" },
-  { path: "/go-to-market", priority: 0.4, changeFrequency: "monthly" }
+  { path: "/intake", priority: 0.8, changeFrequency: "monthly" }
 ];
 
 // Sitemap priority/frequency for the derived /content guide pages.

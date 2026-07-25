@@ -214,6 +214,8 @@ class TestApi(unittest.TestCase):
     def setUp(self):
         import os
         os.environ["STEWARDPATH_DATA_ROOT"] = tempfile.mkdtemp()
+        # Never call real LLM providers from tests, even if backend/.env enables them.
+        os.environ["STEWARDPATH_USE_LLM"] = "false"
         from fastapi.testclient import TestClient
         # Re-import app fresh so it binds to the temp data root.
         import importlib

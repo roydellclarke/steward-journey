@@ -39,8 +39,7 @@ Private by default. Answers are never shared with employees, family, or buyers u
 
 - [Home](${SITE_URL}/): What StewardPath is, who it is for, how it works, what you get, confidentiality, and pricing.
 - [Private readiness check](${SITE_URL}/intake): The guided program. Begin a private readiness check, save and resume by email, and see your readiness.
-- [Readiness workbench](${SITE_URL}/readiness): A classic view of the readiness areas and what the score measures.
-- [For advisors](${SITE_URL}/go-to-market): How CPAs, exit planners, and estate lawyers can bring owner clients in already prepared.
+- [For advisors](${SITE_URL}/advisor): How CPAs, exit planners, and estate lawyers can bring owner clients in already prepared.
 - [Trades readiness guide](${SITE_URL}/content/trades-readiness.md): Selling or handing off an HVAC, plumbing, electrical, or contracting business, in plain owner language.
 - [Privacy](${SITE_URL}/privacy) and [Terms](${SITE_URL}/terms).
 

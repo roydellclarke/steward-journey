@@ -120,17 +120,39 @@ def _parse_json_object(text: str) -> dict[str, Any]:
 
 
 def _merge_enrichment(base: dict[str, Any], kimi: dict[str, Any], deepseek: dict[str, Any]) -> dict[str, Any]:
+    """Overlay LLM output onto the deterministic base.
+
+    Product law: the LLM may refine wording only, never invent or change a
+    computed figure. So this whitelists narrative/text fields and never copies
+    numeric keys (readiness `dimensions`/`overall`, Buffett `scores`) from the
+    model. The deterministic scores always win.
+    """
+
     output = json.loads(json.dumps(base))
-    if kimi.get("narratives"):
-        output["narratives"].update(kimi["narratives"])
-    if kimi.get("jtbd"):
-        output["jtbd"].update(kimi["jtbd"])
+
+    # Kimi: owner-facing narrative text.
+    if isinstance(kimi.get("narratives"), dict):
+        output.setdefault("narratives", {}).update(
+            {k: v for k, v in kimi["narratives"].items() if isinstance(v, str)}
+        )
+    if isinstance(kimi.get("jtbd"), dict):
+        output.setdefault("jtbd", {}).update(kimi["jtbd"])
     if kimi.get("owner_questions"):
         output["owner_questions"] = kimi["owner_questions"]
-    if deepseek.get("readiness"):
-        output["readiness"].update(deepseek["readiness"])
-    if deepseek.get("buffett_quality"):
-        output["buffett_quality"].update(deepseek["buffett_quality"])
+
+    # DeepSeek: refine wording only. Protect every deterministic score.
+    ds_readiness = deepseek.get("readiness")
+    if isinstance(ds_readiness, dict) and isinstance(ds_readiness.get("interpretation"), str):
+        # Only the interpretation sentence may be reworded; dimensions and
+        # overall stay exactly as computed.
+        output.setdefault("readiness", {})["interpretation"] = ds_readiness["interpretation"]
+    ds_quality = deepseek.get("buffett_quality")
+    if isinstance(ds_quality, dict):
+        quality = output.setdefault("buffett_quality", {})
+        if isinstance(ds_quality.get("summary"), str):
+            quality["summary"] = ds_quality["summary"]
+        if isinstance(ds_quality.get("questions_to_answer"), list):
+            quality["questions_to_answer"] = ds_quality["questions_to_answer"]
     if deepseek.get("risks"):
         output["advisor_risks"] = deepseek["risks"]
     if deepseek.get("next_best_questions"):
