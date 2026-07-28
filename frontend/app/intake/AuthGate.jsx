@@ -9,8 +9,8 @@ const GATE_COPY = {
   save: {
     eyebrow: "Save and resume",
     title: "Pick this back up later",
-    body: "Your answers stay private to you. Enter your email and we will send you a 6-digit code. You put that code in on the next screen to keep going. No password to remember.",
-    sendCta: "Email me my code",
+    body: "Your answers are already saved and private to you. Enter your email so you can return on any device, even weeks from now. We send a 6-digit code to confirm it is you, plus a secure link that stays good for a while. No password to remember.",
+    sendCta: "Email me my link",
     verifyCta: "Save and continue"
   },
   report: {
@@ -38,6 +38,7 @@ export default function AuthGate({ gate = "save", projectId, knownEmail = "", on
   const [email, setEmail] = useState(knownEmail);
   const [code, setCode] = useState("");
   const [ttl, setTtl] = useState(10);
+  const [linkDays, setLinkDays] = useState(14);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const panelRef = useRef(null);
@@ -49,6 +50,7 @@ export default function AuthGate({ gate = "save", projectId, knownEmail = "", on
     try {
       const res = await authApi.request(email.trim(), projectId, gate);
       setTtl(res.ttlMinutes || 10);
+      if (res.linkDays) setLinkDays(res.linkDays);
       setStep("code");
     } catch (e) {
       setError(e.message || "Please enter a valid email address.");
@@ -106,8 +108,9 @@ export default function AuthGate({ gate = "save", projectId, knownEmail = "", on
           >
             <p className="authSent">
               Check your email. We just sent a 6-digit code to <strong>{email}</strong>. If you do not see it
-              in a minute, look in your spam or junk folder. Type the code below to keep going. The same email
-              also has a button you can click instead. The code works once and expires in about {ttl} minutes.
+              in a minute, look in your spam or junk folder. Type the code below to keep going. The code works
+              once and expires in about {ttl} minutes. No rush to finish today: the same email has a secure
+              link that lasts {linkDays} days, so you can pick this back up later.
             </p>
             <label className="authLabel" htmlFor="authCode">Your 6-digit code</label>
             <input

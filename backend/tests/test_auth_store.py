@@ -67,6 +67,22 @@ class TestCodeVerification(AuthStoreTestCase):
         self.assertFalse(result.ok)
         self.assertEqual(result.reason, "expired")
 
+    def test_code_expires_short_but_link_lasts_long(self) -> None:
+        # "Save and finish later": the 6-digit code dies fast, the magic link
+        # survives for days so the owner can come back next week.
+        self._challenge(ttl_minutes=10, link_ttl_minutes=14 * 24 * 60)
+        code_res = self.store.verify_code("owner@example.com", "123456", now=BASE + timedelta(minutes=30))
+        self.assertFalse(code_res.ok)
+        self.assertEqual(code_res.reason, "expired")
+        link_res = self.store.consume_token("magic-token-abc", now=BASE + timedelta(days=7))
+        self.assertTrue(link_res.ok)
+
+    def test_magic_link_still_expires_after_its_window(self) -> None:
+        self._challenge(ttl_minutes=10, link_ttl_minutes=14 * 24 * 60)
+        res = self.store.consume_token("magic-token-abc", now=BASE + timedelta(days=15))
+        self.assertFalse(res.ok)
+        self.assertEqual(res.reason, "expired")
+
     def test_reused_code_rejected(self) -> None:
         self._challenge()
         first = self.store.verify_code("owner@example.com", "123456", now=BASE)

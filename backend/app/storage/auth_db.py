@@ -89,18 +89,19 @@ class AuthStore:
                 );
 
                 CREATE TABLE IF NOT EXISTS auth_challenges (
-                    id           TEXT PRIMARY KEY,
-                    email        TEXT NOT NULL,
-                    code_hash    TEXT NOT NULL,
-                    token_hash   TEXT NOT NULL,
-                    gate         TEXT NOT NULL,
-                    project_id   TEXT,
-                    created_at   TEXT NOT NULL,
-                    expires_at   TEXT NOT NULL,
-                    consumed_at  TEXT,
-                    attempts     INTEGER NOT NULL DEFAULT 0,
-                    max_attempts INTEGER NOT NULL DEFAULT 5,
-                    request_ip   TEXT
+                    id              TEXT PRIMARY KEY,
+                    email           TEXT NOT NULL,
+                    code_hash       TEXT NOT NULL,
+                    token_hash      TEXT NOT NULL,
+                    gate            TEXT NOT NULL,
+                    project_id      TEXT,
+                    created_at      TEXT NOT NULL,
+                    expires_at      TEXT NOT NULL,
+                    code_expires_at TEXT,
+                    consumed_at     TEXT,
+                    attempts        INTEGER NOT NULL DEFAULT 0,
+                    max_attempts    INTEGER NOT NULL DEFAULT 5,
+                    request_ip      TEXT
                 );
                 CREATE INDEX IF NOT EXISTS idx_challenges_email ON auth_challenges (email);
 
@@ -136,6 +137,12 @@ class AuthStore:
             cols = {row["name"] for row in conn.execute("PRAGMA table_info(entitlements)").fetchall()}
             if "stripe_subscription_id" not in cols:
                 conn.execute("ALTER TABLE entitlements ADD COLUMN stripe_subscription_id TEXT")
+            # Split code/link lifetimes: the short code window lives here, the
+            # long link window stays in expires_at. Older rows have NULL, and the
+            # code check falls back to expires_at for them.
+            chal_cols = {row["name"] for row in conn.execute("PRAGMA table_info(auth_challenges)").fetchall()}
+            if "code_expires_at" not in chal_cols:
+                conn.execute("ALTER TABLE auth_challenges ADD COLUMN code_expires_at TEXT")
 
     # ---------------------------------------------------------------- orders
     def claim_finalization(self, session_id: str, *, now: datetime | None = None) -> bool:
@@ -169,21 +176,28 @@ class AuthStore:
         gate: str,
         project_id: str | None,
         ttl_minutes: int,
+        link_ttl_minutes: int | None = None,
         request_ip: str | None = None,
         max_attempts: int = 5,
         now: datetime | None = None,
     ) -> str:
-        """Store one sign-in challenge. Returns its id. Code/token kept as hashes."""
+        """Store one sign-in challenge. Returns its id. Code/token kept as hashes.
+
+        ``ttl_minutes`` bounds the short 6-digit code. ``link_ttl_minutes`` bounds
+        the magic link (a high-entropy token), which can live far longer so an
+        owner can save and come back days later. Defaults to the code window.
+        """
 
         moment = now or _now()
+        link_minutes = link_ttl_minutes if link_ttl_minutes is not None else ttl_minutes
         challenge_id = str(uuid4())
         with self._connect() as conn:
             conn.execute(
                 """
                 INSERT INTO auth_challenges
                     (id, email, code_hash, token_hash, gate, project_id,
-                     created_at, expires_at, consumed_at, attempts, max_attempts, request_ip)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL, 0, ?, ?)
+                     created_at, expires_at, code_expires_at, consumed_at, attempts, max_attempts, request_ip)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, 0, ?, ?)
                 """,
                 (
                     challenge_id,
@@ -193,6 +207,7 @@ class AuthStore:
                     gate,
                     project_id,
                     _iso(moment),
+                    _iso(moment + timedelta(minutes=link_minutes)),
                     _iso(moment + timedelta(minutes=ttl_minutes)),
                     max_attempts,
                     request_ip,
@@ -244,7 +259,10 @@ class AuthStore:
             ).fetchone()
             if row is None:
                 return ConsumeResult(False, "not_found", email=normalized)
-            if _parse(row["expires_at"]) <= moment:
+            # The 6-digit code expires at the short code window. Old rows created
+            # before the split have no code_expires_at, so fall back to expires_at.
+            code_deadline = row["code_expires_at"] or row["expires_at"]
+            if _parse(code_deadline) <= moment:
                 return ConsumeResult(False, "expired", email=normalized)
             if row["attempts"] >= row["max_attempts"]:
                 return ConsumeResult(False, "too_many_attempts", email=normalized)

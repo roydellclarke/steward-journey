@@ -41,11 +41,20 @@ export default function IntakePage() {
 
   useEffect(() => {
     const saved = typeof window !== "undefined" ? window.localStorage.getItem(STORAGE_KEY) : "";
-    if (saved) setResumeId(saved);
     // Restore any existing session so we can greet a returning owner by email.
     authApi.me().then((me) => {
       if (me.authenticated) setAccount({ authenticated: true, email: me.email, entitlements: me.entitlements || [] });
     }).catch(() => {});
+    // A refresh mid-intake must restore the saved project, not drop the owner
+    // back to the trust screen where "Begin" would start a fresh 8% check and
+    // orphan their answers. Auto-resume; a claimed project falls through to the
+    // sign-in gate, an unclaimed one loads straight away.
+    if (saved) {
+      setResumeId(saved);
+      begin(saved, false);
+    }
+    // begin is a stable declaration; running it once on mount is intended.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Concierge buyers paid for a private review with a person. Surface it as a

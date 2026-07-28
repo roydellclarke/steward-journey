@@ -1500,14 +1500,20 @@ textarea:focus { outline: none; border-color: var(--sp-sage); }
 .resumeBar {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 12px 24px;
   align-items: center;
   justify-content: space-between;
-  padding: 14px clamp(20px, 4vw, 56px);
-  background: var(--sp-green-soft, var(--sp-card));
+  /* Match the hero/band horizontal rhythm so it reads as part of the page,
+     not a separate notification strip. */
+  padding: 16px var(--sp-pad-x);
+  background: color-mix(in srgb, var(--sp-sage) 8%, var(--sp-paper));
   border-bottom: 1px solid var(--sp-line);
-  font-weight: 600;
   color: var(--sp-ink);
+  font-size: 0.95rem;
+}
+.resumeBar .primaryCta {
+  min-height: 40px;
+  padding: 8px 16px;
 }
 
 @media (max-width: 980px) {

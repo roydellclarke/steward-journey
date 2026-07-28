@@ -95,14 +95,14 @@ export default function PublicHome() {
 
   function scrollToRequest() {
     document.getElementById("request")?.scrollIntoView({ behavior: "smooth", block: "center" });
-    setStatus("Add your details below, then choose an option.");
+    setStatus("Add your details, then choose an option.");
   }
 
   async function submitLead(intent) {
     if (busy) return;
     if (!lead.name && !lead.email) {
       scrollToRequest();
-      setStatus("Add your name or email below, then we will send it.");
+      setStatus("Add your name or email, then we will send it.");
       return;
     }
     setBusy(true);
@@ -317,6 +317,7 @@ export default function PublicHome() {
             an option.
           </p>
         </div>
+        {status ? <p className="leadStatus">{status}</p> : null}
         {/* Enter submits the sample request (the form's primary action) instead
             of doing nothing. Starting the check itself is a separate CTA below. */}
         <form className="leadForm" onSubmit={(event) => { event.preventDefault(); if (!busy) submitLead("sample_report"); }}>
@@ -334,7 +335,6 @@ export default function PublicHome() {
             <button type="button" onClick={copyAdvisorMessage}>Copy advisor message</button>
           </div>
         </form>
-        {status ? <p className="leadStatus">{status}</p> : null}
       </section>
 
       <section className="publicBand">

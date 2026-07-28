@@ -47,6 +47,7 @@ class Settings:
     frontend_origin: str
     auth_db_path: Path
     otp_ttl_minutes: int
+    magic_link_ttl_minutes: int
     postmark_token: str
     postmark_from: str
     resend_api_key: str
@@ -88,6 +89,10 @@ class Settings:
             frontend_origin=os.getenv("STEWARDPATH_FRONTEND_ORIGIN", "http://localhost:3000"),
             auth_db_path=Path(os.getenv("STEWARDPATH_AUTH_DB_PATH", str(auth_db_default))).resolve(),
             otp_ttl_minutes=int(os.getenv("STEWARDPATH_OTP_TTL_MINUTES", "10")),
+            # The 6-digit code stays short (it is low entropy). The magic link is
+            # a 256-bit token, so it can safely live long enough to support
+            # "save and finish later". Default: 14 days.
+            magic_link_ttl_minutes=int(os.getenv("STEWARDPATH_MAGIC_LINK_TTL_MINUTES", str(14 * 24 * 60))),
             postmark_token=os.getenv("STEWARDPATH_POSTMARK_TOKEN", ""),
             postmark_from=os.getenv("STEWARDPATH_POSTMARK_FROM", ""),
             resend_api_key=os.getenv("STEWARDPATH_RESEND_API_KEY", ""),
