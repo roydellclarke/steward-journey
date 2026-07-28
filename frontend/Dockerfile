@@ -16,6 +16,10 @@ ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
 RUN npm run build
 
 FROM node:22-alpine AS runner
+# Links the published image to the repo on the GHCR package page (final stage).
+LABEL org.opencontainers.image.source="https://github.com/roydellclarke/steward-journey"
+LABEL org.opencontainers.image.description="StewardPath frontend (Next.js)"
+LABEL org.opencontainers.image.licenses="UNLICENSED"
 WORKDIR /app
 ENV NODE_ENV=production
 COPY --from=builder /app/.next/standalone ./

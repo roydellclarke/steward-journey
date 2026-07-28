@@ -1,5 +1,10 @@
 FROM python:3.12-alpine
 
+# Links the published image to the repo on the GHCR package page.
+LABEL org.opencontainers.image.source="https://github.com/roydellclarke/steward-journey"
+LABEL org.opencontainers.image.description="StewardPath backend (FastAPI)"
+LABEL org.opencontainers.image.licenses="UNLICENSED"
+
 WORKDIR /app
 
 COPY pyproject.toml ./
