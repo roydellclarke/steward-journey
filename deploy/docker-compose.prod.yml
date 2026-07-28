@@ -1,0 +1,47 @@
+# Production deploy for the server at stewardpathfinder.com (both A records point
+# here). Run ON THAT SERVER:
+#
+#   1. docker login ghcr.io -u roydellclarke   (GitHub PAT with read:packages)
+#   2. put the filled-in .env.production and this Caddyfile next to this file
+#   3. docker compose -f docker-compose.prod.yml up -d
+#
+# Caddy terminates TLS for both hostnames and proxies to the internal containers.
+# The frontend has its API URL (https://api.stewardpathfinder.com) compiled in,
+# so the browser calls the public API host, which Caddy routes to the backend.
+services:
+  backend:
+    image: ghcr.io/roydellclarke/stewardpath-backend:v0.2.0
+    env_file:
+      - .env.production
+    volumes:
+      - stewardpath-data:/data/stewardpath   # durable owner data + auth.db
+    restart: unless-stopped
+    expose:
+      - "8000"
+
+  frontend:
+    image: ghcr.io/roydellclarke/stewardpath-frontend:v0.2.0
+    restart: unless-stopped
+    depends_on:
+      - backend
+    expose:
+      - "3000"
+
+  caddy:
+    image: caddy:2-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data     # persists issued TLS certs across restarts
+      - caddy-config:/config
+    restart: unless-stopped
+    depends_on:
+      - frontend
+      - backend
+
+volumes:
+  stewardpath-data:
+  caddy-data:
+  caddy-config:
