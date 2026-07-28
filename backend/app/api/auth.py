@@ -54,7 +54,9 @@ def build_auth_router(
     router = APIRouter(prefix="/auth", tags=["auth"])
 
     link_serializer = URLSafeTimedSerializer(settings.secret_key, salt="sp-magic-link")
-    ttl_seconds = settings.otp_ttl_minutes * 60
+    # The signed link is valid for the long window so an owner can save and come
+    # back days later; the 6-digit code stays short (enforced in the store).
+    link_ttl_seconds = settings.magic_link_ttl_minutes * 60
 
     def _complete_auth(*, email: str, gate: str | None, project_id: str | None, response: Response) -> dict:
         """Find-or-create the owner, claim the intake project, issue a session."""
@@ -105,6 +107,7 @@ def build_auth_router(
                 gate=body.gate,
                 project_id=body.project_id,
                 ttl_minutes=settings.otp_ttl_minutes,
+                link_ttl_minutes=settings.magic_link_ttl_minutes,
                 request_ip=request.client.host if request.client else None,
                 max_attempts=MAX_CODE_ATTEMPTS,
             )
@@ -126,7 +129,11 @@ def build_auth_router(
         # Uniform response regardless of existence or rate state. (A real
         # delivery failure above is reported; a throttled, not-sent request
         # still answers ok so the throttle stays invisible.)
-        return {"ok": True, "ttlMinutes": settings.otp_ttl_minutes}
+        return {
+            "ok": True,
+            "ttlMinutes": settings.otp_ttl_minutes,
+            "linkDays": max(1, round(settings.magic_link_ttl_minutes / (24 * 60))),
+        }
 
     # --------------------------------------------------------------- verify
     @router.post("/verify")
@@ -151,7 +158,7 @@ def build_auth_router(
         must POST an explicit confirmation to sign in."""
 
         try:
-            payload = link_serializer.loads(token, max_age=ttl_seconds)
+            payload = link_serializer.loads(token, max_age=link_ttl_seconds)
         except (BadSignature, SignatureExpired):
             raise HTTPException(status_code=400, detail=_GENERIC_FAILURE)
         return {"ok": True, "gate": payload.get("g", "save")}
@@ -160,7 +167,7 @@ def build_auth_router(
     @limiter.limit("30/minute")
     def confirm_link(body: AuthConfirmBody, request: Request, response: Response) -> dict:
         try:
-            payload = link_serializer.loads(body.token, max_age=ttl_seconds)
+            payload = link_serializer.loads(body.token, max_age=link_ttl_seconds)
         except (BadSignature, SignatureExpired):
             raise HTTPException(status_code=400, detail=_GENERIC_FAILURE)
         result = auth_store.consume_token(payload.get("t", ""))

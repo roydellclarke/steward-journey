@@ -193,7 +193,18 @@ def _bool_from_text(value: Any) -> bool | None:
     return True
 
 
-def _completion_pct(state: dict[str, Any]) -> int:
+# "answered"/"estimated" count toward completion. "skipped" counts too: the
+# owner made a decision, the flow can proceed. "unknown" is an open gap.
+_COMPLETE_STATUSES = {"answered", "estimated", "skipped"}
+
+
+def _completion_counts(state: dict[str, Any]) -> tuple[int, int]:
+    """Return (complete, total) fields, the basis for the completion percent.
+
+    ``total`` counts every defined field, including ones branching has not
+    surfaced yet; ``complete`` counts those answered, estimated, or skipped.
+    """
+
     fields: list[dict[str, Any]] = []
 
     def collect(value: Any) -> None:
@@ -207,12 +218,30 @@ def _completion_pct(state: dict[str, Any]) -> int:
 
     for section in list(SECTION_FIELDS.keys()) + ["nonNegotiables"]:
         collect(state.get(section))
-    if not fields:
+    complete = len([item for item in fields if item.get("status") in _COMPLETE_STATUSES])
+    return complete, len(fields)
+
+
+def _completion_pct(state: dict[str, Any]) -> int:
+    complete, total = _completion_counts(state)
+    if not total:
         return 0
-    # "answered"/"estimated" count toward completion. "skipped" counts too: the
-    # owner made a decision, the flow can proceed. "unknown" is an open gap.
-    complete = len([item for item in fields if item.get("status") in {"answered", "estimated", "skipped"}])
-    return round((complete / len(fields)) * 100)
+    return round((complete / total) * 100)
+
+
+def _set_completion(state: dict[str, Any]) -> None:
+    """Write the completion percent plus the raw counts into meta.
+
+    Exposing ``completeFields``/``totalFields`` lets the UI show live progress
+    against the same denominator the backend uses, so the number does not
+    snap back when the answers save.
+    """
+
+    complete, total = _completion_counts(state)
+    meta = state.setdefault("meta", {})
+    meta["completionPct"] = round((complete / total) * 100) if total else 0
+    meta["completeFields"] = complete
+    meta["totalFields"] = total
 
 
 def _legacy_profile_field(section: str, name: str, profile: dict[str, Any]) -> dict[str, Any]:
@@ -327,6 +356,8 @@ def migrate_profile_to_intake_state(
             "createdAt": existing_meta.get("createdAt") or timestamp,
             "updatedAt": timestamp,
             "completionPct": 0,
+            "completeFields": 0,
+            "totalFields": 0,
             "lastSection": existing_meta.get("lastSection") or SECTION_ORDER[0],
             "snapshots": list(existing_meta.get("snapshots", [])),
         },
@@ -351,7 +382,7 @@ def migrate_profile_to_intake_state(
     state["uploads"] = list(existing.get("uploads", []))
     state["derived"] = existing.get("derived") if isinstance(existing.get("derived"), dict) else None
 
-    state["meta"]["completionPct"] = _completion_pct(state)
+    _set_completion(state)
     return state
 
 
@@ -396,7 +427,7 @@ def merge_intake_patch(state: dict[str, Any], patch: dict[str, Any] | None) -> d
         state["meta"]["lastSection"] = patch_meta["lastSection"]
 
     state["meta"]["updatedAt"] = _now()
-    state["meta"]["completionPct"] = _completion_pct(state)
+    _set_completion(state)
     return state
 
 
@@ -454,7 +485,7 @@ def set_derived(state: dict[str, Any], derived: dict[str, Any]) -> dict[str, Any
 def append_snapshot(state: dict[str, Any], readiness_score: int | float | None) -> dict[str, Any]:
     state = migrate_profile_to_intake_state({}, state)
     state["meta"]["updatedAt"] = _now()
-    state["meta"]["completionPct"] = _completion_pct(state)
+    _set_completion(state)
     snapshots = list(state["meta"].get("snapshots", []))
     snapshots.append({"takenAt": _now(), "readinessScore": int(readiness_score or 0)})
     state["meta"]["snapshots"] = snapshots[-24:]

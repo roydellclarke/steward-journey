@@ -1193,6 +1193,55 @@ button:focus-visible,
   -webkit-text-fill-color: var(--sp-ink);
 }
 
+/* The page imports intake.css for the auth modal. Its generic .primaryCta/button
+   rules use tokens scoped to .conciergeShell, so out here they collapse to a
+   transparent background and near-white text: the lead buttons vanish until
+   hover. Style the lead actions explicitly (higher specificity wins): one solid
+   primary, three outlined secondaries. */
+.leadButtons .primaryCta {
+  border-color: var(--sp-green);
+  background: var(--sp-green);
+  color: #fff;
+  -webkit-text-fill-color: #fff;
+}
+.leadButtons .primaryCta:hover,
+.leadButtons .primaryCta:focus-visible {
+  border-color: var(--sp-green-strong);
+  background: var(--sp-green-strong);
+  color: #fff;
+  -webkit-text-fill-color: #fff;
+}
+.leadButtons button {
+  border: 1px solid var(--sp-line-strong);
+  background: var(--sp-card);
+  color: var(--sp-ink);
+  -webkit-text-fill-color: var(--sp-ink);
+}
+.leadButtons button:hover,
+.leadButtons button:focus-visible {
+  border-color: var(--sp-ink);
+  background: var(--sp-card);
+  color: var(--sp-ink);
+  -webkit-text-fill-color: var(--sp-ink);
+}
+
+/* Same intake.css leak hits the auth modal when it opens on a public page
+   (save-for-later or checkout from the home page, outside .conciergeShell):
+   its primary button goes transparent. Pin it so it is always visible. */
+.authPanel .primaryCta {
+  border-color: var(--sp-green);
+  background: var(--sp-green);
+  color: #fff;
+  -webkit-text-fill-color: #fff;
+}
+.authPanel .primaryCta:hover,
+.authPanel .primaryCta:focus-visible {
+  border-color: var(--sp-green-strong);
+  background: var(--sp-green-strong);
+  color: #fff;
+  -webkit-text-fill-color: #fff;
+}
+
 .heroReport,
 .privacyBox,
 .publicGrid article,
@@ -1320,6 +1369,12 @@ button:focus-visible,
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+/* FAQ: one readable column. Answers run long, so a wide single column reads
+   better than a cramped multi-column grid. */
+.publicGrid.faq {
+  grid-template-columns: minmax(0, 760px);
+}
+
 .publicGrid article,
 .offerBand article,
 .privacyBox {
@@ -1445,14 +1500,20 @@ textarea:focus { outline: none; border-color: var(--sp-sage); }
 .resumeBar {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 12px 24px;
   align-items: center;
   justify-content: space-between;
-  padding: 14px clamp(20px, 4vw, 56px);
-  background: var(--sp-green-soft, var(--sp-card));
+  /* Match the hero/band horizontal rhythm so it reads as part of the page,
+     not a separate notification strip. */
+  padding: 16px var(--sp-pad-x);
+  background: color-mix(in srgb, var(--sp-sage) 8%, var(--sp-paper));
   border-bottom: 1px solid var(--sp-line);
-  font-weight: 600;
   color: var(--sp-ink);
+  font-size: 0.95rem;
+}
+.resumeBar .primaryCta {
+  min-height: 40px;
+  padding: 8px 16px;
 }
 
 @media (max-width: 980px) {

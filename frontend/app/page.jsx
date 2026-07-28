@@ -3,8 +3,21 @@
 import { useEffect, useState } from "react";
 import { apiFetch, startCheckout } from "../lib/api";
 import { authApi } from "../lib/auth";
+import { FAQ } from "../lib/site";
 import AuthGate from "./intake/AuthGate";
 import "./intake/intake.css"; // overlay/auth modal styles used by AuthGate
+
+// Site-wide FAQ structured data, built from the same FAQ array the page renders
+// visibly below, so the schema.org FAQPage always matches on-page text.
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: FAQ.map(({ q, a }) => ({
+    "@type": "Question",
+    name: q,
+    acceptedAnswer: { "@type": "Answer", text: a }
+  }))
+};
 
 // Where each purchased product sends the owner. Payment is tied to their
 // account, so a later visit lands them on the right path too.
@@ -82,14 +95,14 @@ export default function PublicHome() {
 
   function scrollToRequest() {
     document.getElementById("request")?.scrollIntoView({ behavior: "smooth", block: "center" });
-    setStatus("Add your details below, then choose an option.");
+    setStatus("Add your details, then choose an option.");
   }
 
   async function submitLead(intent) {
     if (busy) return;
     if (!lead.name && !lead.email) {
       scrollToRequest();
-      setStatus("Add your name or email below, then we will send it.");
+      setStatus("Add your name or email, then we will send it.");
       return;
     }
     setBusy(true);
@@ -100,8 +113,8 @@ export default function PublicHome() {
         body: JSON.stringify({ ...lead, intent })
       });
       const confirmation = intent === "readiness_call"
-        ? "Got it. We will reach out privately to set up your readiness review."
-        : "Saved. Check your email, or start the private check now.";
+        ? "Got it. We will reach out privately to set up your readiness review. No email to look for right now."
+        : "Thanks, we saved your request. To see the questions, your score, and your plan now, click the dark Start private readiness check button above. It is free to begin.";
       setStatus(confirmation);
     } catch (error) {
       setStatus(`Could not save yet: ${error.message}`);
@@ -192,9 +205,6 @@ export default function PublicHome() {
               <button type="button" onClick={scrollToRequest}>Request sample report</button>
               <button type="button" onClick={scrollToRequest}>Book a readiness review</button>
             </div>
-            <p className="heroAlt">
-              Prefer the classic workbench? <a href="/readiness">Open it here</a>.
-            </p>
           </div>
           <aside className="heroReport">
             <span>StewardPath helps you answer</span>
@@ -300,22 +310,31 @@ export default function PublicHome() {
         <div>
           <p className="publicEyebrow">Request a sample or bring your advisor in</p>
           <h2>Start with a private check. Share only when you are ready.</h2>
+          <p>
+            Ready to begin? Click the dark Start private readiness check button
+            below. It is free, and nothing is shared until you say so. Want a
+            sample first, or bringing in your advisor? Add your details and pick
+            an option.
+          </p>
         </div>
-        <form className="leadForm" onSubmit={(event) => event.preventDefault()}>
-          <input placeholder="Your name" value={lead.name} onChange={(event) => updateLead("name", event.target.value)} />
-          <input placeholder="Email" value={lead.email} onChange={(event) => updateLead("email", event.target.value)} />
-          <input placeholder="Business type" value={lead.businessType} onChange={(event) => updateLead("businessType", event.target.value)} />
-          <input placeholder="Timeline, e.g. 1-3 years" value={lead.timeline} onChange={(event) => updateLead("timeline", event.target.value)} />
-          <select value={lead.role} onChange={(event) => updateLead("role", event.target.value)}>
+        {status ? <p className="leadStatus">{status}</p> : null}
+        {/* Enter submits the sample request (the form's primary action) instead
+            of doing nothing. Starting the check itself is a separate CTA below. */}
+        <form className="leadForm" onSubmit={(event) => { event.preventDefault(); if (!busy) submitLead("sample_report"); }}>
+          <input aria-label="Your name" placeholder="Your name" value={lead.name} onChange={(event) => updateLead("name", event.target.value)} />
+          <input aria-label="Email" type="email" placeholder="Email" value={lead.email} onChange={(event) => updateLead("email", event.target.value)} />
+          <input aria-label="Business type" placeholder="Business type" value={lead.businessType} onChange={(event) => updateLead("businessType", event.target.value)} />
+          <input aria-label="Timeline" placeholder="Timeline, e.g. 1-3 years" value={lead.timeline} onChange={(event) => updateLead("timeline", event.target.value)} />
+          <select aria-label="Your role" value={lead.role} onChange={(event) => updateLead("role", event.target.value)}>
             {advisorTypes.map((role) => <option key={role}>{role}</option>)}
           </select>
           <div className="leadButtons">
-            <button type="button" onClick={() => submitLead("sample_report")} disabled={busy}>{busy ? "Saving…" : "Request sample report"}</button>
+            <a href="/intake" className="primaryCta">Start private readiness check</a>
+            <button type="submit" disabled={busy}>{busy ? "Saving…" : "Request sample report"}</button>
             <button type="button" onClick={() => submitLead("readiness_call")} disabled={busy}>{busy ? "Saving…" : "Book a readiness review"}</button>
             <button type="button" onClick={copyAdvisorMessage}>Copy advisor message</button>
           </div>
         </form>
-        {status ? <p className="leadStatus">{status}</p> : null}
       </section>
 
       <section className="publicBand">
@@ -337,6 +356,26 @@ export default function PublicHome() {
         </div>
         {payStatus ? <p className="leadStatus" style={{ marginTop: 20 }}>{payStatus}</p> : null}
       </section>
+
+      <section className="publicBand" id="faq">
+        <div>
+          <p className="publicEyebrow">Questions owners ask</p>
+          <h2>Straight answers before you start.</h2>
+        </div>
+        <div className="publicGrid faq">
+          {FAQ.map(({ q, a }) => (
+            <article key={q}>
+              <strong>{q}</strong>
+              <p>{a}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
     </main>
   );
 }

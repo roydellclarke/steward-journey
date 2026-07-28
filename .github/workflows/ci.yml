@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+# Cancel superseded runs on the same ref.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      # No .env in CI. These make app.main importable (the production-secret
+      # guard refuses to boot on the dev secret with secure cookies) and keep
+      # the suite off the network. The auth-store guard tests override these in
+      # their own setUp, so real production posture is still exercised.
+      STEWARDPATH_COOKIE_SECURE: "false"
+      STEWARDPATH_SECRET_KEY: ci-test-secret
+      STEWARDPATH_USE_LLM: "false"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install backend and dependencies
+        run: pip install -e .
+      - name: Run tests
+        run: python -m unittest discover -s tests
+
+  frontend:
+    name: Frontend build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      # A real-looking domain proves the build-time domain guard (lib/site.js)
+      # passes; a placeholder here would fail the production build on purpose.
+      NEXT_PUBLIC_SITE_URL: https://stewardpath.example
+      NEXT_PUBLIC_API_BASE_URL: https://api.stewardpath.example
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install (clean, from lockfile)
+        run: npm ci
+      - name: Build
+        run: npm run build
+
+  docker:
+    name: Docker images build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build both images via compose
+        # Catches the frontend build-arg wiring: the compose file must pass
+        # NEXT_PUBLIC_* as build args, or the production build fails the guard.
+        env:
+          NEXT_PUBLIC_SITE_URL: https://stewardpath.example
+          NEXT_PUBLIC_API_BASE_URL: https://api.stewardpath.example
+        run: docker compose build

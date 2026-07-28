@@ -37,3 +37,11 @@ These are binding for all work in this repo. Follow them every time, without bei
 - Shared design tokens: `frontend/app/theme.css`. Chrome (header/footer): `frontend/app/Chrome.jsx`.
 - Run backend locally on a free port with a Python 3.12 venv (system Python lacks FastAPI): `uv venv --python 3.12 backend/.venv`.
 - Tests: `python -m unittest discover -s backend/tests` (API tests skip without FastAPI).
+
+## gstack
+
+gstack is installed as a skill bundle. Use it as follows.
+
+- **Web browsing:** use the `/browse` skill from gstack for all web browsing. Never use `mcp__claude-in-chrome__*` tools.
+
+Available gstack skills: `/office-hours`, `/plan-ceo-review`, `/plan-eng-review`, `/plan-design-review`, `/design-consultation`, `/design-shotgun`, `/design-html`, `/review`, `/ship`, `/land-and-deploy`, `/canary`, `/benchmark`, `/browse`, `/connect-chrome`, `/qa`, `/qa-only`, `/design-review`, `/setup-browser-cookies`, `/setup-deploy`, `/setup-gbrain`, `/retro`, `/investigate`, `/document-release`, `/document-generate`, `/codex`, `/cso`, `/autoplan`, `/plan-devex-review`, `/devex-review`, `/careful`, `/freeze`, `/guard`, `/unfreeze`, `/gstack-upgrade`, `/learn`.

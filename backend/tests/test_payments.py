@@ -107,6 +107,8 @@ def _reload_app():
     root = tempfile.mkdtemp()
     os.environ["STEWARDPATH_DATA_ROOT"] = root
     os.environ["STEWARDPATH_AUTH_DB_PATH"] = os.path.join(root, "auth", "auth.db")
+    # Never call real LLM providers from tests, even if backend/.env enables them.
+    os.environ["STEWARDPATH_USE_LLM"] = "false"
     os.environ["STEWARDPATH_SECRET_KEY"] = "test-secret-key"
     os.environ["STEWARDPATH_COOKIE_SECURE"] = "false"
     os.environ["STEWARDPATH_FRONTEND_ORIGIN"] = "http://localhost:3000"
@@ -198,6 +200,16 @@ class CheckoutApiTestCase(unittest.TestCase):
         # A second visit to the success page must not send another receipt.
         self.client.get("/checkout/session/cs_test_123")
         self.assertEqual(len(self.main.email_sender.sent), before + 1)
+
+    def test_claim_finalization_is_exactly_once(self):
+        # The atomic claim is what makes finalize safe when the webhook and the
+        # success page race: the first caller wins, everyone after gets False,
+        # so the receipt email and audit event fire exactly once.
+        store = self.main.auth_store
+        self.assertTrue(store.claim_finalization("cs_race"))
+        self.assertFalse(store.claim_finalization("cs_race"))
+        self.assertTrue(store.claim_finalization("cs_other"))
+        self.assertFalse(store.claim_finalization(""))
 
     def test_me_exposes_entitlements_after_purchase(self):
         _sign_in(self.client, self.main)

@@ -1,29 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { authApi } from "../../lib/auth";
+import { useModalA11y } from "./useModalA11y";
 
 // Copy per gate. No em-dashes (project writing law); commas carry the pauses.
 const GATE_COPY = {
   save: {
     eyebrow: "Save and resume",
     title: "Pick this back up later",
-    body: "Your answers stay private to you. Want to pick this back up later? Enter your email and we'll send a secure link, no password to remember.",
-    sendCta: "Send my secure code",
+    body: "Your answers are already saved and private to you. Enter your email so you can return on any device, even weeks from now. We send a 6-digit code to confirm it is you, plus a secure link that stays good for a while. No password to remember.",
+    sendCta: "Email me my link",
     verifyCta: "Save and continue"
   },
   report: {
     eyebrow: "Your readiness report",
     title: "Open your report",
-    body: "Your readiness report is ready. Enter your email and we'll send a secure link to open it. It stays private, and you decide if you ever share it.",
-    sendCta: "Send my secure code",
+    body: "Your readiness report is ready. Enter your email and we will send you a 6-digit code. You put that code in on the next screen to open your report. It stays private, and you decide if you ever share it.",
+    sendCta: "Email me my code",
     verifyCta: "Open my report"
   },
   checkout: {
     eyebrow: "Secure checkout",
     title: "Sign in to continue",
-    body: "Enter your email and we'll send a secure code. Signing in first ties your purchase to your account, so you pick up right where you left off next time. No password to remember.",
-    sendCta: "Send my secure code",
+    body: "Enter your email and we will send you a 6-digit code. You put that code in on the next screen. Signing in first ties your purchase to your account, so you pick up right where you left off next time. No password to remember.",
+    sendCta: "Email me my code",
     verifyCta: "Continue to payment"
   }
 };
@@ -37,8 +38,11 @@ export default function AuthGate({ gate = "save", projectId, knownEmail = "", on
   const [email, setEmail] = useState(knownEmail);
   const [code, setCode] = useState("");
   const [ttl, setTtl] = useState(10);
+  const [linkDays, setLinkDays] = useState(14);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const panelRef = useRef(null);
+  useModalA11y(panelRef, onClose);
 
   async function sendCode() {
     setError("");
@@ -46,6 +50,7 @@ export default function AuthGate({ gate = "save", projectId, knownEmail = "", on
     try {
       const res = await authApi.request(email.trim(), projectId, gate);
       setTtl(res.ttlMinutes || 10);
+      if (res.linkDays) setLinkDays(res.linkDays);
       setStep("code");
     } catch (e) {
       setError(e.message || "Please enter a valid email address.");
@@ -67,13 +72,13 @@ export default function AuthGate({ gate = "save", projectId, knownEmail = "", on
   }
 
   return (
-    <div className="dataOverlay" role="dialog" aria-modal="true" aria-labelledby="authGateTitle">
+    <div className="dataOverlay" role="dialog" aria-modal="true" aria-labelledby="authGateTitle" ref={panelRef}>
       <div className="dataPanel authPanel">
         <div className="dataHead">
           <h2 id="authGateTitle">{copy.title}</h2>
           <button type="button" onClick={onClose} aria-label="Close">×</button>
         </div>
-        <p className="conciergeEyebrow">{copy.eyebrow}</p>
+        <p className="conciergeEyebrow">{copy.eyebrow} · {step === "email" ? "Step 1 of 2" : "Step 2 of 2"}</p>
         <p className="authBody">{copy.body}</p>
 
         {step === "email" ? (
@@ -102,8 +107,10 @@ export default function AuthGate({ gate = "save", projectId, knownEmail = "", on
             onSubmit={(e) => { e.preventDefault(); if (!busy && code.trim().length >= 6) verify(); }}
           >
             <p className="authSent">
-              We sent a 6-digit code to <strong>{email}</strong>. Enter it below. The same email also has a
-              secure link you can open instead. The code works once and expires in about {ttl} minutes.
+              Check your email. We just sent a 6-digit code to <strong>{email}</strong>. If you do not see it
+              in a minute, look in your spam or junk folder. Type the code below to keep going. The code works
+              once and expires in about {ttl} minutes. No rush to finish today: the same email has a secure
+              link that lasts {linkDays} days, so you can pick this back up later.
             </p>
             <label className="authLabel" htmlFor="authCode">Your 6-digit code</label>
             <input

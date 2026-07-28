@@ -7,6 +7,7 @@ import hmac
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
@@ -78,6 +79,24 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Cap request bodies. Owner intake is far smaller than this; the cap stops a
+# single anonymous caller from filling the disk with a giant profile/intake
+# blob. This checks the declared length (what every browser and our frontend
+# send); the store itself stays the durable boundary.
+MAX_BODY_BYTES = 1_000_000
+
+
+@app.middleware("http")
+async def limit_body_size(request: Request, call_next):
+    declared = request.headers.get("content-length")
+    if declared is not None:
+        try:
+            if int(declared) > MAX_BODY_BYTES:
+                return JSONResponse(status_code=413, content={"detail": "Request body too large."})
+        except ValueError:
+            return JSONResponse(status_code=400, content={"detail": "Invalid Content-Length."})
+    return await call_next(request)
 
 app.include_router(
     build_auth_router(
@@ -154,20 +173,21 @@ def health() -> dict:
 
 
 @app.post("/analyze")
-def analyze(request: RunAnalysisRequest, http_request: Request) -> dict:
-    profile = _profile_from_request(request.profile)
+@limiter.limit("20/minute")
+def analyze(request: Request, body: RunAnalysisRequest) -> dict:
+    profile = _profile_from_request(body.profile)
     analysis = analyze_owner_profile_with_optional_llm(profile, settings)
     saved_analysis = None
-    if request.project_id:
+    if body.project_id:
         # This endpoint can persist to a project, so it must honor the same
         # ownership rule as the /projects routes (else it is a write bypass).
-        require_project_access(request.project_id, http_request)
+        require_project_access(body.project_id, request)
         # Persist any intake-state edits the owner made before analyzing.
-        if request.intake_state is not None:
-            store.update_project(request.project_id, name=None, profile=None, intake_state=request.intake_state)
+        if body.intake_state is not None:
+            store.update_project(body.project_id, name=None, profile=None, intake_state=body.intake_state)
         saved_analysis = store.append_analysis(
-            request.project_id,
-            profile_snapshot=_camel_profile(request.profile),
+            body.project_id,
+            profile_snapshot=_camel_profile(body.profile),
             analysis=analysis,
         )
         if saved_analysis is None:
@@ -208,8 +228,9 @@ def list_projects(request: Request) -> dict:
 
 
 @app.post("/projects", status_code=201)
-def create_project(request: ProjectCreateRequest) -> dict:
-    return {"project": store.create_project(name=request.name, profile=request.profile, intake_state=request.intake_state)}
+@limiter.limit("20/minute")
+def create_project(request: Request, body: ProjectCreateRequest) -> dict:
+    return {"project": store.create_project(name=body.name, profile=body.profile, intake_state=body.intake_state)}
 
 
 @app.get("/projects/{project_id}")
@@ -301,7 +322,8 @@ def intake_plan(body: IntakeStateBody) -> dict:
 
 
 @app.post("/intake/reflect")
-def intake_reflect(body: ReflectRequest) -> dict:
+@limiter.limit("20/minute")
+def intake_reflect(request: Request, body: ReflectRequest) -> dict:
     state = migrate_profile_to_intake_state(None, body.intake_state)
     reflection = build_reflection(
         state,
@@ -454,20 +476,24 @@ def list_leads(_admin: None = Depends(require_admin)) -> dict:
 
 
 @app.post("/leads", status_code=201)
-def create_lead(request: LeadCreateRequest) -> dict:
-    if not request.name and not request.email:
+@limiter.limit("10/minute")
+def create_lead(request: Request, body: LeadCreateRequest) -> dict:
+    if not body.name and not body.email:
         raise HTTPException(status_code=400, detail="Please include at least a name or email.")
-    return {"lead": store.append_lead(request.model_dump())}
+    return {"lead": store.append_lead(body.model_dump())}
 
 
 # -------------------------------------------------------------------- payments
 def _finalize_paid_session(session_id: str, email: str, subscription_id: str = "") -> dict | None:
     """Mark an order paid and send the confirmation once. Safe to call twice."""
 
-    order, newly_paid = store.mark_order_paid(session_id, email=email)
+    order, _newly_paid = store.mark_order_paid(session_id, email=email)
     if order is None:
         return None
-    if newly_paid:
+    # Exactly-once gate. mark_order_paid's flag races when the webhook and the
+    # success page finalize the same session at once; this atomic SQLite claim
+    # lets only the first caller run the side effects (grant, receipt email).
+    if auth_store.claim_finalization(session_id):
         store.audit.record(
             "order_paid",
             project_id=order.get("projectId") or "n/a",
@@ -525,7 +551,8 @@ def list_products() -> dict:
 
 
 @app.post("/checkout", status_code=201)
-def create_checkout(request: CheckoutRequest, http_request: Request) -> dict:
+@limiter.limit("10/minute")
+def create_checkout(request: Request, body: CheckoutRequest) -> dict:
     """Start a Stripe Checkout for a product and return the redirect URL.
 
     The owner signs in first, so we tie the order (and the resulting
@@ -533,10 +560,10 @@ def create_checkout(request: CheckoutRequest, http_request: Request) -> dict:
     they bought and route them to the right path.
     """
 
-    product = CATALOG.get(request.product)
+    product = CATALOG.get(body.product)
     if product is None:
         raise HTTPException(status_code=400, detail="Unknown product.")
-    owner_id = session_cookie.read_owner(http_request, auth_store)
+    owner_id = session_cookie.read_owner(request, auth_store)
     if not owner_id:
         raise HTTPException(status_code=401, detail="Please sign in before paying.")
     if not payments.configured:
@@ -564,7 +591,7 @@ def create_checkout(request: CheckoutRequest, http_request: Request) -> dict:
             "stripeSessionId": session.get("id", ""),
             "ownerId": owner_id,
             "email": auth_store.owner_email(owner_id) or "",
-            "projectId": request.project_id,
+            "projectId": body.project_id,
         }
     )
     return {"url": session.get("url"), "sessionId": session.get("id")}

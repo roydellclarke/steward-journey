@@ -1,0 +1,24 @@
+# StewardPath production reverse proxy.
+# Both hostnames resolve to this one server, so Caddy routes by Host header and
+# provisions Let's Encrypt TLS for each automatically (needs ports 80+443 open
+# and the DNS A records already pointing here, which they do).
+
+(secure_headers) {
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		X-Frame-Options "DENY"
+		-Server
+	}
+}
+
+stewardpathfinder.com {
+	import secure_headers
+	reverse_proxy frontend:3000
+}
+
+api.stewardpathfinder.com {
+	import secure_headers
+	reverse_proxy backend:8000
+}

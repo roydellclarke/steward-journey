@@ -11,11 +11,36 @@ as errors, and never silently inflated. Pure Python; no LLM, no fabrication.
 
 from __future__ import annotations
 
+import re
 from typing import Any
 
 from app.intake.branching import flagged_gaps
 from app.services.reasoning import _unified_readiness_score
 from app.storage.intake_state import field_status, field_value
+
+
+# Yes/no answers can arrive as a real boolean or as a string ("true"/"yes")
+# depending on the client. Interpret them tolerantly so a genuine "yes" always
+# counts (e.g. documenting your SOPs must raise the score, never be ignored).
+# None / "" / unrecognized stay unknown, which neither helps nor hurts.
+def _is_yes(value: Any) -> bool:
+    if value is True:
+        return True
+    if isinstance(value, bool):
+        return False
+    if isinstance(value, (int, float)):
+        return value > 0
+    return str(value).strip().lower() in {"true", "yes", "y", "1"}
+
+
+def _is_no(value: Any) -> bool:
+    if value is False:
+        return True
+    if isinstance(value, bool):
+        return False
+    if isinstance(value, (int, float)):
+        return value == 0
+    return str(value).strip().lower() in {"false", "no", "n", "0"}
 
 
 DRIVERS = [
@@ -49,26 +74,26 @@ def _financial(state: dict[str, Any]) -> tuple[float, str, list[str]]:
     comp = field_value(state, "financialClarity", "ownerCompNormalized")
     trend = field_value(state, "financialClarity", "revenueTrend")
 
-    if books is True:
+    if _is_yes(books):
         score += 1.0
         notes.append("your books are current")
-    elif books is False:
+    elif _is_no(books):
         score -= 0.5
         gaps.append("books aren't up to date")
-    if documented is True:
+    if _is_yes(documented):
         score += 1.0
         notes.append("you have documented financial statements")
-    elif documented is False:
+    elif _is_no(documented):
         gaps.append("financial statements aren't documented")
-    if profit is True:
+    if _is_yes(profit):
         score += 0.5
         notes.append("profitability is clear")
-    elif profit is False:
+    elif _is_no(profit):
         gaps.append("profitability isn't clearly established")
-    if comp is True:
+    if _is_yes(comp):
         score += 0.5
         notes.append("owner pay is cleanly separated")
-    elif comp is False:
+    elif _is_no(comp):
         gaps.append("personal and business spending are still mixed")
     if trend == "growing":
         score += 0.5
@@ -106,10 +131,10 @@ def _operational(state: dict[str, Any]) -> tuple[float, str, list[str]]:
     elif mgmt == "none":
         score -= 1.5
         gaps.append("there's little management depth below you")
-    if systems is True:
+    if _is_yes(systems):
         score += 0.5
         notes.append("core systems are documented")
-    elif systems is False:
+    elif _is_no(systems):
         gaps.append("core systems aren't documented")
     if len(functions) >= 4:
         score -= 1.0
@@ -130,10 +155,10 @@ def _process(state: dict[str, Any]) -> tuple[float, str, list[str]]:
     tribal = field_value(state, "processDocumentation", "tribalKnowledgeRisk")
     areas = field_value(state, "processDocumentation", "documentedAreas") or []
 
-    if sops is True:
+    if _is_yes(sops):
         score += 1.0
         notes.append("written procedures exist")
-    elif sops is False:
+    elif _is_no(sops):
         score -= 1.0
         gaps.append("there are no written procedures yet")
     if tribal == "low":
@@ -142,10 +167,17 @@ def _process(state: dict[str, Any]) -> tuple[float, str, list[str]]:
     elif tribal == "high":
         score -= 1.0
         gaps.append("a lot of the business runs on undocumented knowledge")
-    if len(areas) >= 3:
-        score += 0.5
-        notes.append(f"{len(areas)} areas are documented")
-    elif not areas:
+    # Graduated so every documented area raises the score and more is always
+    # better (capped so it cannot dominate the driver). Previously 1-2 areas
+    # earned nothing and 3+ was a flat bonus, which read as "documenting did
+    # nothing". Handles a list (the normal case) or a comma string.
+    area_count = len(areas) if isinstance(areas, (list, tuple)) else len(
+        [a for a in re.split(r"[;,]", str(areas)) if a.strip()]
+    )
+    if area_count:
+        score += min(1.0, 0.2 * area_count)
+        notes.append(f"{area_count} area(s) documented")
+    else:
         gaps.append("no specific areas are documented yet")
 
     rationale = _compose_rationale("Process documentation", notes, gaps, state,
@@ -170,10 +202,10 @@ def _family(state: dict[str, Any]) -> tuple[float, str, list[str]]:
     elif align == "misaligned":
         score -= 1.5
         gaps.append("your family isn't aligned yet")
-    if expectations is True:
+    if _is_yes(expectations):
         score += 0.5
         notes.append("you know what your family expects")
-    elif expectations is False:
+    elif _is_no(expectations):
         gaps.append("family expectations aren't clear")
     if conflict == "low":
         score += 0.5
