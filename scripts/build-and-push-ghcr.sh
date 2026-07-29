@@ -14,7 +14,7 @@ set -euo pipefail
 # ---- Config (override via env) --------------------------------------------
 OWNER="${OWNER:-roydellclarke}"
 REGISTRY="ghcr.io/${OWNER}"
-VERSION="${VERSION:-v0.2.0}"                 # semver tag; never :latest (rollback safety)
+VERSION="${VERSION:-v0.3.0}"                 # semver tag; never :latest (rollback safety)
 SITE_URL="${SITE_URL:-https://stewardpathfinder.com}"
 API_URL="${API_URL:-https://api.stewardpathfinder.com}"
 PUSH="${PUSH:-true}"

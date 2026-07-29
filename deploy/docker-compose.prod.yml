@@ -10,7 +10,7 @@
 # so the browser calls the public API host, which Caddy routes to the backend.
 services:
   backend:
-    image: ghcr.io/roydellclarke/stewardpath-backend:v0.2.0
+    image: ghcr.io/roydellclarke/stewardpath-backend:v0.3.0
     env_file:
       - .env.production
     volumes:
@@ -20,7 +20,7 @@ services:
       - "8000"
 
   frontend:
-    image: ghcr.io/roydellclarke/stewardpath-frontend:v0.2.0
+    image: ghcr.io/roydellclarke/stewardpath-frontend:v0.3.0
     restart: unless-stopped
     depends_on:
       - backend
