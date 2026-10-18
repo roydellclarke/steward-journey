@@ -64,7 +64,7 @@ export default function PreviewHome() {
       <section className="publicBand previewDoors">
         <p className="publicEyebrow">Start where you actually are</p>
         <h2>Which one sounds like you right now?</h2>
-        <ul className="previewMoments">
+        <ul className="momentDoors">
           {MOMENTS.map((moment) => (
             <li key={moment.slug}>
               <a href={`/content/${moment.slug}`}>

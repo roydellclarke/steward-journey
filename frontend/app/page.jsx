@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { apiFetch, startCheckout } from "../lib/api";
 import { authApi } from "../lib/auth";
 import { FAQ } from "../lib/site";
+import { MOMENTS } from "../lib/content";
 import AuthGate from "./intake/AuthGate";
 import "./intake/intake.css"; // overlay/auth modal styles used by AuthGate
 
@@ -220,16 +221,26 @@ export default function PublicHome() {
         </div>
       </section>
 
+      {/* The doors. These replaced three cards that described the audience but
+          led nowhere. Each one now opens the page written for that moment, so
+          an owner who recognizes their own sentence stops reading about the
+          product and starts reading about themselves. */}
       <section className="publicBand">
         <div>
           <p className="publicEyebrow">Who this is for</p>
-          <h2>You may not be ready to sell. You may be ready to protect the handoff.</h2>
+          <h2>Which one sounds like you right now?</h2>
+          <p>You may not be ready to sell. You may be ready to protect the handoff.</p>
         </div>
-        <div className="publicGrid three">
-          <article><strong>No clear successor.</strong><p>Your children may not want it. Your team may not be ready. An outside buyer may never understand what makes it work.</p></article>
-          <article><strong>The wrong buyer worries you.</strong><p>You want a fair price. You do not want it paid for with your people's jobs, your customers' trust, or your name.</p></article>
-          <article><strong>Your advisor needs the full picture.</strong><p>Give your CPA, lawyer, or banker the whole story before a broker tells it for them.</p></article>
-        </div>
+        <ul className="momentDoors">
+          {MOMENTS.map((moment) => (
+            <li key={moment.slug}>
+              <a href={`/content/${moment.slug}`}>
+                <strong>{moment.door}</strong>
+                <span>{moment.title}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
       </section>
 
       <section className="publicBand" id="how-it-works">

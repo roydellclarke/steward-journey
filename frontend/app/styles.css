@@ -1517,12 +1517,69 @@ textarea:focus { outline: none; border-color: var(--sp-sage); }
 }
 
 @media (max-width: 980px) {
+  /* minmax(0, 1fr) rather than 1fr: a plain 1fr track refuses to shrink below
+     the content's own minimum, so a wide card pushed the whole homepage 36px
+     past the viewport on a 390px phone. The 0 minimum lets the track shrink
+     and the content wrap instead. */
   .heroLower,
   .split,
   .publicGrid,
   .publicGrid.three,
   .offerBand,
   .leadForm {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
+
+  /* The hero card keeps each promise on one line on a wide screen, which is
+     the point of the list. On a phone there is no room for that, and the
+     nowrap pushed the page sideways. Let them wrap down here. */
+  .heroReport li {
+    white-space: normal;
+  }
+}
+
+
+/* The moment doors. An owner finds their own sentence and goes straight to
+   the page written for it, without reading a word about the product first.
+   Used on the homepage and on /preview, so the rules live here. */
+
+.momentDoors {
+  margin: 30px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 14px;
+}
+
+.momentDoors a {
+  display: grid;
+  gap: 8px;
+  height: 100%;
+  padding: 24px 26px;
+  background: var(--sp-card);
+  border: 1px solid var(--sp-line-strong);
+  border-radius: var(--sp-radius-lg);
+  text-decoration: none;
+  transition: border-color 120ms ease, background 120ms ease;
+}
+
+.momentDoors a:hover,
+.momentDoors a:focus-visible {
+  border-color: var(--sp-sage);
+  background: var(--sp-soft);
+}
+
+.momentDoors strong {
+  font-family: var(--sp-font-display);
+  font-size: 21px;
+  line-height: 1.25;
+  letter-spacing: var(--sp-tracking-tight);
+  color: var(--sp-ink);
+}
+
+.momentDoors span {
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--sp-muted);
 }
