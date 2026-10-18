@@ -215,7 +215,70 @@ async function run() {
     await page.close();
   }
 
-  // ---- 5. The advisor door ----
+  // ---- 5. The intake opens with a question, not a wall ----
+  {
+    const page = await newPage(browser);
+    await page.goto(`${BASE}/intake`, { waitUntil: "load", timeout: 25000 });
+
+    // The first question is fetched from the public endpoint after mount.
+    await page.waitForSelector(".trustOptions button", { timeout: 12000 });
+    const opts = await page.$$eval(".trustOptions button", (els) => els.length);
+    expect(opts >= 2, "intake: opens on the first question", `${opts} answers offered`);
+
+    const h1 = await page.$eval("h1", (el) => el.textContent.trim());
+    expect(h1.endsWith("?"), "intake: the opening headline is the question itself", h1.slice(0, 50));
+
+    // The privacy promise is present and out of the way, not a wall.
+    const strip = await page.$(".trustStrip");
+    const open = await page.$eval(".trustStrip details", (el) => el.open);
+    expect(Boolean(strip), "intake: privacy strip is on the page");
+    expect(open === false, "intake: the six promises start collapsed");
+
+    const chip = await page.$(".secureChip");
+    expect(Boolean(chip), "intake: header carries the privacy cue");
+
+    // Answering the first question starts the program and carries the answer in.
+    await page.click(".trustOptions button");
+    await page.waitForSelector(".progressHeader", { timeout: 20000 });
+    // The answer must be marked in the accessibility tree, not only by a class.
+    await page.waitForSelector('.choice[aria-pressed="true"]', { timeout: 8000 }).catch(() => {});
+    const checked = await page.$$eval('.choice[aria-pressed="true"]', (els) => els.map((e) => e.textContent.trim()));
+    expect(checked.length >= 1, "intake: the first answer carries into the program", checked.join(", ") || "none selected");
+    await page.close();
+  }
+
+  // ---- 6. The report shows the score and holds back the plan ----
+  // Driven against a real project id so the gate is exercised, not inferred.
+  // Set GATE_PROJECT to a project the backend already analyzed.
+  if (process.env.GATE_PROJECT) {
+    const page = await newPage(browser);
+    await page.goto(`${BASE}/intake`, { waitUntil: "load", timeout: 25000 });
+    await page.evaluate((id) => window.localStorage.setItem("stewardpath.intake.projectId", id), process.env.GATE_PROJECT);
+    await page.goto(`${BASE}/intake`, { waitUntil: "load", timeout: 25000 });
+
+    await page.waitForSelector(".sidebarActions .primaryCta, .readinessSidebar .primaryCta", { timeout: 20000 });
+    await page.evaluate(() => {
+      [...document.querySelectorAll("button")].find((b) => b.textContent.trim() === "See my readiness")?.click();
+    });
+    await page.waitForSelector(".reportHead h1", { timeout: 25000 });
+
+    const headline = await page.$eval(".reportHead h1", (el) => el.textContent.trim());
+    expect(/^\d{1,3}\/100$/.test(headline), "report: the score is free to read", headline);
+
+    const drivers = await page.$$eval(".driverGrid > *", (els) => els.length);
+    expect(drivers === 5, "report: all five reasons are free to read", `${drivers} drivers`);
+
+    const gate = await page.$(".gatePanel");
+    expect(Boolean(gate), "report: one door stands between the score and the plan");
+
+    const briefs = await page.$$eval(".briefCard", (els) => els.length).catch(() => 0);
+    expect(briefs === 0, "report: the briefs wait behind sign-in", `${briefs} visible`);
+
+    await page.screenshot({ path: path.join(SHOT_DIR, "report_gate.png"), fullPage: false });
+    await page.close();
+  }
+
+  // ---- 7. The advisor door ----
   {
     const page = await newPage(browser);
     await page.goto(`${BASE}/for-advisors`, { waitUntil: "load", timeout: 25000 });
@@ -234,7 +297,7 @@ async function run() {
     await page.close();
   }
 
-  // ---- 6. Nothing spills sideways on a phone ----
+  // ---- 8. Nothing spills sideways on a phone ----
   for (const route of ["/", "/sample", "/for-advisors", "/content/cannot-step-away"]) {
     const page = await newPage(browser, 390, 844);
     await page.goto(`${BASE}${route}`, { waitUntil: "load", timeout: 25000 });

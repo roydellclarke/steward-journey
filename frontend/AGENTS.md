@@ -31,3 +31,6 @@ NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8000 npm run dev
   advisor door) is covered by a browser suite. Run it against the app with
   `cd e2e && npm install && BASE=http://localhost:3000 npm run test:discovery`.
   It needs Chrome on the machine and nothing else: no Stripe keys, no email.
+  The report gate check is opt-in, because it needs a project the backend has
+  already analyzed. Create one, analyze it, then pass its id:
+  `GATE_PROJECT=<project-id> npm run test:discovery`.
