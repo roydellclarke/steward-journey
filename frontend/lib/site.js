@@ -70,6 +70,9 @@ export const FAQ = [
 // kept out of the sitemap and llms.txt.
 export const PUBLIC_PAGES = [
   { path: "/", priority: 1.0, changeFrequency: "weekly" },
+  // The finished example. Public and indexable on purpose: it is the page
+  // an owner reads before deciding whether to answer anything.
+  { path: "/sample", priority: 0.9, changeFrequency: "monthly" },
   { path: "/intake", priority: 0.8, changeFrequency: "monthly" }
 ];
 

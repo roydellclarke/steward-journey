@@ -1,0 +1,56 @@
+/* The person behind the promise. One photo, one sentence, one way to reach
+   them. Quiet by design: this is reassurance, not a testimonial wall. */
+
+.stewardCard {
+  display: flex;
+  gap: 22px;
+  align-items: flex-start;
+  max-width: 640px;
+  padding: 26px;
+  background: var(--sp-soft);
+  border: 1px solid var(--sp-soft-line);
+  border-radius: var(--sp-radius-lg);
+}
+
+.stewardPhoto {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex: none;
+}
+
+.stewardInitials {
+  display: grid;
+  place-items: center;
+  background: var(--sp-ink);
+  color: var(--sp-on-dark);
+  font-family: var(--sp-font-display);
+  font-size: 24px;
+  letter-spacing: 0.02em;
+}
+
+.stewardBody { display: grid; gap: 10px; }
+
+.stewardWords {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.55;
+  color: var(--sp-ink);
+}
+
+.stewardWho {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  font-size: 16px;
+  color: var(--sp-muted);
+}
+
+.stewardWho strong { color: var(--sp-ink); }
+.stewardWho a { color: var(--sp-sage-strong); }
+
+@media (max-width: 560px) {
+  .stewardCard { flex-direction: column; gap: 16px; }
+}

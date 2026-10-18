@@ -21,6 +21,7 @@ function BrandMark() {
 // Primary nav. "Readiness program" doubles as the start call to action.
 const NAV_ITEMS = [
   { href: "/", label: "Home" },
+  { href: "/sample", label: "Sample report" },
   { href: "/intake", label: "Readiness program", cta: true },
   { href: "/privacy", label: "Privacy" },
   { href: "/terms", label: "Terms" }
