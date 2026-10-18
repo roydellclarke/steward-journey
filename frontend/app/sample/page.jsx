@@ -70,7 +70,17 @@ export default async function SamplePage() {
   }
 
   const { request: profile, analysis } = data;
-  const { jtbd, readiness, buffett_quality: buyerView, buyer_paths: paths, roadmap, narratives, disclaimers } = analysis;
+  // The API field names carry internal research labels. They stop here: every
+  // name below is one an owner would recognize.
+  const {
+    jtbd: moment,
+    readiness,
+    buffett_quality: buyerView,
+    buyer_paths: paths,
+    roadmap,
+    narratives,
+    disclaimers
+  } = analysis;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -111,7 +121,7 @@ export default async function SamplePage() {
           <div><dt>Sales</dt><dd>{profile.revenue_range}</dd></div>
           <div><dt>Timeline</dt><dd>{profile.timeline}</dd></div>
         </dl>
-        <blockquote className="sampleQuote">{jtbd.struggling_moment}</blockquote>
+        <blockquote className="sampleQuote">{moment.struggling_moment}</blockquote>
         <p className="sampleAttrib">The moment this report was built for.</p>
       </section>
 

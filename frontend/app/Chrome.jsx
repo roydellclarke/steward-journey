@@ -75,7 +75,9 @@ export function SiteFooter() {
         </span>
         <nav className="footLinks" aria-label="Footer">
           <a href="/">Home</a>
+          <a href="/sample">Sample report</a>
           <a href="/intake">Readiness program</a>
+          <a href="/for-advisors">For advisors</a>
           <a href="/privacy">Privacy</a>
           <a href="/terms">Terms</a>
         </nav>

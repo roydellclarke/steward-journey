@@ -1,6 +1,7 @@
 import QuickRead from "../components/QuickRead";
 import StewardCard from "../components/StewardCard";
 import { STEWARD_READY } from "../../lib/steward";
+import { MOMENTS } from "../../lib/content";
 import "./preview.css";
 
 // A second front door, built beside the current homepage rather than on top of
@@ -58,6 +59,21 @@ export default function PreviewHome() {
           </div>
           <QuickRead />
         </div>
+      </section>
+
+      <section className="publicBand previewDoors">
+        <p className="publicEyebrow">Start where you actually are</p>
+        <h2>Which one sounds like you right now?</h2>
+        <ul className="previewMoments">
+          {MOMENTS.map((moment) => (
+            <li key={moment.slug}>
+              <a href={`/content/${moment.slug}`}>
+                <strong>{moment.door}</strong>
+                <span>{moment.title}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
       </section>
 
       <section className="publicBand">

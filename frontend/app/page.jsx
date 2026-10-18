@@ -337,7 +337,7 @@ export default function PublicHome() {
         </form>
       </section>
 
-      <section className="publicBand">
+      <section className="publicBand" id="pricing">
         <div>
           <p className="publicEyebrow">Pricing</p>
           <h2>You're not buying a report. You're starting something you keep.</h2>
