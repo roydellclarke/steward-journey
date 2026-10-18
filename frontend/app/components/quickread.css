@@ -73,6 +73,11 @@
 /* Full-width targets, 56px tall. Easy to hit with a thumb, impossible to
    mis-tap into the wrong answer. */
 .quickOptions button {
+  justify-content: flex-start;
+  /* styles.css forces a light -webkit-text-fill-color on buttons, which beats
+     `color` no matter how specific the rule that set it. Following our own
+     color keeps these readable wherever the component renders. */
+  -webkit-text-fill-color: currentColor;
   min-height: 56px;
   padding: 14px 20px;
   text-align: left;
@@ -95,6 +100,10 @@
 
 .quickBack,
 .quickRestart {
+  /* styles.css forces a light -webkit-text-fill-color on buttons, which beats
+     `color` no matter how specific the rule that set it. Following our own
+     color keeps these readable wherever the component renders. */
+  -webkit-text-fill-color: currentColor;
   justify-self: start;
   min-height: 44px;
   padding: 10px 2px;
@@ -200,6 +209,10 @@
 }
 
 .quickGhost {
+  /* styles.css forces a light -webkit-text-fill-color on buttons, which beats
+     `color` no matter how specific the rule that set it. Following our own
+     color keeps these readable wherever the component renders. */
+  -webkit-text-fill-color: currentColor;
   min-height: 44px;
   display: inline-flex;
   align-items: center;

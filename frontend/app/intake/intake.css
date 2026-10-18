@@ -468,6 +468,11 @@ button.danger:hover { border-color: var(--danger); }
 }
 
 .trustOptions button {
+  justify-content: flex-start;
+  /* styles.css forces a light -webkit-text-fill-color on buttons, which beats
+     `color` no matter how specific the rule that set it. Following our own
+     color keeps these readable wherever the component renders. */
+  -webkit-text-fill-color: currentColor;
   min-height: 56px;
   padding: 14px 20px;
   text-align: left;
@@ -496,6 +501,10 @@ button.danger:hover { border-color: var(--danger); }
 }
 
 .trustActions.secondary button {
+  /* styles.css forces a light -webkit-text-fill-color on buttons, which beats
+     `color` no matter how specific the rule that set it. Following our own
+     color keeps these readable wherever the component renders. */
+  -webkit-text-fill-color: currentColor;
   min-height: 44px;
   padding: 10px 0;
   font: inherit;

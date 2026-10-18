@@ -15,10 +15,15 @@
   --sp-sage-strong: #3a5444;
   --sp-paper: #faf9f6;          /* off-white page background */
   --sp-card: #ffffff;
-  --sp-muted: #6b716c;          /* secondary text */
+  /* Secondary text. Measured against every surface it lands on: 4.86:1 on
+     the sage tint, 5.26 on paper, 5.54 on card. The previous #6b716c read
+     4.38 on the sage tint, under the 4.5 floor, which matters most for
+     the readers this is built for. */
+  --sp-muted: #646a65;
   --sp-line: #ebe9e3;           /* barely-there hairline */
   --sp-line-strong: #ddd9d0;
   --sp-soft: #eef1ec;           /* faint sage tint surface */
+  --sp-surface-strong: #f8f5ee; /* warm paper tint: table heads, inset panels */
   --sp-soft-line: #dde4dd;
   --sp-danger: #8a4b4b;
 
