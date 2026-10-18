@@ -523,6 +523,15 @@ function QuestionInput({ question, draft, onAnswer }) {
     : { value: question.kind === "multi" ? [] : "", status: question.status });
   const value = current.value;
   const skipped = current.status === "skipped";
+  // A value saved when this question still took free text, now that it takes
+  // choices. Rendered alongside the options rather than dropped.
+  const legacyChoice =
+    (question.kind === "single" || question.kind === "band") &&
+    typeof value === "string" &&
+    value !== "" &&
+    !(question.options || []).some((opt) => opt.value === value)
+      ? value
+      : "";
   const unknown = current.status === "unknown" && (value == null || value === "" || (Array.isArray(value) && !value.length));
 
   function setValue(next) {
@@ -551,7 +560,13 @@ function QuestionInput({ question, draft, onAnswer }) {
         <input id={question.id} value={value || ""} placeholder={question.placeholder} onChange={(e) => setValue(e.target.value)} />
       )}
       {(question.kind === "longtext") && (
-        <textarea id={question.id} value={value || ""} placeholder={question.placeholder} onChange={(e) => setValue(e.target.value)} />
+        <>
+          <textarea id={question.id} value={value || ""} placeholder={question.placeholder} onChange={(e) => setValue(e.target.value)} />
+          <p className="dictateHint">
+            Rather speak than type? Tap the microphone key on your keyboard and talk.
+            Your device does the typing, and nothing is sent to us until you continue.
+          </p>
+        </>
       )}
       {question.kind === "boolean" && (
         <div className="choiceRow" role="group" aria-labelledby={`${question.id}-label`}>
@@ -564,6 +579,11 @@ function QuestionInput({ question, draft, onAnswer }) {
       )}
       {(question.kind === "single" || question.kind === "band") && (
         <div className="choiceWrap" role="group" aria-labelledby={`${question.id}-label`}>
+          {legacyChoice ? (
+            <button type="button" className="choice active legacyChoice" aria-pressed={true} title="Your earlier answer">
+              {legacyChoice}
+            </button>
+          ) : null}
           {question.options.map((opt) => (
             <button type="button" key={opt.value} className={value === opt.value ? "choice active" : "choice"} aria-pressed={value === opt.value} onClick={() => setValue(opt.value)}>
               {opt.label}

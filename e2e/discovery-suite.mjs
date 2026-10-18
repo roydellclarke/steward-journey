@@ -18,6 +18,8 @@ const BASE = process.env.BASE || "http://localhost:3000";
 const CHROME = process.env.CHROME || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 const SHOT_DIR = path.join(path.dirname(new URL(import.meta.url).pathname), "screenshots");
 
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
 const results = [];
 const pass = (name, note = "") => results.push({ status: "PASS", name, note });
 const fail = (name, note = "") => results.push({ status: "FAIL", name, note });
@@ -244,10 +246,66 @@ async function run() {
     await page.waitForSelector('.choice[aria-pressed="true"]', { timeout: 8000 }).catch(() => {});
     const checked = await page.$$eval('.choice[aria-pressed="true"]', (els) => els.map((e) => e.textContent.trim()));
     expect(checked.length >= 1, "intake: the first answer carries into the program", checked.join(", ") || "none selected");
+
+    // The opening section should need no keyboard at all. Industry, region and
+    // years were free text until now; all three are taps.
+    const typed = await page.$$eval(
+      ".conciergeMain input[type=\"text\"], .conciergeMain input:not([type]), .conciergeMain textarea",
+      (els) => els.length
+    );
+    expect(typed === 0, "intake: the first section needs no typing", `${typed} text fields`);
     await page.close();
   }
 
-  // ---- 6. The report shows the score and holds back the plan ----
+  // ---- 6. The program advances from the first question to the last ----
+  // Sixteen Continue clicks: one per section, one per reflection screen. This
+  // is the only check that walks the whole program, so it also confirms the
+  // dictation hint reaches the two questions an owner answers in their own
+  // words.
+  {
+    const page = await newPage(browser);
+    // Pages in one browser share localStorage, and an earlier check saved a
+    // project there. Clear it so this starts from the opening screen rather
+    // than resuming halfway.
+    await page.goto(`${BASE}/intake`, { waitUntil: "load", timeout: 25000 });
+    await page.evaluate(() => window.localStorage.clear());
+    await page.goto(`${BASE}/intake`, { waitUntil: "load", timeout: 25000 });
+    await page.waitForSelector(".trustOptions button", { timeout: 15000 });
+    await page.click(".trustOptions button");
+    await page.waitForSelector(".progressHeader", { timeout: 20000 });
+
+    let reached = false;
+    let clicks = 0;
+    for (let i = 0; i < 40 && !reached; i++) {
+      if (await page.$("textarea")) { reached = true; break; }
+      const clicked = await page.evaluate(() => {
+        const el = [...document.querySelectorAll("button")]
+          .find((b) => b.textContent.trim() === "Continue" && !b.disabled);
+        if (!el) return false;
+        el.click();
+        return true;
+      });
+      if (!clicked) break;
+      clicks++;
+      await sleep(950);
+    }
+    expect(reached, "program: advances from the first section to the last", `${clicks} continues`);
+
+    const hint = await page.$eval(".dictateHint", (el) => el.textContent).catch(() => "");
+    expect(
+      hint.includes("microphone key on your keyboard"),
+      "program: a long answer offers the keyboard's own dictation",
+      hint ? "hint present" : "no hint"
+    );
+    expect(
+      hint.includes("nothing is sent to us"),
+      "program: the hint says StewardPath records nothing"
+    );
+    expect(page.errors.length === 0, "program: no console errors across the walk", page.errors.join(" | ").slice(0, 160));
+    await page.close();
+  }
+
+  // ---- 7. The report shows the score and holds back the plan ----
   // Driven against a real project id so the gate is exercised, not inferred.
   // Set GATE_PROJECT to a project the backend already analyzed.
   if (process.env.GATE_PROJECT) {
@@ -278,7 +336,7 @@ async function run() {
     await page.close();
   }
 
-  // ---- 7. The advisor door ----
+  // ---- 8. The advisor door ----
   {
     const page = await newPage(browser);
     await page.goto(`${BASE}/for-advisors`, { waitUntil: "load", timeout: 25000 });
@@ -297,7 +355,7 @@ async function run() {
     await page.close();
   }
 
-  // ---- 8. Nothing spills sideways on a phone ----
+  // ---- 9. Nothing spills sideways on a phone ----
   for (const route of ["/", "/sample", "/for-advisors", "/content/cannot-step-away"]) {
     const page = await newPage(browser, 390, 844);
     await page.goto(`${BASE}${route}`, { waitUntil: "load", timeout: 25000 });

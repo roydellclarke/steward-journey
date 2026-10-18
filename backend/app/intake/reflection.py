@@ -25,7 +25,7 @@ def _summ_business(state: dict[str, Any]) -> str | None:
     years = field_value(state, "business", "yearsOperating")
     bits = []
     if industry:
-        bits.append(f"a {industry} business")
+        bits.append(f"a business in {industry}")
     if years:
         bits.append(f"you've run for {years} years")
     if band:

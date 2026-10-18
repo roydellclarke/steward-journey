@@ -142,9 +142,9 @@ def narrative_outputs(state: dict[str, Any], scored: dict[str, Any]) -> dict[str
 
     industry = field_value(state, "business", "industry")
     years = field_value(state, "business", "yearsOperating")
-    business_ref = f"This {industry} business" if industry else "This business"
+    business_ref = f"This business in {industry}" if industry else "This business"
     if years:
-        business_ref += f", built over {years} years,"
+        business_ref += f", built across {years} years,"
     non_neg = _list(state, "nonNegotiables", "nonNegotiables")
     protect = _join(non_neg) if non_neg else "the people, standards, and trust behind it"
     overall = scored.get("overall", 0)

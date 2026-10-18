@@ -547,3 +547,16 @@ button.danger:hover { border-color: var(--danger); }
 .gateWhy { color: var(--sp-muted); }
 
 .gatePanel .primaryCta { margin-top: 18px; }
+
+/* The dictation hint under the two long answers. It points at the keyboard key
+   the owner's device already has: nothing is recorded or sent by us. */
+.dictateHint {
+  margin: 10px 0 0;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+/* An answer saved before this question took choices. Marked so it reads as the
+   owner's own earlier words rather than an option we offer. */
+.choice.legacyChoice { font-style: italic; }
