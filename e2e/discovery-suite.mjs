@@ -74,7 +74,7 @@ async function run() {
   // ---- 1. The three-question read, clicked all the way through ----
   {
     const page = await newPage(browser);
-    await page.goto(`${BASE}/preview`, { waitUntil: "load", timeout: 25000 });
+    await page.goto(`${BASE}/`, { waitUntil: "load", timeout: 25000 });
     await page.waitForSelector(".quickOptions button", { timeout: 10000 });
 
     const count = await page.$$eval(".quickOptions button", (b) => b.length);
@@ -140,7 +140,7 @@ async function run() {
       tie
     );
 
-    expect(page.errors.length === 0, "preview: no console errors", page.errors.join(" | ").slice(0, 160));
+    expect(page.errors.length === 0, "homepage: no console errors", page.errors.join(" | ").slice(0, 160));
     await page.close();
   }
 
@@ -235,7 +235,7 @@ async function run() {
   }
 
   // ---- 6. Nothing spills sideways on a phone ----
-  for (const route of ["/", "/preview", "/sample", "/for-advisors", "/content/cannot-step-away"]) {
+  for (const route of ["/", "/sample", "/for-advisors", "/content/cannot-step-away"]) {
     const page = await newPage(browser, 390, 844);
     await page.goto(`${BASE}${route}`, { waitUntil: "load", timeout: 25000 });
     const overflow = await page.evaluate(() =>

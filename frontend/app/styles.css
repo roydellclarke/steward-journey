@@ -1128,10 +1128,25 @@ button:focus-visible,
 
 .heroLower {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 380px;
-  gap: 56px;
+  /* The right column holds the three-question card, which needs room to show
+     four full-width answers without wrapping them onto two lines. */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 560px);
+  gap: clamp(28px, 4vw, 56px);
   align-items: start;
   margin-top: 36px;
+}
+
+/* The one quiet way out of the hero, for a reader who wants proof before
+   they answer anything. */
+.heroQuiet {
+  margin-top: 18px;
+  font-size: 17px;
+  color: var(--sp-muted);
+}
+
+.heroQuiet a {
+  color: var(--sp-sage-strong);
+  text-underline-offset: 3px;
 }
 
 .heroLead p {

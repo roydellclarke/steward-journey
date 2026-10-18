@@ -6,6 +6,9 @@ import { authApi } from "../lib/auth";
 import { FAQ } from "../lib/site";
 import { MOMENTS } from "../lib/content";
 import AuthGate from "./intake/AuthGate";
+import QuickRead from "./components/QuickRead";
+import StewardCard from "./components/StewardCard";
+import { STEWARD_READY } from "../lib/steward";
 import "./intake/intake.css"; // overlay/auth modal styles used by AuthGate
 
 // Site-wide FAQ structured data, built from the same FAQ array the page renders
@@ -115,7 +118,7 @@ export default function PublicHome() {
       });
       const confirmation = intent === "readiness_call"
         ? "Got it. We will reach out privately to set up your readiness review. No email to look for right now."
-        : "Thanks, we saved your request. To see the questions, your score, and your plan now, click the dark Start private readiness check button above. It is free to begin.";
+        : "Thanks, we saved your request. You do not have to wait for it: the finished sample report is ready to read now.";
       setStatus(confirmation);
     } catch (error) {
       setStatus(`Could not save yet: ${error.message}`);
@@ -191,6 +194,10 @@ export default function PublicHome() {
       <section className="publicHero">
         <p className="publicEyebrow">A private, guided way to get ready to hand off your business</p>
         <h1>Decide what you protect before a buyer decides for you.</h1>
+        {/* One thing to do above the fold. The three buttons that used to sit
+            here sent two of three visitors scrolling down the same page, and
+            the card beside them promised what the check does instead of
+            showing it. The questions do both jobs at once. */}
         <div className="heroLower">
           <div className="heroLead">
             <p>
@@ -198,26 +205,17 @@ export default function PublicHome() {
               work for you, the customers who count on you, and the town that
               knows your name. StewardPath helps you make the big choice before
               anyone else makes it for you: what you could lose, what to fix
-              first, and who should run it next. You will not do this alone.
-              Nothing leaves this page unless you say so.
+              first, and who should run it next.
             </p>
-            <div className="publicActions">
-              <a href="/intake" className="primaryCta">Start private readiness check</a>
-              <button type="button" onClick={scrollToRequest}>Request sample report</button>
-              <button type="button" onClick={scrollToRequest}>Book a readiness review</button>
-            </div>
+            <p>
+              Start with three questions. You will see where you stand in about a
+              minute. Nothing is saved, nothing is sent, and nobody is told.
+            </p>
+            <p className="heroQuiet">
+              Rather read one first? <a href="/sample">See a finished report, start to finish.</a>
+            </p>
           </div>
-          <aside className="heroReport">
-            <span>StewardPath helps you answer</span>
-            <strong>What should not be lost if you step back?</strong>
-            <ul>
-              <li>Where the business still needs you</li>
-              <li>What a careful buyer will ask about</li>
-              <li>Who could take over and fit your values</li>
-              <li>What to keep private until a buyer earns it</li>
-              <li>What to get ready before you call your advisor</li>
-            </ul>
-          </aside>
+          <QuickRead />
         </div>
       </section>
 
@@ -299,6 +297,16 @@ export default function PublicHome() {
         </div>
       </section>
 
+      {STEWARD_READY ? (
+        <section className="publicBand">
+          <div>
+            <p className="publicEyebrow">Who you are dealing with</p>
+            <h2>A person, not a company voice.</h2>
+          </div>
+          <StewardCard />
+        </section>
+      ) : null}
+
       <section className="publicBand split" id="confidentiality">
         <div>
           <p className="publicEyebrow">Confidentiality first</p>
@@ -319,19 +327,19 @@ export default function PublicHome() {
 
       <section className="publicBand leadPanel" id="request">
         <div>
-          <p className="publicEyebrow">Request a sample or bring your advisor in</p>
+          <p className="publicEyebrow">Bring in a person, or bring in your advisor</p>
           <h2>Start with a private check. Share only when you are ready.</h2>
           <p>
-            Ready to begin? Click the dark Start private readiness check button
-            below. It is free, and nothing is shared until you say so. Want a
-            sample first, or bringing in your advisor? Add your details and pick
-            an option.
+            The check is free to begin and nothing is shared until you say so.
+            Want a person to walk it with you, or want your own advisor in the
+            room? Add your details and pick an option. Looking for the sample
+            report? <a href="/sample">It is already written, and you can read it now.</a>
           </p>
         </div>
         {status ? <p className="leadStatus">{status}</p> : null}
         {/* Enter submits the sample request (the form's primary action) instead
             of doing nothing. Starting the check itself is a separate CTA below. */}
-        <form className="leadForm" onSubmit={(event) => { event.preventDefault(); if (!busy) submitLead("sample_report"); }}>
+        <form className="leadForm" onSubmit={(event) => { event.preventDefault(); if (!busy) submitLead("readiness_call"); }}>
           <input aria-label="Your name" placeholder="Your name" value={lead.name} onChange={(event) => updateLead("name", event.target.value)} />
           <input aria-label="Email" type="email" placeholder="Email" value={lead.email} onChange={(event) => updateLead("email", event.target.value)} />
           <input aria-label="Business type" placeholder="Business type" value={lead.businessType} onChange={(event) => updateLead("businessType", event.target.value)} />
@@ -341,8 +349,7 @@ export default function PublicHome() {
           </select>
           <div className="leadButtons">
             <a href="/intake" className="primaryCta">Start private readiness check</a>
-            <button type="submit" disabled={busy}>{busy ? "Saving…" : "Request sample report"}</button>
-            <button type="button" onClick={() => submitLead("readiness_call")} disabled={busy}>{busy ? "Saving…" : "Book a readiness review"}</button>
+            <button type="submit" disabled={busy}>{busy ? "Saving…" : "Book a readiness review"}</button>
             <button type="button" onClick={copyAdvisorMessage}>Copy advisor message</button>
           </div>
         </form>
@@ -360,7 +367,7 @@ export default function PublicHome() {
           </p>
         </div>
         <div className="offerBand">
-          <article><span>Free</span><strong>Sample report</strong><p>See the questions, the score, and the plan StewardPath builds with you.</p><button type="button" className="offerCta ghost" onClick={scrollToRequest}>Start free</button></article>
+          <article><span>Free</span><strong>Sample report</strong><p>The whole report, start to finish, on a business we made up. No account, no email.</p><a className="offerCta ghost" href="/sample">Read the sample</a></article>
           <article><span>$249</span><strong>Owner Readiness Program</strong><p>A guided program you walk through to a confident handoff, on your terms. Find your clarity, name what you refuse to lose, and weigh the successors who fit your values, not only the highest bidder. It grows as you prepare.</p><button type="button" className="offerCta" onClick={() => buy("report")} disabled={busy}>Start the program</button></article>
           <article><span>$1,500</span><strong>Concierge package</strong><p>A guided check, a private review with a real person, and help getting ready for the talks ahead. You show up to the lawyer and accountant organized, which cuts their hours.</p><button type="button" className="offerCta" onClick={() => buy("concierge")} disabled={busy}>Get the concierge package</button></article>
           <article><span>$199/mo</span><strong>Advisor pilot</strong><p>For CPAs, exit planners, and advisors guiding up to ten owner clients. Each one arrives prepared.</p><button type="button" className="offerCta" onClick={() => buy("advisor")} disabled={busy}>Start the advisor pilot</button></article>
