@@ -32,3 +32,6 @@ stewardPath.txt
 
 # Python editable-install build output
 *.egg-info/
+
+# Claude Code per-developer permission allowlist, not shared config
+.claude/settings.local.json
