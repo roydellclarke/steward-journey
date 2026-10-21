@@ -47,16 +47,6 @@ const sampleSections = [
   ["A plan you come back to", "Save it. Come back. Watch the score go up as you get ready."]
 ];
 
-// What it feels like to use, in plain owner's language. Grade-7 reading level.
-const outcomes = [
-  ["It listens to you", "It asks one question at a time and shows you what it heard. It feels like a talk, not a form."],
-  ["You decide what to share", "Your answers stay private. You choose what to share, and who gets to see it."],
-  ["One step at a time", "A clear score and a simple plan turn a big decision into small, doable steps."],
-  ["Ready to meet your advisor", "You walk into the CPA or lawyer meeting prepared, with a short summary in hand."],
-  ["A real person when you want one", "Ask for a private review and a person takes it from there. You are never left alone with an app."],
-  ["You know where you stand", "A clear score in five areas, with the reason behind each one."]
-];
-
 const journeySteps = [
   ["1", "Begin privately", "First we show you what we collect, why, and how you stay in control. Then you begin when you are ready."],
   ["2", "Share at your pace", "Easy questions first. Harder ones come later, with a kind word before each. \"I don't know\" is a fine answer."],
@@ -247,24 +237,15 @@ export default function PublicHome() {
           <h2>We stay with you. It is not just a report.</h2>
           <p>StewardPath is something you come back to. You get a guided check, a plan, and a score that goes up as you get ready. It is not a report you file and forget.</p>
         </div>
-        <figure className="bandImage">
-          <img
-            src="/img/Roadmap_to_a_Graceful_Exit.png"
-            alt="A roadmap to a graceful exit: get ready in private, see where you stand, weigh the right next owner, and walk into the advisor meeting prepared."
-            loading="lazy"
-            width="2752"
-            height="1536"
-          />
-          <figcaption>Your path to a graceful exit, one step at a time.</figcaption>
-        </figure>
-        <div className="publicGrid">
+        <ol className="journeySteps">
           {journeySteps.map(([step, title, body]) => (
-            <article key={step}>
-              <strong>{step}. {title}</strong>
+            <li key={step}>
+              <b>Step {step}</b>
+              <strong>{title}</strong>
               <p>{body}</p>
-            </article>
+            </li>
           ))}
-        </div>
+        </ol>
       </section>
 
       <section className="publicBand reportPreview">
@@ -274,21 +255,6 @@ export default function PublicHome() {
         </div>
         <div className="publicGrid">
           {sampleSections.map(([title, body]) => (
-            <article key={title}>
-              <strong>{title}</strong>
-              <p>{body}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="publicBand">
-        <div>
-          <p className="publicEyebrow">What owners want to feel</p>
-          <h2>The point is not a document. It is how the decision feels.</h2>
-        </div>
-        <div className="publicGrid">
-          {outcomes.map(([title, body]) => (
             <article key={title}>
               <strong>{title}</strong>
               <p>{body}</p>
@@ -380,12 +346,12 @@ export default function PublicHome() {
           <p className="publicEyebrow">Questions owners ask</p>
           <h2>Straight answers before you start.</h2>
         </div>
-        <div className="publicGrid faq">
-          {FAQ.map(({ q, a }) => (
-            <article key={q}>
-              <strong>{q}</strong>
+        <div className="faqList">
+          {FAQ.map(({ q, a }, index) => (
+            <details key={q} name="faq" open={index === 0}>
+              <summary>{q}</summary>
               <p>{a}</p>
-            </article>
+            </details>
           ))}
         </div>
       </section>
