@@ -2,6 +2,11 @@
   "name": "stewardpath-e2e",
   "private": true,
   "type": "module",
-  "scripts": { "test": "node ui-suite.mjs" },
-  "dependencies": { "puppeteer-core": "^23.0.0" }
+  "scripts": {
+    "test": "node ui-suite.mjs",
+    "test:discovery": "node discovery-suite.mjs"
+  },
+  "dependencies": {
+    "puppeteer-core": "^23.0.0"
+  }
 }

@@ -36,7 +36,10 @@ These are binding for all work in this repo. Follow them every time, without bei
 - StewardPath = `backend/` (FastAPI, port 8000/8001) + `frontend/` (Next.js, port 3000/3001). The repo also holds a separate "Agent Harness" (`harness/`); StewardPath is the product.
 - Shared design tokens: `frontend/app/theme.css`. Chrome (header/footer): `frontend/app/Chrome.jsx`.
 - Run backend locally on a free port with a Python 3.12 venv (system Python lacks FastAPI): `uv venv --python 3.12 backend/.venv`.
-- Tests: `python -m unittest discover -s backend/tests` (API tests skip without FastAPI).
+- Tests: `cd backend && .venv/bin/python -m unittest discover -s tests -t .` (107 pass).
+  Running discover from the repo root instead reports 36 import errors that are an
+  artefact of the discovery path, not real failures. With a Python that lacks
+  FastAPI the API tests skip rather than run.
 
 ## gstack
 

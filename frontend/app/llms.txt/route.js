@@ -1,4 +1,11 @@
 import { SITE_URL, TAGLINE } from "../../lib/site";
+import { CONTENT, CONTENT_SLUGS } from "../../lib/content";
+
+// Every guide lists itself here, so adding one to lib/content.js publishes it
+// to AI clients with no second place to remember.
+const guideLines = CONTENT_SLUGS.map(
+  (slug) => `- [${CONTENT[slug].title}](${SITE_URL}/content/${slug}.md): ${CONTENT[slug].description}`
+).join("\n");
 
 // Serves /llms.txt (the emerging standard at llmstxt.org): a plain-Markdown
 // summary that helps LLMs and AI agents understand the site without parsing
@@ -39,9 +46,13 @@ Private by default. Answers are never shared with employees, family, or buyers u
 
 - [Home](${SITE_URL}/): What StewardPath is, who it is for, how it works, what you get, confidentiality, and pricing.
 - [Private readiness check](${SITE_URL}/intake): The guided program. Begin a private readiness check, save and resume by email, and see your readiness.
-- [For advisors](${SITE_URL}/advisor): How CPAs, exit planners, and estate lawyers can bring owner clients in already prepared.
-- [Trades readiness guide](${SITE_URL}/content/trades-readiness.md): Selling or handing off an HVAC, plumbing, electrical, or contracting business, in plain owner language.
+- [Sample report](${SITE_URL}/sample): A complete readiness report for an invented business, readable without an account: the score across five areas, what a careful buyer studies, six transfer paths weighed, the plan, and the briefs.
+- [For advisors](${SITE_URL}/for-advisors): How CPAs, attorneys, and planners bring owner clients in already prepared.
 - [Privacy](${SITE_URL}/privacy) and [Terms](${SITE_URL}/terms).
+
+## Guides
+
+${guideLines}
 
 ## What you get
 

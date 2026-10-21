@@ -1,0 +1,62 @@
+/* Advisor-facing. Same tokens, slightly denser than the owner pages: this
+   reader is at a desk, not on a couch, and they are scanning. */
+
+.advisorsHead h1 { max-width: 21ch; }
+
+.advisorsLede {
+  margin: 18px 0 0;
+  max-width: 64ch;
+  font-size: 18px;
+  line-height: 1.62;
+  color: var(--sp-ink-soft);
+}
+
+.advisorsActions {
+  margin: 28px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+}
+
+.advisorsGrid {
+  margin-top: 30px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.advisorsGrid article {
+  padding: 24px 26px;
+  background: var(--sp-card);
+  border: 1px solid var(--sp-line);
+  border-radius: var(--sp-radius-lg);
+}
+
+.advisorsGrid strong { display: block; margin-bottom: 9px; font-size: 19px; color: var(--sp-ink); }
+.advisorsGrid p { margin: 0; font-size: 17px; line-height: 1.6; color: var(--sp-muted); }
+
+.advisorsMoments {
+  margin: 26px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 1px;
+  background: var(--sp-line);
+  border: 1px solid var(--sp-line);
+  border-radius: var(--sp-radius);
+  overflow: hidden;
+  max-width: 760px;
+}
+
+.advisorsMoments a {
+  display: block;
+  padding: 18px 22px;
+  background: var(--sp-card);
+  font-size: 18px;
+  color: var(--sp-ink);
+  text-decoration: none;
+}
+
+.advisorsMoments a:hover,
+.advisorsMoments a:focus-visible { background: var(--sp-soft); color: var(--sp-sage-strong); }

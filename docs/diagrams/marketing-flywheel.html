@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Marketing Flywheel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* Same skin and colour rule as docs/diagrams/architecture.html: one hue per
+       station, each ring arc in the hue of the station it enters. Spokes are the
+       exception, since all six share one destination: a spoke carries its own
+       station's hue, because it stands for what that station writes down. The
+       hub stays near-black, the one dark element, as the loop type requires. */
+    :root {
+      --color-paper: #faf9f6;
+      --color-ink:   #15171a;
+      --color-muted: #646a65;
+      --color-soft:  #5a615c;
+      --font-sans:    'Inter', -apple-system, 'Helvetica Neue', system-ui, sans-serif;
+      --font-display: 'Manrope', var(--font-sans);
+      --font-mono:    'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-paper);
+      color: var(--color-ink);
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      padding: 3rem 2rem;
+    }
+
+    .frame { max-width: 1200px; width: 100%; }
+    .diagram-container { width: 100%; overflow-x: auto; }
+
+    .eyebrow {
+      font-family: var(--font-mono); font-size: 0.66rem; font-weight: 500;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--color-muted); margin-bottom: 0.5rem;
+    }
+
+    h1 {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+      font-weight: 700; letter-spacing: -0.02em; line-height: 1.15;
+      color: var(--color-ink); margin-bottom: 1.5rem;
+    }
+
+    svg { width: 100%; min-width: 1040px; display: block; }
+
+    @media print {
+      .diagram-container { overflow-x: visible; }
+      svg { min-width: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <p class="eyebrow">Loop · StewardPath</p>
+    <h1>Each turn hands the next owner in</h1>
+
+    <div class="diagram-container">
+      <svg viewBox="0 0 1040 716" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="sp-flywheel-title sp-flywheel-desc">
+        <title id="sp-flywheel-title">The StewardPath marketing flywheel</title>
+        <desc id="sp-flywheel-desc">Six stations turn clockwise from pages written in an owner's own words, through three free questions, a guided intake, a readiness score, a human review, and an advisor pilot that points the next owner back at those pages. Every station writes to one shared readiness record at the centre.</desc>
+
+        <defs>
+          <marker id="m0" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#77465f"/></marker>
+          <marker id="m1" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4a6a55"/></marker>
+          <marker id="m2" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4d6a8a"/></marker>
+          <marker id="m3" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#36646a"/></marker>
+          <marker id="m4" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#8a5942"/></marker>
+          <marker id="m5" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#7d6329"/></marker>
+        </defs>
+
+        <rect width="100%" height="100%" fill="#faf9f6"/>
+
+        <!-- RING: clockwise flow, each arc in the hue of the station it enters -->
+        <path d="M 600.0 113.726 A 240.0 240.0 0 0 1 704.969 187.073" fill="none" stroke="#4a6a55" stroke-width="1.4" marker-end="url(#m1)"/>
+        <path d="M 743.285 252.0 A 240.0 240.0 0 0 1 743.722 426.882" fill="none" stroke="#4d6a8a" stroke-width="1.4" marker-end="url(#m2)"/>
+        <path d="M 705.731 492.0 A 240.0 240.0 0 0 1 601.13 565.871" fill="none" stroke="#36646a" stroke-width="1.4" marker-end="url(#m3)"/>
+        <path d="M 440 566.274 A 240.0 240.0 0 0 1 335.031 492.927" fill="none" stroke="#8a5942" stroke-width="1.4" marker-end="url(#m4)"/>
+        <path d="M 296.715 428 A 240.0 240.0 0 0 1 296.278 253.118" fill="none" stroke="#7d6329" stroke-width="1.4" marker-end="url(#m5)"/>
+        <path d="M 334.269 188 A 240.0 240.0 0 0 1 438.87 114.129" fill="none" stroke="#77465f" stroke-width="1.4" marker-end="url(#m0)"/>
+
+        <!-- SPOKES: what each station writes to the shared record -->
+        <path d="M 520.0 132.0 L 520.0 282.0" fill="none" class="spoke" stroke="#77465f" stroke-width="1" stroke-opacity="0.7" stroke-dasharray="5,4" marker-end="url(#m0)"/>
+        <path d="M 672.42 252.0 L 615.263 285.0" fill="none" class="spoke" stroke="#4a6a55" stroke-width="1" stroke-opacity="0.7" stroke-dasharray="5,4" marker-end="url(#m1)"/>
+        <path d="M 672.42 428.0 L 615.263 395.0" fill="none" class="spoke" stroke="#4d6a8a" stroke-width="1" stroke-opacity="0.7" stroke-dasharray="5,4" marker-end="url(#m2)"/>
+        <rect x="611.9" y="415.4" width="47.8" height="12" rx="2" fill="#faf9f6"/>
+        <text x="635.8" y="424.4" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">ANSWERS</text>
+        <path d="M 520.0 548.0 L 520.0 398.0" fill="none" class="spoke" stroke="#36646a" stroke-width="1" stroke-opacity="0.7" stroke-dasharray="5,4" marker-end="url(#m3)"/>
+        <rect x="485.5" y="463.0" width="37.0" height="12" rx="2" fill="#faf9f6"/>
+        <text x="504.0" y="472.0" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">SCORE</text>
+        <path d="M 367.58 428.0 L 424.737 395.0" fill="none" class="spoke" stroke="#8a5942" stroke-width="1" stroke-opacity="0.7" stroke-dasharray="5,4" marker-end="url(#m4)"/>
+        <path d="M 367.58 252.0 L 424.737 285.0" fill="none" class="spoke" stroke="#7d6329" stroke-width="1" stroke-opacity="0.7" stroke-dasharray="5,4" marker-end="url(#m5)"/>
+        <rect x="358.9" y="272.4" width="58.6" height="12" rx="2" fill="#faf9f6"/>
+        <text x="388.2" y="281.4" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">REFERRALS</text>
+
+        <!-- STATIONS -->
+        <rect x="440" y="68" width="160" height="64" rx="6" fill="#77465f" fill-opacity="0.06" stroke="#77465f" stroke-width="1.2"/>
+        <text x="456" y="96" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif">Owner's own words</text>
+        <text x="456" y="114" fill="#77465f" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">six moment pages</text>
+        <rect x="648" y="188" width="160" height="64" rx="6" fill="#4a6a55" fill-opacity="0.06" stroke="#4a6a55" stroke-width="1.2"/>
+        <text x="664" y="216" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif">Three free questions</text>
+        <text x="664" y="234" fill="#4a6a55" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">no account, no price</text>
+        <rect x="648" y="428" width="160" height="64" rx="6" fill="#4d6a8a" fill-opacity="0.06" stroke="#4d6a8a" stroke-width="1.2"/>
+        <text x="664" y="456" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif">Guided intake</text>
+        <text x="664" y="474" fill="#4d6a8a" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">nine sections</text>
+        <rect x="440" y="548" width="160" height="64" rx="6" fill="#36646a" fill-opacity="0.06" stroke="#36646a" stroke-width="1.2"/>
+        <text x="456" y="576" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif">Score and plan</text>
+        <text x="456" y="594" fill="#36646a" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">the number moves</text>
+        <rect x="232" y="428" width="160" height="64" rx="6" fill="#8a5942" fill-opacity="0.06" stroke="#8a5942" stroke-width="1.2"/>
+        <text x="248" y="456" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif">A person reviews</text>
+        <text x="248" y="474" fill="#8a5942" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">handoff package</text>
+        <rect x="232" y="188" width="160" height="64" rx="6" fill="#7d6329" fill-opacity="0.12" stroke="#7d6329" stroke-width="1.8"/>
+        <text x="248" y="216" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif">Advisor pilot</text>
+        <text x="248" y="234" fill="#7d6329" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">ten owners each</text>
+
+        <!-- HUB: the one dark element, and the only thing that accumulates -->
+        <rect x="420" y="288" width="200" height="104" rx="8" fill="#15171a"/>
+        <text x="520" y="326" fill="#faf9f6" font-size="13" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">The readiness record</text>
+        <text x="520" y="348" fill="#faf9f6" fill-opacity="0.72" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">one per owner, kept private</text>
+        <text x="520" y="366" fill="#faf9f6" fill-opacity="0.72" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">richer on every pass</text>
+
+        <!-- LEGEND -->
+        <line x1="24" y1="648" x2="1016" y2="648" stroke="#15171a" stroke-opacity="0.12" stroke-width="1"/>
+
+        <path d="M 24 676 A 40 40 0 0 1 56 676" fill="none" stroke="#5a615c" stroke-width="1.4"/>
+        <text x="68" y="679" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">THE TURN, IN THE COLOUR OF WHERE IT LANDS</text>
+
+        <line x1="476" y1="676" x2="504" y2="676" stroke="#5a615c" stroke-width="1" stroke-opacity="0.7" stroke-dasharray="5,4"/>
+        <text x="516" y="679" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">WHAT THAT STATION WRITES DOWN</text>
+
+        <rect x="836" y="668" width="18" height="16" rx="3" fill="#7d6329" fill-opacity="0.12" stroke="#7d6329" stroke-width="1.8"/>
+        <text x="864" y="679" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">WHERE IT COMPOUNDS</text>
+      </svg>
+    </div>
+  </div>
+</body>
+</html>

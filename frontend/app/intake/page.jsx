@@ -38,6 +38,12 @@ export default function IntakePage() {
   const [pendingResume, setPendingResume] = useState(""); // a claimed project awaiting sign-in
   const [showBook, setShowBook] = useState(false);
   const [saveState, setSaveState] = useState("idle"); // idle | saving | saved
+  // The first question, fetched before any project exists, so the opening
+  // screen can ask something instead of explaining something.
+  const [firstQuestion, setFirstQuestion] = useState(null);
+  // How the readiness moved across the section just finished, shown at the
+  // break so the work stays visible while it is still slow.
+  const [scoreMove, setScoreMove] = useState(null);
 
   useEffect(() => {
     const saved = typeof window !== "undefined" ? window.localStorage.getItem(STORAGE_KEY) : "";
@@ -53,6 +59,13 @@ export default function IntakePage() {
       setResumeId(saved);
       begin(saved, false);
     }
+    // Public endpoint, no project and no account needed.
+    intakeApi.questions()
+      .then((payload) => {
+        const first = payload?.sections?.[0]?.questions?.[0];
+        if (first) setFirstQuestion(first);
+      })
+      .catch(() => {});
     // begin is a stable declaration; running it once on mount is intended.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -120,7 +133,7 @@ export default function IntakePage() {
     return Math.round((complete / total) * 100);
   }, [intakeState, drafts, activeSection]);
 
-  async function begin(existingId, afterAuth = false) {
+  async function begin(existingId, afterAuth = false, staged = null) {
     setBusy(true);
     setStatus("Setting up your private space…");
     try {
@@ -136,6 +149,9 @@ export default function IntakePage() {
       // Resume at the first section that still has an open question.
       const idx = Math.max(0, (loaded.plan.sections || []).findIndex((s) => !s.complete));
       setSectionIndex(idx === -1 ? 0 : idx);
+      // An answer given on the opening screen is real work. Carry it in as a
+      // draft so the autosave picks it up and the owner never answers twice.
+      if (staged) setDraft(staged.id, staged.value);
       setStep("intake");
       setStatus("");
     } catch (error) {
@@ -191,8 +207,10 @@ export default function IntakePage() {
     setStatus("Saving privately…");
     try {
       const patch = mergePatches();
+      const before = score?.overall ?? null;
       const saved = await intakeApi.putIntake(projectId, patch);
       applyLoaded(saved);
+      setScoreMove({ from: before, to: saved.score?.overall ?? null });
       setSaveState("saved");
       // Reflective-summary moment grounded in what was just shared.
       const next = saved.plan.nextQuestionId;
@@ -240,6 +258,7 @@ export default function IntakePage() {
 
   function advanceAfterReflection() {
     setReflection(null);
+    setScoreMove(null);
     if (sectionIndex < sections.length - 1) {
       setSectionIndex(sectionIndex + 1);
     } else {
@@ -255,13 +274,11 @@ export default function IntakePage() {
       const handoff = await intakeApi.handoff(projectId);
       setReport({ ...result, handoff: handoff.handoff });
       setScore(result.score);
-      // Gate 2: an owner signs in before viewing the report. Already-signed-in
-      // owners go straight through; everyone else passes the report gate first.
-      if (account.authenticated) {
-        setStep("report");
-      } else {
-        setAuthGate("report");
-      }
+      // The score and the reasoning behind it are free. An owner who answered
+      // thirty-eight questions has earned the answer to the one they came
+      // with. Signing in opens the plan, the briefs, and the saved record,
+      // which are the things worth coming back for.
+      setStep("report");
       setStatus("");
     } catch (error) {
       setStatus(`Could not prepare report: ${error.message}`);
@@ -284,7 +301,14 @@ export default function IntakePage() {
   if (step === "trust") {
     return (
       <>
-        <TrustScreen onBegin={() => begin("")} onResume={resumeId ? () => begin(resumeId) : null} busy={busy} status={status} />
+        <TrustScreen
+          onBegin={() => begin("")}
+          onResume={resumeId ? () => begin(resumeId) : null}
+          busy={busy}
+          status={status}
+          firstQuestion={firstQuestion}
+          onAnswerFirst={(value) => begin("", false, { id: firstQuestion.id, value })}
+        />
         {authGateEl}
       </>
     );
@@ -292,12 +316,17 @@ export default function IntakePage() {
 
   if (step === "report" && report) {
     return (
-      <ReportView
-        report={report}
-        score={score}
-        projectId={projectId}
-        onBackToIntake={() => { setStep("intake"); setReport(null); }}
-      />
+      <>
+        <ReportView
+          report={report}
+          score={score}
+          projectId={projectId}
+          authenticated={account.authenticated}
+          onSignIn={() => setAuthGate("report")}
+          onBackToIntake={() => { setStep("intake"); setReport(null); }}
+        />
+        {authGateEl}
+      </>
     );
   }
 
@@ -313,7 +342,7 @@ export default function IntakePage() {
       <div className="conciergeGrid">
         <div className="conciergeMain">
           {reflection ? (
-            <ReflectionMoment reflection={reflection} onContinue={advanceAfterReflection} busy={busy} />
+            <ReflectionMoment reflection={reflection} move={scoreMove} onContinue={advanceAfterReflection} busy={busy} />
           ) : activeSection ? (
             <SectionView
               section={activeSection}
@@ -350,27 +379,80 @@ export default function IntakePage() {
   );
 }
 
-function TrustScreen({ onBegin, onResume, busy, status }) {
+// The opening screen used to be six promises and a button, which asked an
+// owner to read a policy before anything was asked of them. The promises moved
+// into a strip they can open, and the screen now opens with the first real
+// question. The privacy cue is still on the page, and the header carries it on
+// every intake screen besides.
+function TrustScreen({ onBegin, onResume, busy, status, firstQuestion, onAnswerFirst }) {
   return (
     <main className="conciergeShell single">
       <section className="trustCard">
         <p className="conciergeEyebrow">Private readiness</p>
-        <h1>First, how this stays private.</h1>
-        <ul className="trustList">
-          <li><strong>What we collect:</strong> ranges and your own words. Never exact numbers.</li>
-          <li><strong>Why:</strong> so your plan fits you and guards what you name.</li>
-          <li><strong>Private by default:</strong> no one sees this. Not family, not employees, not buyers. Not unless you choose.</li>
-          <li><strong>You hold the keys:</strong> you decide later what to share, and with whom.</li>
-          <li><strong>Never used to train AI:</strong> your answers stay yours. We do not feed them to any system.</li>
-          <li><strong>Yours to erase:</strong> export your data or delete it for good, anytime.</li>
-        </ul>
-        <p className="trustScope">StewardPath prepares you. It does not give legal, tax, valuation, or investment advice. Stop, skip, or come back whenever you need.</p>
-        <div className="trustActions">
-          <button type="button" className="primaryCta" onClick={onBegin} disabled={busy}>
-            {busy ? "Setting up…" : "Begin privately"}
-          </button>
+
+        <div className="trustStrip">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect x="4" y="10" width="16" height="11" rx="2.5" fill="#4a6a55" />
+            <path d="M8 10V7.5a4 4 0 0 1 8 0V10" stroke="#4a6a55" strokeWidth="2" />
+          </svg>
+          <p>
+            Private by default. Nobody sees this, your answers never train AI,
+            and you can delete all of it any day.
+          </p>
+          <details>
+            <summary>What we collect, and why</summary>
+            <ul className="trustList">
+              <li><strong>What we collect:</strong> ranges and your own words. Never exact numbers.</li>
+              <li><strong>Why:</strong> so your plan fits you and guards what you name.</li>
+              <li><strong>Private by default:</strong> no one sees this. Not family, not employees, not buyers. Not unless you choose.</li>
+              <li><strong>You hold the keys:</strong> you decide later what to share, and with whom.</li>
+              <li><strong>Never used to train AI:</strong> your answers stay yours. We do not feed them to any system.</li>
+              <li><strong>Yours to erase:</strong> export your data or delete it for good, anytime.</li>
+            </ul>
+          </details>
+        </div>
+
+        {firstQuestion ? (
+          <>
+            <h1>{firstQuestion.prompt}</h1>
+            {firstQuestion.why ? <p className="trustWhy">{firstQuestion.why}</p> : null}
+            <div className="trustOptions">
+              {(firstQuestion.options || []).map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => onAnswerFirst(option.value)}
+                  disabled={busy}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </>
+        ) : (
+          <>
+            <h1>Let us start where you are.</h1>
+            <div className="trustActions">
+              <button type="button" className="primaryCta" onClick={onBegin} disabled={busy}>
+                {busy ? "Setting up…" : "Begin privately"}
+              </button>
+            </div>
+          </>
+        )}
+
+        <p className="trustScope">
+          Thirty-eight questions, a few at a time. &quot;I don&apos;t know&quot; is a fine answer.
+          Stop, skip, or come back whenever you need. StewardPath prepares you. It does
+          not give legal, tax, valuation, or investment advice.
+        </p>
+
+        <div className="trustActions secondary">
+          {firstQuestion ? (
+            <button type="button" onClick={onBegin} disabled={busy}>Skip this one and begin</button>
+          ) : null}
           {onResume ? <button type="button" onClick={onResume} disabled={busy}>Resume where I left off</button> : null}
         </div>
+
         {status ? <p className="conciergeStatus" role="status">{status}</p> : null}
       </section>
     </main>
@@ -441,6 +523,15 @@ function QuestionInput({ question, draft, onAnswer }) {
     : { value: question.kind === "multi" ? [] : "", status: question.status });
   const value = current.value;
   const skipped = current.status === "skipped";
+  // A value saved when this question still took free text, now that it takes
+  // choices. Rendered alongside the options rather than dropped.
+  const legacyChoice =
+    (question.kind === "single" || question.kind === "band") &&
+    typeof value === "string" &&
+    value !== "" &&
+    !(question.options || []).some((opt) => opt.value === value)
+      ? value
+      : "";
   const unknown = current.status === "unknown" && (value == null || value === "" || (Array.isArray(value) && !value.length));
 
   function setValue(next) {
@@ -469,12 +560,18 @@ function QuestionInput({ question, draft, onAnswer }) {
         <input id={question.id} value={value || ""} placeholder={question.placeholder} onChange={(e) => setValue(e.target.value)} />
       )}
       {(question.kind === "longtext") && (
-        <textarea id={question.id} value={value || ""} placeholder={question.placeholder} onChange={(e) => setValue(e.target.value)} />
+        <>
+          <textarea id={question.id} value={value || ""} placeholder={question.placeholder} onChange={(e) => setValue(e.target.value)} />
+          <p className="dictateHint">
+            Rather speak than type? Tap the microphone key on your keyboard and talk.
+            Your device does the typing, and nothing is sent to us until you continue.
+          </p>
+        </>
       )}
       {question.kind === "boolean" && (
         <div className="choiceRow" role="group" aria-labelledby={`${question.id}-label`}>
           {[["yes", true], ["no", false]].map(([label, v]) => (
-            <button type="button" key={label} className={value === v ? "choice active" : "choice"} onClick={() => setValue(v)}>
+            <button type="button" key={label} className={value === v ? "choice active" : "choice"} aria-pressed={value === v} onClick={() => setValue(v)}>
               {label === "yes" ? "Yes" : "No"}
             </button>
           ))}
@@ -482,8 +579,13 @@ function QuestionInput({ question, draft, onAnswer }) {
       )}
       {(question.kind === "single" || question.kind === "band") && (
         <div className="choiceWrap" role="group" aria-labelledby={`${question.id}-label`}>
+          {legacyChoice ? (
+            <button type="button" className="choice active legacyChoice" aria-pressed={true} title="Your earlier answer">
+              {legacyChoice}
+            </button>
+          ) : null}
           {question.options.map((opt) => (
-            <button type="button" key={opt.value} className={value === opt.value ? "choice active" : "choice"} onClick={() => setValue(opt.value)}>
+            <button type="button" key={opt.value} className={value === opt.value ? "choice active" : "choice"} aria-pressed={value === opt.value} onClick={() => setValue(opt.value)}>
               {opt.label}
             </button>
           ))}
@@ -525,11 +627,24 @@ function QuestionInput({ question, draft, onAnswer }) {
   );
 }
 
-function ReflectionMoment({ reflection, onContinue, busy }) {
+// What the score did across the section just finished. A number that falls is
+// not failure and the copy says so: a lower score after more answers means the
+// picture got truer, which is the point.
+function scoreMoveLine(move) {
+  if (!move || move.to === null || move.to === undefined) return "";
+  if (move.from === null || move.from === undefined) return `Your readiness starts at ${move.to} out of 100.`;
+  if (move.to > move.from) return `Your readiness moved from ${move.from} to ${move.to}.`;
+  if (move.to === move.from) return `Your readiness held at ${move.to}.`;
+  return `Your readiness moved from ${move.from} to ${move.to}. A number that drops here is not bad news. It means we know more than we did.`;
+}
+
+function ReflectionMoment({ reflection, move, onContinue, busy }) {
+  const line = scoreMoveLine(move);
   return (
     <section className="reflectionCard">
       <p className="conciergeEyebrow">A moment to take stock</p>
       <p className="reflectionText">{reflection.text}</p>
+      {line ? <p className="reflectionMove">{line}</p> : null}
       <button type="button" className="primaryCta" onClick={onContinue} disabled={busy}>Continue</button>
     </section>
   );
@@ -637,7 +752,7 @@ function DataControlCenter({ projectId, onClose }) {
   );
 }
 
-function ReportView({ report, score, projectId, onBackToIntake }) {
+function ReportView({ report, score, projectId, authenticated, onSignIn, onBackToIntake }) {
   const synthesis = report.analysis;
   const handoff = report.handoff;
   const [showBook, setShowBook] = useState(false);
@@ -663,8 +778,26 @@ function ReportView({ report, score, projectId, onBackToIntake }) {
         </div>
       </section>
 
-      <ActionPlan projectId={projectId} onBackToIntake={onBackToIntake} />
+      {!authenticated ? (
+        <section className="reportSection gatePanel">
+          <h3>Your plan and your briefs are ready.</h3>
+          <p>
+            The score above is yours to keep reading. What comes next is the part
+            you work from: the steps in the order that moves your score, the
+            successor paths weighed against what you refuse to lose, and the
+            briefs you hand to your advisor and your family.
+          </p>
+          <p className="gateWhy">
+            Signing in saves this readiness to your name so you can come back to
+            it. We send a link to your email. There is no password to remember.
+          </p>
+          <button type="button" className="primaryCta" onClick={onSignIn}>Open my plan</button>
+        </section>
+      ) : null}
 
+      {authenticated ? <ActionPlan projectId={projectId} onBackToIntake={onBackToIntake} /> : null}
+
+      {authenticated ? (
       <section className="reportSection">
         <h3>Successor paths, weighed against what you value</h3>
         <div className="pathGrid">
@@ -680,9 +813,11 @@ function ReportView({ report, score, projectId, onBackToIntake }) {
           <p className="excludedNote">Excluded at your request: {synthesis.buyerFit.excluded.map((e) => e.path).join(", ")}.</p>
         ) : null}
       </section>
+      ) : null}
 
-      <SuccessorScorecard projectId={projectId} />
+      {authenticated ? <SuccessorScorecard projectId={projectId} /> : null}
 
+      {authenticated ? (
       <section className="reportSection">
         <h3>Briefs you can use</h3>
         <p className="reportLead">Hand these to your advisor or your family. Arriving organized makes their work faster, and lighter on the bill.</p>
@@ -693,12 +828,15 @@ function ReportView({ report, score, projectId, onBackToIntake }) {
           </article>
         ))}
       </section>
+      ) : null}
 
+      {authenticated ? (
       <section className="reportSection routing">
         <h3>{handoff?.routing?.headline || "Your next step"}</h3>
         <p>{handoff?.routing?.body}</p>
         <button type="button" className="primaryCta" onClick={() => setShowBook(true)}>{handoff?.routing?.cta || "Book a private readiness review"}</button>
       </section>
+      ) : null}
 
       <section className="disclaimerBand">
         {(synthesis.disclaimers || []).map((d) => <span key={d}>{d}</span>)}

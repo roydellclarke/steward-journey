@@ -29,3 +29,9 @@ yarn-error.log*
 .DS_Store
 stewardPath.txt
 .gstack/
+
+# Python editable-install build output
+*.egg-info/
+
+# Claude Code per-developer permission allowlist, not shared config
+.claude/settings.local.json

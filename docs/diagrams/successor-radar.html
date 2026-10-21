@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Successor Fit</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-paper: #faf9f6; --color-ink: #15171a;
+      --color-muted: #646a65; --color-soft: #5a615c; --color-accent: #4a6a55;
+      --font-sans: 'Inter', -apple-system, 'Helvetica Neue', system-ui, sans-serif;
+      --font-display: 'Manrope', var(--font-sans);
+      --font-mono: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+    }
+    body { font-family: var(--font-sans); background: var(--color-paper); color: var(--color-ink);
+      min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 3rem 2rem; }
+    .frame { max-width: 1280px; width: 100%; }
+    .diagram-container { width: 100%; overflow-x: auto; }
+    .eyebrow { font-family: var(--font-mono); font-size: 0.66rem; font-weight: 500;
+      letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-muted); margin-bottom: 0.5rem; }
+    h1 { font-family: var(--font-display); font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+      font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.5rem; }
+    svg { width: 100%; min-width: 1000px; display: block; }
+    @media print { .diagram-container { overflow-x: visible; } svg { min-width: 0; } }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <p class="eyebrow">Radar · StewardPath</p>
+    <h1>The best price is rarely the best fit</h1>
+    <div class="diagram-container">
+      <svg viewBox="0 0 1000 520" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="sp-radar-title sp-radar-desc">
+        <title id="sp-radar-title">Four transfer paths scored on legacy, proceeds and fit</title>
+        <desc id="sp-radar-desc">Four ways to hand a business on, each scored one to five on how much legacy survives, how much money is on the table, and how well the path fits the owner. The two highest-paying paths score lowest on the other two axes.</desc>
+        <polygon points="500,230 527,278 473,278" fill="none" stroke="#15171a" stroke-opacity="0.1" stroke-width="1"/>\n        <polygon points="500,199 555,294 445,294" fill="none" stroke="#15171a" stroke-opacity="0.1" stroke-width="1"/>\n        <polygon points="500,167 582,309 418,309" fill="none" stroke="#15171a" stroke-opacity="0.1" stroke-width="1"/>\n        <polygon points="500,136 609,325 391,325" fill="none" stroke="#15171a" stroke-opacity="0.1" stroke-width="1"/>\n        <polygon points="500,104 637,341 363,341" fill="none" stroke="#ddd9d0" stroke-opacity="0.2" stroke-width="1"/>\n        <line x1="500" y1="262" x2="500" y2="104" stroke="#ddd9d0" stroke-opacity="0.6" stroke-width="1"/>\n        <line x1="500" y1="262" x2="637" y2="341" stroke="#ddd9d0" stroke-opacity="0.6" stroke-width="1"/>\n        <line x1="500" y1="262" x2="363" y2="341" stroke="#ddd9d0" stroke-opacity="0.6" stroke-width="1"/>\n        <text x="500" y="82" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Legacy kept</text>\n        <text x="656" y="356" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="start">Money on the table</text>\n        <text x="344" y="356" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="end">Fit with you</text>\n        <text x="492" y="233" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end">1</text>\n        <text x="492" y="202" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end">2</text>\n        <text x="492" y="170" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end">3</text>\n        <text x="492" y="139" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end">4</text>\n        <text x="492" y="107" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end">5</text>\n        <polygon points="500,199 637,341 445,294" fill="#9c6b50" fill-opacity="0.18" stroke="#9c6b50" stroke-width="1.5"/>\n        <polygon points="500,167 637,341 445,294" fill="#b8915a" fill-opacity="0.18" stroke="#b8915a" stroke-width="1.5"/>\n        <polygon points="500,104 582,309 391,325" fill="#7c8f6f" fill-opacity="0.18" stroke="#7c8f6f" stroke-width="1.5"/>\n        <polygon points="500,136 609,325 391,325" fill="#4a6a55" fill-opacity="0.18" stroke="#4a6a55" stroke-width="1.8"/>\n        <circle cx="500" cy="136" r="4" fill="#4a6a55"/>\n        <circle cx="609" cy="325" r="4" fill="#4a6a55"/>\n        <circle cx="391" cy="325" r="4" fill="#4a6a55"/>\n        <line x1="24" y1="470" x2="976" y2="470" stroke="#15171a" stroke-opacity="0.12" stroke-width="1"/>\n        <rect x="24" y="492" width="16" height="8" rx="1" fill="#7c8f6f" fill-opacity="0.18" stroke="#7c8f6f" stroke-width="1.5"/>\n        <text x="50" y="500" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">FAMILY TRANSFER</text>\n        <rect x="256" y="492" width="16" height="8" rx="1" fill="#4a6a55" fill-opacity="0.18" stroke="#4a6a55" stroke-width="1.8"/>\n        <text x="282" y="500" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">MANAGEMENT BUYOUT</text>\n        <rect x="488" y="492" width="16" height="8" rx="1" fill="#b8915a" fill-opacity="0.18" stroke="#b8915a" stroke-width="1.5"/>\n        <text x="514" y="500" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">STRATEGIC BUYER</text>\n        <rect x="720" y="492" width="16" height="8" rx="1" fill="#9c6b50" fill-opacity="0.18" stroke="#9c6b50" stroke-width="1.5"/>\n        <text x="746" y="500" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">PRIVATE EQUITY</text>
+      </svg>
+    </div>
+  </div>
+</body>
+</html>

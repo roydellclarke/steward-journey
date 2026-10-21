@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getContent, CONTENT_SLUGS, faqEntities } from "../../../lib/content";
 import { SITE_URL } from "../../../lib/site";
+import QuickRead from "../../components/QuickRead";
 import "./content.css";
 
 // Per-page structured data: an Article (so the guide is eligible as a cited
@@ -68,7 +69,7 @@ export default async function ContentPage({ params }) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(buildJsonLd(c)) }}
       />
       <article className="contentArticle">
-        <p className="publicEyebrow">Guide for trades owners</p>
+        <p className="publicEyebrow">{c.eyebrow || "Guide"}</p>
         <h1>{c.title}</h1>
         <p className="contentIntro">{c.intro}</p>
 
@@ -81,6 +82,14 @@ export default async function ContentPage({ params }) {
             ) : null}
           </section>
         ))}
+
+        {c.quickRead ? (
+          <section className="contentSection contentQuick">
+            <h2>Where do you stand right now?</h2>
+            <p>Three questions, about a minute. No account, no email, nothing saved.</p>
+            <QuickRead />
+          </section>
+        ) : null}
 
         {c.cta ? (
           <p className="contentCta">

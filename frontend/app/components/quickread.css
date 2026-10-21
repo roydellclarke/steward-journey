@@ -1,0 +1,241 @@
+/* The three-question read. Consumes the shared tokens only (theme.css), so it
+   matches every other surface: near-black ink, one sage accent, hairline
+   borders, whitespace doing the work.
+
+   The owner reading this is often 65 and holding an iPad at arm's length, so
+   no sentence they have to read drops below 17px. Counters, band words, and
+   fine print sit at 15px to 16px, and none of them carry meaning on their
+   own. */
+
+.quickRead {
+  background: var(--sp-card);
+  border: 1px solid var(--sp-line-strong);
+  border-radius: var(--sp-radius-lg);
+  padding: clamp(24px, 3.4vw, 38px);
+  box-shadow: var(--sp-shadow);
+  display: grid;
+  gap: 14px;
+  max-width: 640px;
+}
+
+.quickTop {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.quickEyebrow {
+  margin: 0;
+  font-size: 13px;
+  letter-spacing: var(--sp-tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--sp-sage-strong);
+  font-weight: 600;
+}
+
+.quickCount {
+  font-size: 15px;
+  color: var(--sp-muted);
+}
+
+.quickPrompt,
+.quickHeadline {
+  margin: 0;
+  font-family: var(--sp-font-display);
+  font-size: clamp(23px, 2.5vw, 30px);
+  line-height: 1.18;
+  letter-spacing: var(--sp-tracking-tight);
+  color: var(--sp-ink);
+  max-width: 24ch;
+}
+
+.quickWhy,
+.quickBody {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--sp-muted);
+}
+
+.quickBody {
+  color: var(--sp-ink-soft);
+  font-size: 18px;
+  max-width: 54ch;
+}
+
+.quickOptions {
+  display: grid;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+/* Full-width targets, 56px tall. Easy to hit with a thumb, impossible to
+   mis-tap into the wrong answer. */
+.quickOptions button {
+  justify-content: flex-start;
+  /* styles.css forces a light -webkit-text-fill-color on buttons, which beats
+     `color` no matter how specific the rule that set it. Following our own
+     color keeps these readable wherever the component renders. */
+  -webkit-text-fill-color: currentColor;
+  min-height: 56px;
+  padding: 14px 20px;
+  text-align: left;
+  font: inherit;
+  font-size: 17px;
+  line-height: 1.4;
+  color: var(--sp-ink);
+  background: var(--sp-paper);
+  border: 1px solid var(--sp-line-strong);
+  border-radius: var(--sp-radius);
+  cursor: pointer;
+  transition: border-color 120ms ease, background 120ms ease;
+}
+
+.quickOptions button:hover,
+.quickOptions button:focus-visible {
+  border-color: var(--sp-sage);
+  background: var(--sp-soft);
+}
+
+.quickBack,
+.quickRestart {
+  /* styles.css forces a light -webkit-text-fill-color on buttons, which beats
+     `color` no matter how specific the rule that set it. Following our own
+     color keeps these readable wherever the component renders. */
+  -webkit-text-fill-color: currentColor;
+  justify-self: start;
+  min-height: 44px;
+  padding: 10px 2px;
+  font: inherit;
+  font-size: 17px;
+  color: var(--sp-muted);
+  background: none;
+  border: none;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.quickBack:hover,
+.quickRestart:hover {
+  color: var(--sp-ink);
+}
+
+/* ---- the result ---- */
+
+.quickRead--result {
+  gap: 18px;
+}
+
+.quickAreas {
+  list-style: none;
+  margin: 2px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 1px;
+  background: var(--sp-line);
+  border: 1px solid var(--sp-line);
+  border-radius: var(--sp-radius);
+  overflow: hidden;
+}
+
+.quickAreas li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2px 14px;
+  padding: 14px 18px;
+  background: var(--sp-card);
+}
+
+.quickAreas li.isPressure {
+  background: var(--sp-soft);
+}
+
+.quickAreaName {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--sp-ink);
+}
+
+.quickAreaBand {
+  font-size: 15px;
+  color: var(--sp-sage-strong);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  align-self: center;
+}
+
+.quickAreaAnswer {
+  grid-column: 1 / -1;
+  font-size: 16px;
+  color: var(--sp-muted);
+  line-height: 1.5;
+}
+
+.quickLimits {
+  border-top: 1px solid var(--sp-line);
+  padding-top: 18px;
+  display: grid;
+  gap: 10px;
+}
+
+.quickLimits strong {
+  font-size: 17px;
+  color: var(--sp-ink);
+}
+
+.quickLimits ul {
+  margin: 0;
+  padding-left: 20px;
+  display: grid;
+  gap: 7px;
+}
+
+.quickLimits li,
+.quickLimits p {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.55;
+  color: var(--sp-muted);
+}
+
+.quickActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  margin-top: 4px;
+}
+
+.quickGhost {
+  /* styles.css forces a light -webkit-text-fill-color on buttons, which beats
+     `color` no matter how specific the rule that set it. Following our own
+     color keeps these readable wherever the component renders. */
+  -webkit-text-fill-color: currentColor;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  padding: 12px 22px;
+  font-size: 17px;
+  color: var(--sp-ink);
+  text-decoration: none;
+  border: 1px solid var(--sp-line-strong);
+  border-radius: var(--sp-radius-pill);
+}
+
+.quickGhost:hover,
+.quickGhost:focus-visible {
+  border-color: var(--sp-ink);
+}
+
+.quickFine {
+  margin: 0;
+  font-size: 15px;
+  color: var(--sp-muted);
+}
+
+@media (max-width: 640px) {
+  .quickActions { gap: 10px; }
+  .quickActions > * { width: 100%; justify-content: center; text-align: center; }
+}

@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StewardPath Diagrams</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --paper:#faf9f6; --ink:#15171a; --muted:#646a65; --soft:#5a615c;
+    --accent:#4a6a55; --line:#ebe9e3; --card:#ffffff;
+    --sans:'Inter',-apple-system,'Helvetica Neue',system-ui,sans-serif;
+    --display:'Manrope',var(--sans);
+    --mono:'Geist Mono',ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  body { background:var(--paper); color:var(--ink); font-family:var(--sans); line-height:1.6; }
+  .wrap { max-width:1360px; margin:0 auto;
+    padding-left:max(20px,env(safe-area-inset-left,0px));
+    padding-right:max(20px,env(safe-area-inset-right,0px));
+    padding-block:56px 96px; }
+  .eyebrow { font-family:var(--mono); font-size:.66rem; font-weight:500; letter-spacing:.18em;
+    text-transform:uppercase; color:var(--accent); }
+  header h1 { font-family:var(--display); font-size:clamp(32px,5vw,52px); font-weight:700;
+    letter-spacing:-.025em; line-height:1.05; margin:14px 0 16px; text-wrap:balance; }
+  header p.lede { max-width:64ch; color:var(--muted); font-size:17px; }
+  nav { margin:48px 0 8px; border-top:1px solid var(--line); padding-top:28px;
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:28px; }
+  .navhead { font-family:var(--mono); font-size:.62rem; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--soft); margin-bottom:10px; }
+  nav ul { list-style:none; display:grid; gap:7px; }
+  nav a { color:var(--ink); text-decoration:none; font-size:14px; line-height:1.4;
+    border-bottom:1px solid transparent; }
+  nav a:hover, nav a:focus-visible { border-bottom-color:var(--accent); color:var(--accent); }
+  .band { margin:88px 0 0; border-top:1px solid var(--line); padding-top:26px; }
+  .bandsub { color:var(--muted); font-size:15px; margin-top:6px; max-width:60ch; }
+  .fig { margin:40px 0 0; scroll-margin-top:24px; }
+  .figtype { font-family:var(--mono); font-size:.6rem; letter-spacing:.16em; text-transform:uppercase;
+    color:var(--soft); }
+  .fig h2 { font-family:var(--display); font-size:clamp(19px,2.2vw,25px); font-weight:600;
+    letter-spacing:-.015em; line-height:1.2; margin:8px 0 0; }
+  .note { color:var(--muted); font-size:14.5px; margin:8px 0 18px; max-width:72ch; }
+  .scroller { width:100%; overflow-x:auto; background:var(--card);
+    border:1px solid var(--line); border-radius:10px; padding:10px; }
+  .scroller svg { display:block; width:100%; min-width:var(--vbw); height:auto; }
+  figcaption { font-family:var(--mono); font-size:11px; color:var(--soft); margin-top:9px; }
+  footer { margin-top:96px; border-top:1px solid var(--line); padding-top:22px;
+    color:var(--muted); font-size:14px; }
+  @media print { .scroller { overflow-x:visible; border:0; padding:0; }
+    .scroller svg { min-width:0; } nav { display:none; } .fig { break-inside:avoid; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Thirteen diagrams · StewardPath</p>
+    <h1>Every view of the system, on one page</h1>
+    <p class="lede">Each figure is also a standalone file in <code>docs/diagrams/</code>. They share one
+    skin and one colour rule: a component keeps its hue, and a connector carries the hue of whatever it
+    enters. Where a figure states something the code cannot prove, it says so.</p>
+  </header>
+  <nav>
+      <div class="navgroup"><p class="navhead">The system</p><ul>
+        <li><a href="#architecture">Every request enters through one door</a></li>
+        <li><a href="#high-level">Three containers, two concerns that cross everything</a></li>
+      </ul></div>
+      <div class="navgroup"><p class="navhead">How it works</p><ul>
+        <li><a href="#signin-process">Six steps, and the secret is never stored</a></li>
+        <li><a href="#data-flow">Nobody sees the answers but the owner</a></li>
+        <li><a href="#dp-integration">Four ways in, four ways out, one place it rests</a></li>
+      </ul></div>
+      <div class="navgroup"><p class="navhead">What is kept, and who may read it</p><ul>
+        <li><a href="#medallion">One answer, four tiers, one reader until the last</a></li>
+        <li><a href="#dp-security-matrix">Who can read what, and who can read nothing</a></li>
+      </ul></div>
+      <div class="navgroup"><p class="navhead">The owner's experience</p><ul>
+        <li><a href="#service-blueprint">The promise is kept below the line</a></li>
+        <li><a href="#owner-journey">The hard part comes third</a></li>
+        <li><a href="#readiness-waterfall">Fixing the worst thing first barely moves the number</a></li>
+      </ul></div>
+      <div class="navgroup"><p class="navhead">The arguments</p><ul>
+        <li><a href="#successor-radar">The best price is rarely the best fit</a></li>
+        <li><a href="#marketing-flywheel">Each turn hands the next owner in</a></li>
+        <li><a href="#wardley-map">What is worth building, and what to just buy</a></li>
+      </ul></div>
+  </nav>
+    <section class="band" id="g0">
+      <p class="eyebrow">The system</p>
+      <p class="bandsub">Two views of the same machine, one by traffic and one by stack.</p>
+    </section>
+    <figure class="fig" id="architecture">
+      <p class="figtype">Architecture · StewardPath</p>
+      <h2>Every request enters through one door</h2>
+      <p class="note">Caddy is the only container with a published port. Note what is missing: the frontend never calls the backend server-side.</p>
+      <div class="scroller" style="--vbw:1040px">
+<svg viewBox="0 88 1040 612" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="sp-architecture-title sp-architecture-desc">
+        <title id="sp-architecture-title">StewardPath production architecture</title>
+        <desc id="sp-architecture-desc">Caddy terminates TLS for two hostnames and routes by Host header to a Next.js frontend and a FastAPI backend inside a pinned Docker network, where the backend writes to SQLite and per-project JSON and calls Stripe, an email provider, and an optional LLM provider. Each component has its own colour, and every arrow carries the colour of the component it enters.</desc>
+
+        <defs>
+          <marker id="to-ingress" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4a6a55"/></marker>
+          <marker id="to-web" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4d6a8a"/></marker>
+          <marker id="to-api" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#36646a"/></marker>
+          <marker id="to-authdb" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#8a5942"/></marker>
+          <marker id="to-json" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#7d6329"/></marker>
+          <marker id="to-stripe" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#77465f"/></marker>
+          <marker id="to-mail" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#5d6636"/></marker>
+          <marker id="to-llm" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#646a65"/></marker>
+        </defs>
+
+        <rect x="0" y="88" width="1040" height="612" fill="#faf9f6"/>
+
+        <!-- ZONE: the pinned Docker network. Neutral on purpose, so it frames the
+             coloured boxes instead of competing with them. -->
+        <rect x="196" y="112" width="568" height="504" rx="8" fill="#15171a" fill-opacity="0.02" stroke="#15171a" stroke-opacity="0.18" stroke-width="1" stroke-dasharray="4,4"/>
+        <rect x="236" y="116" width="296" height="12" rx="2" fill="#faf9f6"/>
+        <text x="384" y="125" fill="#5a615c" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.14em">DOCKER NETWORK · 172.28.0.0/16 · NO HOST PORTS</text>
+
+        <!-- ARROWS, each in the colour of the box it enters. Drawn before nodes. -->
+
+        <!-- browser into Caddy -->
+        <line x1="156" y1="336" x2="212" y2="336" stroke="#4a6a55" stroke-width="1.4" marker-end="url(#to-ingress)"/>
+        <rect x="158" y="316" width="54" height="12" rx="2" fill="#faf9f6"/>
+        <text x="185" y="325" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">HTTPS 443</text>
+
+        <!-- Caddy into the frontend -->
+        <path d="M356,312 H374 Q382,312 382,304 V196 Q382,188 390,188 H404" fill="none" stroke="#4d6a8a" stroke-width="1.4" marker-end="url(#to-web)"/>
+        <rect x="316" y="244" width="56" height="12" rx="2" fill="#faf9f6"/>
+        <text x="372" y="253" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end" letter-spacing="0.06em">BY HOST</text>
+
+        <!-- Caddy into the backend -->
+        <line x1="356" y1="356" x2="404" y2="356" stroke="#36646a" stroke-width="1.4" marker-end="url(#to-api)"/>
+
+        <!-- backend into auth.db -->
+        <path d="M468,416 V432 Q468,440 460,440 H406 Q398,440 398,448 V468" fill="none" stroke="#8a5942" stroke-width="1.4" marker-end="url(#to-authdb)"/>
+
+        <!-- backend into the JSON store -->
+        <path d="M524,416 V432 Q524,440 532,440 H562 Q570,440 570,448 V468" fill="none" stroke="#7d6329" stroke-width="1.4" marker-end="url(#to-json)"/>
+
+        <!-- backend out to Stripe -->
+        <path d="M584,320 H690 Q698,320 698,312 V218 Q698,210 706,210 H808" fill="none" stroke="#77465f" stroke-width="1.4" marker-end="url(#to-stripe)"/>
+        <rect x="708" y="256" width="58" height="12" rx="2" fill="#faf9f6"/>
+        <text x="708" y="265" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">CHECKOUT</text>
+
+        <!-- Stripe's signed webhook back into the backend -->
+        <path d="M808,234 H776 Q768,234 768,242 V336 Q768,344 760,344 H588" fill="none" stroke="#36646a" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#to-api)"/>
+        <rect x="702" y="286" width="56" height="12" rx="2" fill="#faf9f6"/>
+        <text x="758" y="295" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end" letter-spacing="0.06em">WEBHOOK</text>
+
+        <!-- backend out to the email provider -->
+        <path d="M584,370 H808" fill="none" stroke="#5d6636" stroke-width="1.4" marker-end="url(#to-mail)"/>
+
+        <!-- backend out to the optional LLM provider -->
+        <path d="M584,392 H738 Q746,392 746,400 V490 Q746,498 754,498 H808" fill="none" stroke="#646a65" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#to-llm)"/>
+        <rect x="652" y="442" width="84" height="12" rx="2" fill="#faf9f6"/>
+        <text x="736" y="451" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end" letter-spacing="0.06em">OFF BY DEFAULT</text>
+
+        <!-- NODES -->
+
+        <!-- Owner's browser -->
+        <rect x="24" y="294" width="132" height="84" rx="6" fill="#5f5668" fill-opacity="0.06" stroke="#5f5668" stroke-width="1.2"/>
+        <rect x="36" y="306" width="46" height="11" rx="2" fill="none" stroke="#5f5668" stroke-width="0.8"/>
+        <text x="59" y="314" fill="#5f5668" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.18em">CLIENT</text>
+        <text x="36" y="338" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif">Owner's browser</text>
+        <text x="36" y="354" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">HttpOnly cookie</text>
+        <text x="36" y="368" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">SameSite=None</text>
+
+        <!-- Caddy -->
+        <rect x="220" y="280" width="136" height="112" rx="6" fill="#4a6a55" fill-opacity="0.06" stroke="#4a6a55" stroke-width="1.2"/>
+        <rect x="232" y="292" width="62" height="11" rx="2" fill="none" stroke="#4a6a55" stroke-width="0.8"/>
+        <text x="263" y="300" fill="#4a6a55" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.18em">INGRESS</text>
+        <text x="232" y="324" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif">Caddy</text>
+        <text x="232" y="340" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">TLS · 80, 443</text>
+        <text x="232" y="354" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">HSTS · nosniff</text>
+        <text x="232" y="368" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">X-Frame: DENY</text>
+        <text x="232" y="382" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">sets XFF</text>
+
+        <!-- Next.js frontend -->
+        <rect x="404" y="144" width="180" height="88" rx="6" fill="#4d6a8a" fill-opacity="0.06" stroke="#4d6a8a" stroke-width="1.2"/>
+        <rect x="416" y="156" width="54" height="11" rx="2" fill="none" stroke="#4d6a8a" stroke-width="0.8"/>
+        <text x="443" y="164" fill="#4d6a8a" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.18em">WEB</text>
+        <text x="416" y="188" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif">Next.js 15.5.28</text>
+        <text x="416" y="204" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">:3000 · standalone</text>
+        <text x="416" y="218" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">30 static pages</text>
+
+        <!-- FastAPI backend -->
+        <rect x="404" y="296" width="180" height="120" rx="6" fill="#36646a" fill-opacity="0.06" stroke="#36646a" stroke-width="1.2"/>
+        <rect x="416" y="308" width="46" height="11" rx="2" fill="none" stroke="#36646a" stroke-width="0.8"/>
+        <text x="439" y="316" fill="#36646a" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.18em">API</text>
+        <text x="416" y="344" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif">FastAPI</text>
+        <text x="416" y="362" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">:8000 · uvicorn</text>
+        <text x="416" y="376" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">39 routes</text>
+        <text x="416" y="398" fill="#36646a" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">Origin-checked writes</text>
+
+        <!-- SQLite auth.db -->
+        <rect x="324" y="468" width="148" height="124" rx="6" fill="#8a5942" fill-opacity="0.06" stroke="#8a5942" stroke-width="1.2"/>
+        <rect x="336" y="480" width="52" height="11" rx="2" fill="none" stroke="#8a5942" stroke-width="0.8"/>
+        <text x="362" y="488" fill="#8a5942" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.18em">STORE</text>
+        <text x="336" y="512" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif">SQLite auth.db</text>
+        <text x="336" y="528" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">owners, sessions,</text>
+        <text x="336" y="542" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">challenges, grants</text>
+        <text x="336" y="562" fill="#8a5942" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">HMAC digests only</text>
+        <text x="336" y="578" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">6 tables</text>
+
+        <!-- Per-project JSON -->
+        <rect x="496" y="468" width="148" height="124" rx="6" fill="#7d6329" fill-opacity="0.06" stroke="#7d6329" stroke-width="1.2"/>
+        <rect x="508" y="480" width="52" height="11" rx="2" fill="none" stroke="#7d6329" stroke-width="0.8"/>
+        <text x="534" y="488" fill="#7d6329" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.18em">STORE</text>
+        <text x="508" y="512" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif">Project JSON</text>
+        <text x="508" y="528" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">profile, intake,</text>
+        <text x="508" y="542" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">analysis, successors</text>
+        <text x="508" y="562" fill="#7d6329" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">atomic writes</text>
+        <text x="508" y="578" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">+ audit log</text>
+
+        <text x="484" y="608" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">ONE DURABLE VOLUME · /data/stewardpath</text>
+
+        <!-- Stripe -->
+        <rect x="808" y="168" width="204" height="84" rx="6" fill="#77465f" fill-opacity="0.06" stroke="#77465f" stroke-width="1.2"/>
+        <rect x="820" y="180" width="66" height="11" rx="2" fill="none" stroke="#77465f" stroke-width="0.8"/>
+        <text x="853" y="188" fill="#77465f" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.18em">EXTERNAL</text>
+        <text x="820" y="212" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif">Stripe</text>
+        <text x="820" y="228" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">hosted Checkout</text>
+        <text x="820" y="242" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">signature verified</text>
+
+        <!-- Email provider -->
+        <rect x="808" y="328" width="204" height="84" rx="6" fill="#5d6636" fill-opacity="0.06" stroke="#5d6636" stroke-width="1.2"/>
+        <rect x="820" y="340" width="66" height="11" rx="2" fill="none" stroke="#5d6636" stroke-width="0.8"/>
+        <text x="853" y="348" fill="#5d6636" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.18em">EXTERNAL</text>
+        <text x="820" y="372" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif">Resend or Postmark</text>
+        <text x="820" y="388" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">sign-in code, link</text>
+        <text x="820" y="402" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">purchase receipt</text>
+
+        <!-- Optional LLM provider -->
+        <rect x="808" y="456" width="204" height="84" rx="6" fill="#646a65" fill-opacity="0.03" stroke="#646a65" stroke-width="1" stroke-dasharray="4,3"/>
+        <rect x="820" y="468" width="66" height="11" rx="2" fill="none" stroke="#646a65" stroke-width="0.8"/>
+        <text x="853" y="476" fill="#646a65" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.18em">OPTIONAL</text>
+        <text x="820" y="500" fill="#646a65" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif">DeepSeek / Moonshot</text>
+        <text x="820" y="516" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">wording only</text>
+        <text x="820" y="530" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">never facts</text>
+
+        <!-- LEGEND: the colour rule in words beats nine swatches -->
+        <line x1="24" y1="644" x2="1012" y2="644" stroke="#15171a" stroke-opacity="0.12" stroke-width="1"/>
+
+        <text x="24" y="671" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">EVERY ARROW CARRIES THE COLOUR OF THE BOX IT ENTERS</text>
+
+        <line x1="540" y1="668" x2="568" y2="668" stroke="#5a615c" stroke-width="1.4"/>
+        <text x="576" y="671" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">LIVE PATH</text>
+
+        <line x1="700" y1="668" x2="728" y2="668" stroke="#5a615c" stroke-width="1" stroke-dasharray="4,3"/>
+        <text x="736" y="671" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">RETURN OR OPTIONAL</text>
+      </svg>
+      </div>
+      <figcaption>docs/diagrams/architecture.html</figcaption>
+    </figure>
+    <figure class="fig" id="high-level">
+      <p class="figtype">High-level · StewardPath</p>
+      <h2>Three containers, two concerns that cross everything</h2>
+      <p class="note">The same system by phase, with identity and the audit trail running under all of it. One slot is deliberately empty.</p>
+      <div class="scroller" style="--vbw:1000px">
+<svg viewBox="0 0 1000 584" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="sp-hl-title sp-hl-desc">
+        <title id="sp-hl-title">StewardPath end to end, from outside the network to what the owner gets</title>
+        <desc id="sp-hl-desc">Three external systems sit outside a dashed boundary and feed a Docker network holding two stores, a scoring stage, a synthesis stage and the surfaces the owner reads. Passwordless identity and the audit trail run as bars beneath every phase.</desc>
+        <defs>
+          <marker id="hl-muted" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#646a65"/></marker>
+          <marker id="hl-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4a6a55"/></marker>
+        </defs>
+        <rect width="100%" height="100%" fill="#faf9f6"/>
+        <polygon points="0,4 180,4 192,18 180,32 0,32" fill="#eceae3"/>
+        <text x="96" y="21" fill="#5a615c" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.14em">SOURCES</text>
+        <polygon points="192,4 372,4 384,18 372,32 192,32 204,18" fill="#e3e0d6"/>
+        <text x="288" y="21" fill="#5a615c" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.14em">KEEP</text>
+        <polygon points="384,4 564,4 576,18 564,32 384,32 396,18" fill="#eceae3"/>
+        <text x="480" y="21" fill="#5a615c" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.14em">SCORE</text>
+        <polygon points="576,4 756,4 768,18 756,32 576,32 588,18" fill="#e3e0d6"/>
+        <text x="672" y="21" fill="#5a615c" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.14em">PREPARE</text>
+        <polygon points="768,4 964,4 964,32 768,32 780,18" fill="#eceae3"/>
+        <text x="866" y="21" fill="#5a615c" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.14em">DELIVER</text>
+        <rect x="4" y="40" width="132" height="336" rx="6" fill="#15171a" fill-opacity="0.02" stroke="#15171a" stroke-opacity="0.2" stroke-width="0.8" stroke-dasharray="6,3"/>
+        <rect x="196" y="40" width="768" height="336" rx="8" fill="#15171a" fill-opacity="0.02" stroke="#15171a" stroke-opacity="0.18" stroke-width="1.2"/>
+        <text x="212" y="362" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.12em">DOCKER NETWORK · 172.28.0.0/16 · THREE CONTAINERS</text>
+        <path d="M 132,104 H 154 a 8,8 0 0,1 16,0 H 212" fill="none" stroke="#646a65" stroke-width="1.0" marker-end="url(#hl-muted)"/>
+        <path d="M 132,184 H 154 Q 162,184 162,176 V 92 Q 162,84 170,84 H 212" fill="none" stroke="#646a65" stroke-width="1.0" marker-end="url(#hl-muted)"/>
+        <path d="M 132,264 H 166 Q 174,264 174,256 V 132 Q 174,124 182,124 H 212" fill="none" stroke="#646a65" stroke-width="1.0" marker-end="url(#hl-muted)"/>
+        <path d="M 364,104 H 404" fill="none" stroke="#4a6a55" stroke-width="1.2" marker-end="url(#hl-accent)"/>
+        <path d="M 556,104 H 596" fill="none" stroke="#4a6a55" stroke-width="1.2" marker-end="url(#hl-accent)"/>
+        <path d="M 748,104 H 790" fill="none" stroke="#646a65" stroke-width="1.0" marker-end="url(#hl-muted)"/>
+        <rect x="8" y="72" width="124" height="64" rx="6" fill="#4a6a55" fill-opacity="0.04" stroke="#4a6a55" stroke-opacity="0.55" stroke-width="1"/>
+        <rect x="16" y="80" width="28" height="12" rx="3" fill="#4a6a55" fill-opacity="0.18"/>
+        <text x="30" y="89" fill="#4a6a55" font-size="7" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">EXT</text>
+        <text x="70" y="114" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Owner's browser</text>
+        <text x="70" y="130" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">answers, taps, consent</text>
+        <rect x="8" y="152" width="124" height="64" rx="6" fill="#77465f" fill-opacity="0.04" stroke="#77465f" stroke-opacity="0.55" stroke-width="1"/>
+        <rect x="16" y="160" width="28" height="12" rx="3" fill="#77465f" fill-opacity="0.18"/>
+        <text x="30" y="169" fill="#77465f" font-size="7" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">EXT</text>
+        <text x="70" y="194" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Stripe</text>
+        <text x="70" y="210" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">checkout and webhook</text>
+        <rect x="8" y="232" width="124" height="64" rx="6" fill="#5d6636" fill-opacity="0.04" stroke="#5d6636" stroke-opacity="0.55" stroke-width="1"/>
+        <rect x="16" y="240" width="28" height="12" rx="3" fill="#5d6636" fill-opacity="0.18"/>
+        <text x="30" y="249" fill="#5d6636" font-size="7" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">EXT</text>
+        <text x="70" y="274" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Resend</text>
+        <text x="70" y="290" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">delivers the sign-in</text>
+        <rect x="212" y="64" width="152" height="80" rx="6" fill="#8a5942" fill-opacity="0.04" stroke="#8a5942" stroke-opacity="0.55" stroke-width="1"/>
+        <rect x="220" y="72" width="40" height="12" rx="3" fill="#8a5942" fill-opacity="0.18"/>
+        <text x="240" y="81" fill="#8a5942" font-size="7" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">STORE</text>
+        <text x="288" y="114" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">The two stores</text>
+        <text x="288" y="130" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">JSON files + SQLite</text>
+        <rect x="404" y="64" width="152" height="80" rx="6" fill="#4a6a55" fill-opacity="0.08" stroke="#4a6a55" stroke-opacity="1" stroke-width="1.4"/>
+        <rect x="412" y="72" width="40" height="12" rx="3" fill="#4a6a55" fill-opacity="0.18"/>
+        <text x="432" y="81" fill="#4a6a55" font-size="7" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">SCORE</text>
+        <text x="480" y="114" fill="#4a6a55" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Readiness scoring</text>
+        <text x="480" y="130" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">five drivers, weakest-link</text>
+        <rect x="596" y="64" width="152" height="80" rx="6" fill="#36646a" fill-opacity="0.04" stroke="#36646a" stroke-opacity="0.55" stroke-width="1"/>
+        <rect x="604" y="72" width="34" height="12" rx="3" fill="#36646a" fill-opacity="0.18"/>
+        <text x="621" y="81" fill="#36646a" font-size="7" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">PREP</text>
+        <text x="672" y="114" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Synthesis and handoff</text>
+        <text x="672" y="130" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">grounded in the answers</text>
+        <rect x="790" y="64" width="152" height="80" rx="6" fill="#7d6329" fill-opacity="0.04" stroke="#7d6329" stroke-opacity="0.55" stroke-width="1"/>
+        <rect x="798" y="72" width="28" height="12" rx="3" fill="#7d6329" fill-opacity="0.18"/>
+        <text x="812" y="81" fill="#7d6329" font-size="7" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">OUT</text>
+        <text x="866" y="114" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">What the owner gets</text>
+        <text x="866" y="130" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">report, plan, brief</text>
+        <rect x="4" y="388" width="960" height="40" rx="6" fill="#36646a" fill-opacity="0.05" stroke="#36646a" stroke-opacity="0.5" stroke-width="0.8"/>
+        <text x="482" y="406" fill="#15171a" font-size="10" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Passwordless identity</text>
+        <text x="482" y="420" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">HMAC digests · single-use codes · 30-day sessions</text>
+        <rect x="4" y="432" width="960" height="40" rx="6" fill="#5f5668" fill-opacity="0.05" stroke="#5f5668" stroke-opacity="0.5" stroke-width="0.8"/>
+        <text x="482" y="450" fill="#15171a" font-size="10" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Audit trail</text>
+        <text x="482" y="464" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">append-only, metadata only, outlives a deletion</text>
+        <polygon points="972,40 1000,40 1000,244 986,256 972,244" fill="#eceae3"/>
+        <text x="986" y="148" fill="#5a615c" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.14em" transform="rotate(-90 986 148)">SECURITY</text>
+        <polygon points="972,256 986,268 1000,256 1000,472 972,472" fill="#e3e0d6"/>
+        <text x="986" y="364" fill="#5a615c" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.14em" transform="rotate(-90 986 364)">OBSERVABILITY</text>
+        <line x1="4" y1="506" x2="964" y2="506" stroke="#15171a" stroke-opacity="0.12" stroke-width="1"/>
+        <text x="4" y="532" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">DASHED ZONE: OUTSIDE THE NETWORK · SOLID ZONE: THE THREE CONTAINERS · BARS: CONCERNS THAT CROSS EVERY PHASE</text>
+        <text x="4" y="552" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">NO ORCHESTRATION BAR: STEWARDPATH RUNS NO SCHEDULER, SO THAT SLOT IS LEFT EMPTY RATHER THAN FILLED</text>
+      </svg>
+      </div>
+      <figcaption>docs/diagrams/high-level.html</figcaption>
+    </figure>
+    <section class="band" id="g1">
+      <p class="eyebrow">How it works</p>
+      <p class="bandsub">Three mechanisms, drawn at the level a new engineer needs.</p>
+    </section>
+    <figure class="fig" id="signin-process">
+      <p class="figtype">Process · StewardPath</p>
+      <h2>Six steps, and the secret is never stored</h2>
+      <p class="note">Six steps, four actors, and the real caps. The store never holds a code, only a keyed digest.</p>
+      <div class="scroller" style="--vbw:840px">
+<svg viewBox="0 0 840 456" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="sp-process-title sp-process-desc">
+        <title id="sp-process-title">How a StewardPath owner signs in without a password</title>
+        <desc id="sp-process-desc">Across six steps and four actors an owner types an email, the API mints a six-digit code and a 256-bit link token, the store keeps only keyed HMAC digests of both, the provider delivers them, and a single-use atomic claim turns a correct code into a thirty-day session.</desc>
+        <defs>
+          <marker id="pm-muted" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#646a65"/></marker>
+          <marker id="pm-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4a6a55"/></marker>
+        </defs>
+        <rect width="100%" height="100%" fill="#faf9f6"/>
+        <rect x="140" y="36" width="700" height="80" fill="#15171a" fill-opacity="0.018"/>
+        <line x1="0" y1="36" x2="840" y2="36" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.8"/>
+        <line x1="0" y1="116" x2="840" y2="116" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.8"/>
+        <rect x="140" y="196" width="700" height="80" fill="#15171a" fill-opacity="0.018"/>
+        <line x1="0" y1="196" x2="840" y2="196" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.8"/>
+        <line x1="0" y1="276" x2="840" y2="276" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.8"/>
+        <line x1="0" y1="356" x2="840" y2="356" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.8"/>
+        <line x1="140" y1="36" x2="140" y2="356" stroke="#15171a" stroke-opacity="0.2" stroke-width="1"/>
+        <rect x="190" y="8" width="16" height="16" rx="8" fill="#15171a" fill-opacity="0.12"/>
+        <text x="198" y="19" fill="#15171a" font-size="8" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">1</text>
+        <text x="198" y="32" fill="#646a65" font-size="6" font-weight="500" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.12em">ASK</text>
+        <rect x="302" y="8" width="16" height="16" rx="8" fill="#15171a" fill-opacity="0.12"/>
+        <text x="310" y="19" fill="#15171a" font-size="8" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">2</text>
+        <text x="310" y="32" fill="#646a65" font-size="6" font-weight="500" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.12em">MINT</text>
+        <rect x="414" y="8" width="16" height="16" rx="8" fill="#15171a" fill-opacity="0.12"/>
+        <text x="422" y="19" fill="#15171a" font-size="8" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">3</text>
+        <text x="422" y="32" fill="#646a65" font-size="6" font-weight="500" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.12em">SEND</text>
+        <rect x="526" y="8" width="16" height="16" rx="8" fill="#15171a" fill-opacity="0.12"/>
+        <text x="534" y="19" fill="#15171a" font-size="8" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">4</text>
+        <text x="534" y="32" fill="#646a65" font-size="6" font-weight="500" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.12em">OPEN</text>
+        <rect x="638" y="8" width="16" height="16" rx="8" fill="#4a6a55" fill-opacity="0.2"/>
+        <text x="646" y="19" fill="#4a6a55" font-size="8" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">5</text>
+        <text x="646" y="32" fill="#4a6a55" font-size="6" font-weight="500" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.12em">PROVE</text>
+        <rect x="750" y="8" width="16" height="16" rx="8" fill="#15171a" fill-opacity="0.12"/>
+        <text x="758" y="19" fill="#15171a" font-size="8" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">6</text>
+        <text x="758" y="32" fill="#646a65" font-size="6" font-weight="500" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.12em">ADMIT</text>
+        <text x="70" y="72" fill="#4a6a55" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.14em">THE</text>
+        <text x="70" y="84" fill="#4a6a55" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.14em">OWNER</text>
+        <text x="70" y="152" fill="#36646a" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.14em">THE</text>
+        <text x="70" y="164" fill="#36646a" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.14em">API</text>
+        <text x="70" y="232" fill="#8a5942" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.14em">THE</text>
+        <text x="70" y="244" fill="#8a5942" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.14em">STORE</text>
+        <text x="70" y="312" fill="#5d6636" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.14em">EMAIL</text>
+        <text x="70" y="324" fill="#5d6636" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.14em">PROVIDER</text>
+        <path d="M 248,76 H 246 Q 254,76 254,84 V 148 Q 254,156 262,156 H 260" fill="none" stroke="#646a65" stroke-width="1" marker-end="url(#pm-muted)"/>
+        <path d="M 310,188 V 198" fill="none" stroke="#646a65" stroke-width="1" marker-end="url(#pm-muted)"/>
+        <path d="M 360,156 H 358 Q 366,156 366,164 V 308 Q 366,316 374,316 H 372" fill="none" stroke="#646a65" stroke-width="1" marker-end="url(#pm-muted)"/>
+        <path d="M 472,316 H 470 Q 478,316 478,308 V 84 Q 478,76 486,76 H 484" fill="none" stroke="#646a65" stroke-width="1" marker-end="url(#pm-muted)"/>
+        <path d="M 584,76 H 582 Q 590,76 590,84 V 148 Q 590,156 598,156 H 596" fill="none" stroke="#4a6a55" stroke-width="1.4" marker-end="url(#pm-accent)"/>
+        <rect x="600" y="110" width="59" height="12" rx="2" fill="#faf9f6"/>
+        <text x="604" y="119" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">THE PROOF</text>
+        <path d="M 646,188 V 198" fill="none" stroke="#646a65" stroke-width="1" marker-end="url(#pm-muted)"/>
+        <path d="M 696,156 H 708" fill="none" stroke="#4a6a55" stroke-width="1.4" marker-end="url(#pm-accent)"/>
+        <path d="M 758,124 V 114" fill="none" stroke="#646a65" stroke-width="1" marker-end="url(#pm-muted)"/>
+        <rect x="148" y="44" width="100" height="64" rx="6" fill="#4a6a55" fill-opacity="0.05" stroke="#4a6a55" stroke-width="1"/>
+        <rect x="152" y="48" width="22" height="10" rx="3" fill="#4a6a55" fill-opacity="0.18"/>
+        <text x="163" y="55" fill="#4a6a55" font-size="6" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">OWN</text>
+        <text x="198" y="67" fill="#15171a" font-size="9" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Types an email</text>
+        <text x="198" y="79" fill="#646a65" font-size="6.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">no password, ever</text>
+        <text x="198" y="91" fill="#5a615c" font-size="6.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">the intake gate</text>
+        <rect x="226" y="98" width="18" height="8" rx="3" fill="#15171a" fill-opacity="0.07"/>
+        <text x="235" y="104" fill="#646a65" font-size="5.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">WB</text>
+        <rect x="260" y="124" width="100" height="64" rx="6" fill="#36646a" fill-opacity="0.05" stroke="#36646a" stroke-width="1"/>
+        <rect x="264" y="128" width="22" height="10" rx="3" fill="#36646a" fill-opacity="0.18"/>
+        <text x="275" y="135" fill="#36646a" font-size="6" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">API</text>
+        <text x="310" y="147" fill="#15171a" font-size="9" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Mints two secrets</text>
+        <text x="310" y="159" fill="#646a65" font-size="6.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">6 digits + 256 bits</text>
+        <text x="310" y="171" fill="#5a615c" font-size="6.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">secrets module</text>
+        <rect x="264" y="178" width="18" height="8" rx="3" fill="#15171a" fill-opacity="0.07"/>
+        <text x="273" y="184" fill="#646a65" font-size="5.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">WB</text>
+        <rect x="338" y="178" width="18" height="8" rx="3" fill="#15171a" fill-opacity="0.07"/>
+        <text x="347" y="184" fill="#646a65" font-size="5.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">LS</text>
+        <rect x="260" y="204" width="100" height="64" rx="6" fill="#8a5942" fill-opacity="0.05" stroke="#8a5942" stroke-width="1"/>
+        <rect x="264" y="208" width="22" height="10" rx="3" fill="#8a5942" fill-opacity="0.18"/>
+        <text x="275" y="215" fill="#8a5942" font-size="6" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">DB</text>
+        <text x="310" y="227" fill="#15171a" font-size="9" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Keeps digests only</text>
+        <text x="310" y="239" fill="#646a65" font-size="6.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">HMAC-SHA256, keyed</text>
+        <text x="310" y="251" fill="#5a615c" font-size="6.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">auth_challenges</text>
+        <rect x="264" y="258" width="18" height="8" rx="3" fill="#15171a" fill-opacity="0.07"/>
+        <text x="273" y="264" fill="#646a65" font-size="5.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">LS</text>
+        <rect x="338" y="258" width="18" height="8" rx="3" fill="#15171a" fill-opacity="0.07"/>
+        <text x="347" y="264" fill="#646a65" font-size="5.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">LS</text>
+        <rect x="372" y="284" width="100" height="64" rx="6" fill="#5d6636" fill-opacity="0.05" stroke="#5d6636" stroke-width="1"/>
+        <rect x="376" y="288" width="22" height="10" rx="3" fill="#5d6636" fill-opacity="0.18"/>
+        <text x="387" y="295" fill="#5d6636" font-size="6" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">MAIL</text>
+        <text x="422" y="307" fill="#15171a" font-size="9" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Delivers both</text>
+        <text x="422" y="319" fill="#646a65" font-size="6.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">code and signed link</text>
+        <text x="422" y="331" fill="#5a615c" font-size="6.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">Resend or Postmark</text>
+        <rect x="376" y="338" width="18" height="8" rx="3" fill="#15171a" fill-opacity="0.07"/>
+        <text x="385" y="344" fill="#646a65" font-size="5.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">LS</text>
+        <rect x="450" y="338" width="18" height="8" rx="3" fill="#15171a" fill-opacity="0.07"/>
+        <text x="459" y="344" fill="#646a65" font-size="5.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">LS</text>
+        <rect x="484" y="44" width="100" height="64" rx="6" fill="#4a6a55" fill-opacity="0.05" stroke="#4a6a55" stroke-width="1"/>
+        <rect x="488" y="48" width="22" height="10" rx="3" fill="#4a6a55" fill-opacity="0.18"/>
+        <text x="499" y="55" fill="#4a6a55" font-size="6" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">OWN</text>
+        <text x="534" y="67" fill="#15171a" font-size="9" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Opens the email</text>
+        <text x="534" y="79" fill="#646a65" font-size="6.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">a peek never burns it</text>
+        <text x="534" y="91" fill="#5a615c" font-size="6.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">GET /auth/confirm</text>
+        <rect x="488" y="98" width="18" height="8" rx="3" fill="#15171a" fill-opacity="0.07"/>
+        <text x="497" y="104" fill="#646a65" font-size="5.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">LS</text>
+        <rect x="562" y="98" width="18" height="8" rx="3" fill="#15171a" fill-opacity="0.07"/>
+        <text x="571" y="104" fill="#646a65" font-size="5.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">LS</text>
+        <rect x="596" y="124" width="100" height="64" rx="6" fill="#36646a" fill-opacity="0.1" stroke="#36646a" stroke-width="1.8"/>
+        <rect x="600" y="128" width="22" height="10" rx="3" fill="#36646a" fill-opacity="0.18"/>
+        <text x="611" y="135" fill="#36646a" font-size="6" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">API</text>
+        <text x="646" y="147" fill="#15171a" font-size="9" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Checks the code</text>
+        <text x="646" y="159" fill="#646a65" font-size="6.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">compare_digest</text>
+        <text x="646" y="171" fill="#5a615c" font-size="6.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">POST /auth/verify</text>
+        <rect x="600" y="178" width="18" height="8" rx="3" fill="#15171a" fill-opacity="0.07"/>
+        <text x="609" y="184" fill="#646a65" font-size="5.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">LS</text>
+        <rect x="674" y="178" width="18" height="8" rx="3" fill="#15171a" fill-opacity="0.07"/>
+        <text x="683" y="184" fill="#646a65" font-size="5.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">LS</text>
+        <rect x="596" y="204" width="100" height="64" rx="6" fill="#8a5942" fill-opacity="0.05" stroke="#8a5942" stroke-width="1"/>
+        <rect x="600" y="208" width="22" height="10" rx="3" fill="#8a5942" fill-opacity="0.18"/>
+        <text x="611" y="215" fill="#8a5942" font-size="6" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">DB</text>
+        <text x="646" y="227" fill="#15171a" font-size="9" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Claims it once</text>
+        <text x="646" y="239" fill="#646a65" font-size="6.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">UPDATE WHERE NULL</text>
+        <text x="646" y="251" fill="#5a615c" font-size="6.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">rowcount must be 1</text>
+        <rect x="600" y="258" width="18" height="8" rx="3" fill="#15171a" fill-opacity="0.07"/>
+        <text x="609" y="264" fill="#646a65" font-size="5.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">LS</text>
+        <rect x="674" y="258" width="18" height="8" rx="3" fill="#15171a" fill-opacity="0.07"/>
+        <text x="683" y="264" fill="#646a65" font-size="5.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">LS</text>
+        <rect x="708" y="124" width="100" height="64" rx="6" fill="#36646a" fill-opacity="0.05" stroke="#36646a" stroke-width="1"/>
+        <rect x="712" y="128" width="22" height="10" rx="3" fill="#36646a" fill-opacity="0.18"/>
+        <text x="723" y="135" fill="#36646a" font-size="6" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">API</text>
+        <text x="758" y="147" fill="#15171a" font-size="9" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Issues a session</text>
+        <text x="758" y="159" fill="#646a65" font-size="6.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">30 days, HttpOnly</text>
+        <text x="758" y="171" fill="#5a615c" font-size="6.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">sp_session</text>
+        <rect x="712" y="178" width="18" height="8" rx="3" fill="#15171a" fill-opacity="0.07"/>
+        <text x="721" y="184" fill="#646a65" font-size="5.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">LS</text>
+        <rect x="708" y="44" width="100" height="64" rx="6" fill="#4a6a55" fill-opacity="0.05" stroke="#4a6a55" stroke-width="1"/>
+        <rect x="712" y="48" width="22" height="10" rx="3" fill="#4a6a55" fill-opacity="0.18"/>
+        <text x="723" y="55" fill="#4a6a55" font-size="6" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">OWN</text>
+        <text x="758" y="67" fill="#15171a" font-size="9" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Signed in</text>
+        <text x="758" y="79" fill="#646a65" font-size="6.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">the project is claimed</text>
+        <text x="758" y="91" fill="#5a615c" font-size="6.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">once, never reassigned</text>
+        <rect x="712" y="98" width="18" height="8" rx="3" fill="#15171a" fill-opacity="0.07"/>
+        <text x="721" y="104" fill="#646a65" font-size="5.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">LS</text>
+        <text x="16" y="372" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">WB WHAT THE BROWSER SENDS · LS A ONE-TIME SECRET</text>
+        <line x1="16" y1="390" x2="44" y2="390" stroke="#4a6a55" stroke-width="1.4"/>
+        <text x="54" y="393" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">THE STEP THAT DECIDES: PROVE IT, OR START AGAIN</text>
+        <text x="16" y="414" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">CAPS: 5 CODES PER EMAIL PER 15 MIN · 10 GUESSES PER EMAIL PER 15 MIN · 5 PER CHALLENGE</text>
+        <text x="16" y="435" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">LIVES: CODE 10 MINUTES · LINK 14 DAYS · SESSION 30 DAYS</text>
+      </svg>
+      </div>
+      <figcaption>docs/diagrams/signin-process.html</figcaption>
+    </figure>
+    <figure class="fig" id="data-flow">
+      <p class="figtype">Data flow · StewardPath</p>
+      <h2>Nobody sees the answers but the owner</h2>
+      <p class="note">Follow one answer. The advisor lane touches exactly one node, at the end.</p>
+      <div class="scroller" style="--vbw:728px">
+<svg viewBox="0 0 728 376" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="sp-dataflow-title sp-dataflow-desc">
+        <title id="sp-dataflow-title">Who touches an owner's answers, at each step</title>
+        <desc id="sp-dataflow-desc">Across five steps and three roles, the owner's answers are stored, scored and turned into a brief. The advisor receives only the fields the owner chose to share, and the owner's consent gates that handoff.</desc>
+        <defs>
+          <marker id="df-muted" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#646a65"/></marker>
+          <marker id="df-trigger" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#646a65"/></marker>
+          <marker id="df-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4a6a55"/></marker>
+        </defs>
+        <rect width="100%" height="100%" fill="#faf9f6"/>
+        <rect x="0" y="36" width="728" height="80" fill="#15171a" fill-opacity="0.018"/>
+        <line x1="0" y1="36" x2="728" y2="36" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.8"/>
+        <line x1="0" y1="116" x2="728" y2="116" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.8"/>
+        <rect x="0" y="196" width="728" height="80" fill="#15171a" fill-opacity="0.018"/>
+        <line x1="0" y1="196" x2="728" y2="196" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.8"/>
+        <line x1="0" y1="276" x2="728" y2="276" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.8"/>
+        <line x1="140" y1="36" x2="140" y2="276" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.8"/>
+        <rect x="180" y="6" width="32" height="16" rx="8" fill="#15171a" fill-opacity="0.12"/>
+        <text x="196" y="17" fill="#15171a" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" font-weight="600">01</text>
+        <text x="196" y="31" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.14em">ANSWER</text>
+        <rect x="292" y="6" width="32" height="16" rx="8" fill="#15171a" fill-opacity="0.12"/>
+        <text x="308" y="17" fill="#15171a" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" font-weight="600">02</text>
+        <text x="308" y="31" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.14em">STORE</text>
+        <rect x="404" y="6" width="32" height="16" rx="8" fill="#15171a" fill-opacity="0.12"/>
+        <text x="420" y="17" fill="#15171a" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" font-weight="600">03</text>
+        <text x="420" y="31" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.14em">SCORE</text>
+        <rect x="516" y="6" width="32" height="16" rx="8" fill="#4a6a55" fill-opacity="0.2"/>
+        <text x="532" y="17" fill="#4a6a55" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" font-weight="600">04</text>
+        <text x="532" y="31" fill="#4a6a55" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.14em">CHOOSE</text>
+        <rect x="628" y="6" width="32" height="16" rx="8" fill="#15171a" fill-opacity="0.12"/>
+        <text x="644" y="17" fill="#15171a" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" font-weight="600">05</text>
+        <text x="644" y="31" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.14em">REVIEW</text>
+        <text x="70" y="72" fill="#4a6a55" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.14em">THE</text>
+        <text x="70" y="84" fill="#4a6a55" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.14em">OWNER</text>
+        <text x="70" y="152" fill="#36646a" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.14em">STEWARD</text>
+        <text x="70" y="164" fill="#36646a" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.14em">PATH</text>
+        <text x="70" y="232" fill="#77465f" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.14em">THE</text>
+        <text x="70" y="244" fill="#77465f" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.14em">ADVISOR</text>
+        <path d="M 246,76 H 244 Q 252,76 252,84 V 148 Q 252,156 260,156 H 258" fill="none" stroke="#646a65" stroke-width="1" marker-end="url(#df-muted)"/>
+        <path d="M 358,156 H 370" fill="none" stroke="#646a65" stroke-width="1" marker-end="url(#df-muted)"/>
+        <path d="M 470,156 H 468 Q 476,156 476,148 V 84 Q 476,76 484,76 H 482" fill="none" stroke="#646a65" stroke-width="1" marker-end="url(#df-muted)"/>
+        <path d="M 582,156 H 580 Q 588,156 588,164 V 228 Q 588,236 596,236 H 594" fill="none" stroke="#4a6a55" stroke-width="1.4" marker-end="url(#df-accent)"/>
+        <rect x="598" y="190" width="69" height="12" rx="2" fill="#faf9f6"/>
+        <text x="602" y="199" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">ONLY SHARED</text>
+        <rect x="146" y="44" width="100" height="64" rx="6" fill="#4a6a55" fill-opacity="0.05" stroke="#4a6a55" stroke-width="1"/>
+        <rect x="150" y="48" width="18" height="10" rx="3" fill="#4a6a55" fill-opacity="0.18"/>
+        <text x="159" y="55" fill="#4a6a55" font-size="6" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" font-weight="600">OWN</text>
+        <text x="196" y="67" fill="#15171a" font-size="9" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Answers</text>
+        <text x="196" y="79" fill="#646a65" font-size="6.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">tap, type or skip</text>
+        <text x="196" y="91" fill="#5a615c" font-size="6.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">/intake</text>
+        <rect x="150" y="98" width="16" height="8" rx="3" fill="#15171a" fill-opacity="0.07"/>
+        <text x="158" y="104" fill="#646a65" font-size="5.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">WB</text>
+        <rect x="226" y="98" width="16" height="8" rx="3" fill="#15171a" fill-opacity="0.07"/>
+        <text x="234" y="104" fill="#646a65" font-size="5.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">DB</text>
+        <rect x="258" y="124" width="100" height="64" rx="6" fill="#36646a" fill-opacity="0.05" stroke="#36646a" stroke-width="1"/>
+        <rect x="262" y="128" width="18" height="10" rx="3" fill="#36646a" fill-opacity="0.18"/>
+        <text x="271" y="135" fill="#36646a" font-size="6" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" font-weight="600">SYS</text>
+        <text x="308" y="147" fill="#15171a" font-size="9" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Durable record</text>
+        <text x="308" y="159" fill="#646a65" font-size="6.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">JSON + SQLite</text>
+        <text x="308" y="171" fill="#5a615c" font-size="6.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">/data/stewardpath</text>
+        <rect x="262" y="178" width="16" height="8" rx="3" fill="#15171a" fill-opacity="0.07"/>
+        <text x="270" y="184" fill="#646a65" font-size="5.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">DB</text>
+        <rect x="338" y="178" width="16" height="8" rx="3" fill="#15171a" fill-opacity="0.07"/>
+        <text x="346" y="184" fill="#646a65" font-size="5.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">DB</text>
+        <rect x="370" y="124" width="100" height="64" rx="6" fill="#36646a" fill-opacity="0.05" stroke="#36646a" stroke-width="1"/>
+        <rect x="374" y="128" width="18" height="10" rx="3" fill="#36646a" fill-opacity="0.18"/>
+        <text x="383" y="135" fill="#36646a" font-size="6" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" font-weight="600">SYS</text>
+        <text x="420" y="147" fill="#15171a" font-size="9" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Readiness score</text>
+        <text x="420" y="159" fill="#646a65" font-size="6.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">five drivers</text>
+        <text x="420" y="171" fill="#5a615c" font-size="6.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">scoring.py</text>
+        <rect x="374" y="178" width="16" height="8" rx="3" fill="#15171a" fill-opacity="0.07"/>
+        <text x="382" y="184" fill="#646a65" font-size="5.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">DB</text>
+        <rect x="450" y="178" width="16" height="8" rx="3" fill="#15171a" fill-opacity="0.07"/>
+        <text x="458" y="184" fill="#646a65" font-size="5.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">TB</text>
+        <path d="M 532,108 V 118" fill="none" stroke="#646a65" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#df-trigger)"/>
+        <rect x="546" y="107" width="52" height="12" rx="2" fill="#faf9f6"/>
+        <text x="550" y="116" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">CONSENT</text>
+        <rect x="482" y="44" width="100" height="64" rx="6" fill="#4a6a55" fill-opacity="0.05" stroke="#4a6a55" stroke-width="1"/>
+        <rect x="486" y="48" width="18" height="10" rx="3" fill="#4a6a55" fill-opacity="0.18"/>
+        <text x="495" y="55" fill="#4a6a55" font-size="6" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" font-weight="600">OWN</text>
+        <text x="532" y="67" fill="#15171a" font-size="9" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Chooses to share</text>
+        <text x="532" y="79" fill="#646a65" font-size="6.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">field by field</text>
+        <text x="532" y="91" fill="#5a615c" font-size="6.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">disclosure controls</text>
+        <rect x="486" y="98" width="16" height="8" rx="3" fill="#15171a" fill-opacity="0.07"/>
+        <text x="494" y="104" fill="#646a65" font-size="5.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">TB</text>
+        <rect x="562" y="98" width="16" height="8" rx="3" fill="#15171a" fill-opacity="0.07"/>
+        <text x="570" y="104" fill="#646a65" font-size="5.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">TB</text>
+        <rect x="482" y="124" width="100" height="64" rx="6" fill="#36646a" fill-opacity="0.1" stroke="#36646a" stroke-width="1.8"/>
+        <rect x="486" y="128" width="18" height="10" rx="3" fill="#36646a" fill-opacity="0.18"/>
+        <text x="495" y="135" fill="#36646a" font-size="6" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" font-weight="600">SYS</text>
+        <text x="532" y="147" fill="#15171a" font-size="9" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Handoff package</text>
+        <text x="532" y="159" fill="#646a65" font-size="6.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">shared fields only</text>
+        <text x="532" y="171" fill="#5a615c" font-size="6.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">build_handoff</text>
+        <rect x="486" y="178" width="16" height="8" rx="3" fill="#15171a" fill-opacity="0.07"/>
+        <text x="494" y="184" fill="#646a65" font-size="5.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">TB</text>
+        <rect x="562" y="178" width="16" height="8" rx="3" fill="#15171a" fill-opacity="0.07"/>
+        <text x="570" y="184" fill="#646a65" font-size="5.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">FL</text>
+        <rect x="594" y="204" width="100" height="64" rx="6" fill="#77465f" fill-opacity="0.05" stroke="#77465f" stroke-width="1"/>
+        <rect x="598" y="208" width="18" height="10" rx="3" fill="#77465f" fill-opacity="0.18"/>
+        <text x="607" y="215" fill="#77465f" font-size="6" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" font-weight="600">ADV</text>
+        <text x="644" y="227" fill="#15171a" font-size="9" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Reads the brief</text>
+        <text x="644" y="239" fill="#646a65" font-size="6.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">never the raw answers</text>
+        <text x="644" y="251" fill="#5a615c" font-size="6.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">booked review</text>
+        <rect x="598" y="258" width="16" height="8" rx="3" fill="#15171a" fill-opacity="0.07"/>
+        <text x="606" y="264" fill="#646a65" font-size="5.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">FL</text>
+        <rect x="674" y="258" width="16" height="8" rx="3" fill="#15171a" fill-opacity="0.07"/>
+        <text x="682" y="264" fill="#646a65" font-size="5.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">FL</text>
+        <text x="16" y="292" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">WB WEB INPUT · DB DATASET · TB TABLE · FL FILE OR BRIEF</text>
+        <line x1="16" y1="310" x2="44" y2="310" stroke="#4a6a55" stroke-width="1.4"/>
+        <text x="54" y="313" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">THE ONE HANDOFF THAT LEAVES THE OWNER</text>
+        <line x1="16" y1="332" x2="44" y2="332" stroke="#646a65" stroke-width="1" stroke-dasharray="4,3"/>
+        <text x="54" y="335" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">THE OWNER&#39;S CONSENT GATES IT</text>
+      </svg>
+      </div>
+      <figcaption>docs/diagrams/data-flow.html</figcaption>
+    </figure>
+    <figure class="fig" id="dp-integration">
+      <p class="figtype">DP integration · StewardPath</p>
+      <h2>Four ways in, four ways out, one place it rests</h2>
+      <p class="note">The same data asked differently: what plugs in, what plugs out, over what wire.</p>
+      <div class="scroller" style="--vbw:1200px">
+<svg viewBox="0 0 1200 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="sp-dpi-title sp-dpi-desc">
+        <title id="sp-dpi-title">What plugs into StewardPath, and what plugs out</title>
+        <desc id="sp-dpi-desc">Four sources feed the platform: the owner's answers and successor ratings over HTTPS, a one-time sign-in proof, and signed Stripe webhooks. Inside sit three stores under a scoring bar and a synthesis bar. Four surfaces read out: the owner's report, the action plan, the advisor brief and an admin-only ops console.</desc>
+        <defs>
+          <marker id="dp-0" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4a6a55"/></marker>
+          <marker id="dp-1" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4a6a55"/></marker>
+          <marker id="dp-2" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#36646a"/></marker>
+          <marker id="dp-3" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#77465f"/></marker>
+          <marker id="dp-c0" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4a6a55"/></marker>
+          <marker id="dp-c1" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4a6a55"/></marker>
+          <marker id="dp-c2" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#8a5942"/></marker>
+          <marker id="dp-c3" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#5d6636"/></marker>
+        </defs>
+        <rect width="100%" height="100%" fill="#faf9f6"/>
+        <rect x="260" y="72" width="696" height="336" rx="8" fill="#15171a" fill-opacity="0.02" stroke="#15171a" stroke-opacity="0.18" stroke-width="1"/>
+        <rect x="284" y="66" width="188" height="12" rx="2" fill="#faf9f6"/>
+        <text x="292" y="75" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.14em">WHAT STEWARDPATH KEEPS</text>
+        <path d="M 200 124 H 256" fill="none" stroke="#4a6a55" stroke-width="1.2" marker-end="url(#dp-0)"/>
+        <rect x="212" y="106" width="37" height="12" rx="2" fill="#faf9f6"/>
+        <text x="230" y="115" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">HTTPS</text>
+        <path d="M 200 212 H 256" fill="none" stroke="#4a6a55" stroke-width="1.2" marker-end="url(#dp-1)"/>
+        <rect x="212" y="194" width="37" height="12" rx="2" fill="#faf9f6"/>
+        <text x="230" y="203" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">HTTPS</text>
+        <path d="M 200 300 H 256" fill="none" stroke="#36646a" stroke-width="1.2" marker-end="url(#dp-2)"/>
+        <rect x="203" y="282" width="53" height="12" rx="2" fill="#faf9f6"/>
+        <text x="230" y="291" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">ONE-TIME</text>
+        <path d="M 200 388 H 256" fill="none" stroke="#77465f" stroke-width="1.2" marker-end="url(#dp-3)"/>
+        <rect x="206" y="370" width="48" height="12" rx="2" fill="#faf9f6"/>
+        <text x="230" y="379" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">WEBHOOK</text>
+        <path d="M 956 124 H 996" fill="none" stroke="#4a6a55" stroke-width="1.2" marker-end="url(#dp-c0)"/>
+        <rect x="960" y="106" width="37" height="12" rx="2" fill="#faf9f6"/>
+        <text x="978" y="115" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">HTTPS</text>
+        <path d="M 956 212 H 996" fill="none" stroke="#4a6a55" stroke-width="1.2" marker-end="url(#dp-c1)"/>
+        <rect x="960" y="194" width="37" height="12" rx="2" fill="#faf9f6"/>
+        <text x="978" y="203" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">HTTPS</text>
+        <path d="M 956 300 H 996" fill="none" stroke="#8a5942" stroke-width="1.2" marker-end="url(#dp-c2)"/>
+        <rect x="957" y="282" width="42" height="12" rx="2" fill="#faf9f6"/>
+        <text x="978" y="291" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">BOOKED</text>
+        <path d="M 956 388 H 996" fill="none" stroke="#5d6636" stroke-width="1.2" marker-end="url(#dp-c3)"/>
+        <rect x="960" y="370" width="37" height="12" rx="2" fill="#faf9f6"/>
+        <text x="978" y="379" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">ADMIN</text>
+        <rect x="40" y="92" width="160" height="64" rx="6" fill="#4a6a55" fill-opacity="0.05" stroke="#4a6a55" stroke-width="1"/>
+        <rect x="50" y="101" width="22" height="11" rx="3" fill="#4a6a55" fill-opacity="0.18"/>
+        <text x="61" y="109" fill="#4a6a55" font-size="6.5" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">IN</text>
+        <text x="120" y="127" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Owner answers</text>
+        <text x="120" y="143" fill="#646a65" fill-opacity="1" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">nine sections, one at a time</text>
+        <rect x="40" y="180" width="160" height="64" rx="6" fill="#4a6a55" fill-opacity="0.05" stroke="#4a6a55" stroke-width="1"/>
+        <rect x="50" y="189" width="22" height="11" rx="3" fill="#4a6a55" fill-opacity="0.18"/>
+        <text x="61" y="197" fill="#4a6a55" font-size="6.5" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">IN</text>
+        <text x="120" y="215" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Successor ratings</text>
+        <text x="120" y="231" fill="#646a65" fill-opacity="1" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">six criteria per candidate</text>
+        <rect x="40" y="268" width="160" height="64" rx="6" fill="#36646a" fill-opacity="0.05" stroke="#36646a" stroke-width="1"/>
+        <rect x="50" y="277" width="22" height="11" rx="3" fill="#36646a" fill-opacity="0.18"/>
+        <text x="61" y="285" fill="#36646a" font-size="6.5" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">IN</text>
+        <text x="120" y="303" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Sign-in proof</text>
+        <text x="120" y="319" fill="#646a65" fill-opacity="1" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">a code or a signed link</text>
+        <rect x="40" y="356" width="160" height="64" rx="6" fill="#77465f" fill-opacity="0.05" stroke="#77465f" stroke-width="1"/>
+        <rect x="50" y="365" width="22" height="11" rx="3" fill="#77465f" fill-opacity="0.18"/>
+        <text x="61" y="373" fill="#77465f" font-size="6.5" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">IN</text>
+        <text x="120" y="391" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Stripe events</text>
+        <text x="120" y="407" fill="#646a65" fill-opacity="1" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">checkout and renewals</text>
+        <rect x="1000" y="92" width="160" height="64" rx="6" fill="#4a6a55" fill-opacity="0.05" stroke="#4a6a55" stroke-width="1"/>
+        <rect x="1010" y="101" width="28" height="11" rx="3" fill="#4a6a55" fill-opacity="0.18"/>
+        <text x="1024" y="109" fill="#4a6a55" font-size="6.5" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">OUT</text>
+        <text x="1080" y="127" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">The owner's report</text>
+        <text x="1080" y="143" fill="#646a65" fill-opacity="1" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">score, gaps, narratives</text>
+        <rect x="1000" y="180" width="160" height="64" rx="6" fill="#4a6a55" fill-opacity="0.05" stroke="#4a6a55" stroke-width="1"/>
+        <rect x="1010" y="189" width="28" height="11" rx="3" fill="#4a6a55" fill-opacity="0.18"/>
+        <text x="1024" y="197" fill="#4a6a55" font-size="6.5" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">OUT</text>
+        <text x="1080" y="215" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">The action plan</text>
+        <text x="1080" y="231" fill="#646a65" fill-opacity="1" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">steps that move the score</text>
+        <rect x="1000" y="268" width="160" height="64" rx="6" fill="#8a5942" fill-opacity="0.05" stroke="#8a5942" stroke-width="1"/>
+        <rect x="1010" y="277" width="28" height="11" rx="3" fill="#8a5942" fill-opacity="0.18"/>
+        <text x="1024" y="285" fill="#8a5942" font-size="6.5" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">OUT</text>
+        <text x="1080" y="303" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">The advisor brief</text>
+        <text x="1080" y="319" fill="#646a65" fill-opacity="1" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">only the shared fields</text>
+        <rect x="1000" y="356" width="160" height="64" rx="6" fill="#5d6636" fill-opacity="0.05" stroke="#5d6636" stroke-width="1"/>
+        <rect x="1010" y="365" width="28" height="11" rx="3" fill="#5d6636" fill-opacity="0.18"/>
+        <text x="1024" y="373" fill="#5d6636" font-size="6.5" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">OUT</text>
+        <text x="1080" y="391" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Ops console</text>
+        <text x="1080" y="407" fill="#646a65" fill-opacity="1" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">leads and orders</text>
+        <rect x="276" y="104" width="664" height="56" rx="6" fill="#4a6a55" fill-opacity="0.1" stroke="#4a6a55" stroke-width="1.8"/>
+        <rect x="286" y="113" width="40" height="11" rx="3" fill="#4a6a55" fill-opacity="0.18"/>
+        <text x="306" y="121" fill="#4a6a55" font-size="6.5" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">SCORE</text>
+        <text x="608" y="135" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Readiness scoring</text>
+        <text x="608" y="151" fill="#646a65" fill-opacity="1" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">five drivers, weakest-link weighted</text>
+        <rect x="276" y="176" width="210" height="72" rx="6" fill="#7d6329" fill-opacity="0.05" stroke="#7d6329" stroke-width="1"/>
+        <rect x="286" y="185" width="40" height="11" rx="3" fill="#7d6329" fill-opacity="0.18"/>
+        <text x="306" y="193" fill="#7d6329" font-size="6.5" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">STORE</text>
+        <text x="381" y="215" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Project JSON</text>
+        <text x="381" y="231" fill="#646a65" fill-opacity="1" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">answers and analyses</text>
+        <rect x="502" y="176" width="210" height="72" rx="6" fill="#8a5942" fill-opacity="0.05" stroke="#8a5942" stroke-width="1"/>
+        <rect x="512" y="185" width="40" height="11" rx="3" fill="#8a5942" fill-opacity="0.18"/>
+        <text x="532" y="193" fill="#8a5942" font-size="6.5" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">IDENT</text>
+        <text x="607" y="215" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">SQLite auth.db</text>
+        <text x="607" y="231" fill="#646a65" fill-opacity="1" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">owners and sessions</text>
+        <rect x="728" y="176" width="210" height="72" rx="6" fill="#5f5668" fill-opacity="0.05" stroke="#5f5668" stroke-width="1"/>
+        <rect x="738" y="185" width="40" height="11" rx="3" fill="#5f5668" fill-opacity="0.18"/>
+        <text x="758" y="193" fill="#5f5668" font-size="6.5" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">TRAIL</text>
+        <text x="833" y="215" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Audit log</text>
+        <text x="833" y="231" fill="#646a65" fill-opacity="1" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">metadata, append-only</text>
+        <rect x="276" y="264" width="664" height="44" rx="6" fill="#36646a" fill-opacity="0.05" stroke="#36646a" stroke-width="1"/>
+        <rect x="286" y="273" width="34" height="11" rx="3" fill="#36646a" fill-opacity="0.18"/>
+        <text x="303" y="281" fill="#36646a" font-size="6.5" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">PREP</text>
+        <text x="608" y="289" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Synthesis and handoff</text>
+        <text x="608" y="305" fill="#646a65" fill-opacity="1" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">grounded only in what the owner typed</text>
+        <rect x="40" y="460" width="1120" height="56" rx="6" fill="#15171a"/>
+        <rect x="50" y="469" width="34" height="11" rx="3" fill="#faf9f6" fill-opacity="0.22"/>
+        <text x="67" y="477" fill="#faf9f6" font-size="6.5" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">RULE</text>
+        <text x="600" y="491" fill="#faf9f6" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Default private, never used to train AI</text>
+        <text x="600" y="507" fill="#faf9f6" fill-opacity="0.72" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">export or delete anything, any time</text>
+        <line x1="40" y1="552" x2="1160" y2="552" stroke="#15171a" stroke-opacity="0.12" stroke-width="1"/>
+        <text x="40" y="580" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">EACH WIRE IS COLOURED BY WHAT TRAVELS ON IT · FOUR WAYS IN, FOUR WAYS OUT, ONE PLACE IT RESTS</text>
+      </svg>
+      </div>
+      <figcaption>docs/diagrams/dp-integration.html</figcaption>
+    </figure>
+    <section class="band" id="g2">
+      <p class="eyebrow">What is kept, and who may read it</p>
+      <p class="bandsub">The privacy claim as lineage, then as an audit grid.</p>
+    </section>
+    <figure class="fig" id="medallion">
+      <p class="figtype">Medallion · StewardPath</p>
+      <h2>One answer, four tiers, one reader until the last</h2>
+      <p class="note">Four tiers of one answer. Read the last row of each: it says the owner, nobody else, three times.</p>
+      <div class="scroller" style="--vbw:852px">
+<svg viewBox="0 0 852 494" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="sp-med-title sp-med-desc">
+        <title id="sp-med-title">The four tiers an owner's answer passes through</title>
+        <desc id="sp-med-desc">An answer is kept raw as typed, migrated forward by schema version without discarding the old record, scored into five drivers with the reasoning attached, and finally released as a brief containing only the fields the owner chose. The owner is the sole reader until that last tier.</desc>
+        <defs>
+          <marker id="md-m" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#646a65"/></marker>
+          <marker id="md-a" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4a6a55"/></marker>
+        </defs>
+        <rect width="100%" height="100%" fill="#faf9f6"/>
+        <path d="M 102 80 C 102 24, 290 24, 290 80" fill="none" stroke="#646a65" stroke-width="1" marker-end="url(#md-m)"/>
+        <rect x="150" y="44" width="91" height="12" rx="2" fill="#faf9f6"/>
+        <text x="196" y="53" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">MIGRATE ON READ</text>
+        <path d="M 290 80 C 290 24, 478 24, 478 80" fill="none" stroke="#646a65" stroke-width="1" marker-end="url(#md-m)"/>
+        <rect x="366" y="44" width="37" height="12" rx="2" fill="#faf9f6"/>
+        <text x="384" y="53" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">SCORE</text>
+        <path d="M 478 80 C 478 24, 666 24, 666 80" fill="none" stroke="#4a6a55" stroke-width="1.4" marker-end="url(#md-a)"/>
+        <rect x="548" y="44" width="48" height="12" rx="2" fill="#faf9f6"/>
+        <text x="572" y="53" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">RELEASE</text>
+        <rect x="16" y="80" width="172" height="326" rx="8" fill="#8a5942" fill-opacity="0.045" stroke="#8a5942" stroke-opacity="0.55" stroke-width="1"/>
+        <rect x="30" y="96" width="37" height="14" rx="3" fill="#8a5942" fill-opacity="0.2"/>
+        <text x="48.5" y="106" fill="#8a5942" font-size="8" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">RAW</text>
+        <text x="30" y="138" fill="#15171a" font-size="13" font-weight="600" font-family="'Inter', system-ui, sans-serif">Raw</text>
+        <text x="30" y="156" fill="#646a65" font-size="8.5" font-family="'Geist Mono', ui-monospace, monospace">as the owner typed it</text>
+        <line x1="30" y1="172" x2="174" y2="172" stroke="#8a5942" stroke-opacity="0.3" stroke-width="1"/>
+        <text x="30" y="198" fill="#8a5942" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.12em">WRITTEN BY</text>
+        <text x="30" y="214" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">the owner, one tap at</text>
+        <text x="30" y="227" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">a time</text>
+        <text x="30" y="256" fill="#8a5942" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.12em">FORMAT</text>
+        <text x="30" y="272" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">intake_state.json</text>
+        <text x="30" y="301" fill="#8a5942" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.12em">HOLDS</text>
+        <text x="30" y="317" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">every answer, skips</text>
+        <text x="30" y="330" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">included</text>
+        <text x="30" y="359" fill="#8a5942" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.12em">WHO READS IT</text>
+        <text x="30" y="375" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">the owner, nobody else</text>
+        <rect x="204" y="80" width="172" height="326" rx="8" fill="#7d6329" fill-opacity="0.045" stroke="#7d6329" stroke-opacity="0.55" stroke-width="1"/>
+        <rect x="218" y="96" width="72" height="14" rx="3" fill="#7d6329" fill-opacity="0.2"/>
+        <text x="254.0" y="106" fill="#7d6329" font-size="8" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">MIGRATED</text>
+        <text x="218" y="138" fill="#15171a" font-size="13" font-weight="600" font-family="'Inter', system-ui, sans-serif">Migrated</text>
+        <text x="218" y="156" fill="#646a65" font-size="8.5" font-family="'Geist Mono', ui-monospace, monospace">same answers, current shape</text>
+        <line x1="218" y1="172" x2="362" y2="172" stroke="#7d6329" stroke-opacity="0.3" stroke-width="1"/>
+        <text x="218" y="198" fill="#7d6329" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.12em">WRITTEN BY</text>
+        <text x="218" y="214" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif"></text>
+        <text x="218" y="227" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">migrate_profile_to_intake_state</text>
+        <text x="218" y="256" fill="#7d6329" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.12em">FORMAT</text>
+        <text x="218" y="272" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">schemaVersion forward</text>
+        <text x="218" y="301" fill="#7d6329" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.12em">HOLDS</text>
+        <text x="218" y="317" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">old records, never</text>
+        <text x="218" y="330" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">discarded</text>
+        <text x="218" y="359" fill="#7d6329" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.12em">WHO READS IT</text>
+        <text x="218" y="375" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">the owner, nobody else</text>
+        <rect x="392" y="80" width="172" height="326" rx="8" fill="#4a6a55" fill-opacity="0.045" stroke="#4a6a55" stroke-opacity="0.55" stroke-width="1"/>
+        <rect x="406" y="96" width="58" height="14" rx="3" fill="#4a6a55" fill-opacity="0.2"/>
+        <text x="435.0" y="106" fill="#4a6a55" font-size="8" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">SCORED</text>
+        <text x="406" y="138" fill="#15171a" font-size="13" font-weight="600" font-family="'Inter', system-ui, sans-serif">Scored</text>
+        <text x="406" y="156" fill="#646a65" font-size="8.5" font-family="'Geist Mono', ui-monospace, monospace">five drivers and a number</text>
+        <line x1="406" y1="172" x2="550" y2="172" stroke="#4a6a55" stroke-opacity="0.3" stroke-width="1"/>
+        <text x="406" y="198" fill="#4a6a55" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.12em">WRITTEN BY</text>
+        <text x="406" y="214" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">scoring.py</text>
+        <text x="406" y="243" fill="#4a6a55" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.12em">FORMAT</text>
+        <text x="406" y="259" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">driverScores +</text>
+        <text x="406" y="272" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">rationale</text>
+        <text x="406" y="301" fill="#4a6a55" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.12em">HOLDS</text>
+        <text x="406" y="317" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">why each score is what</text>
+        <text x="406" y="330" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">it is</text>
+        <text x="406" y="359" fill="#4a6a55" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.12em">WHO READS IT</text>
+        <text x="406" y="375" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">the owner, nobody else</text>
+        <rect x="580" y="80" width="172" height="326" rx="8" fill="#36646a" fill-opacity="0.09" stroke="#36646a" stroke-opacity="1" stroke-width="1.8"/>
+        <rect x="594" y="96" width="58" height="14" rx="3" fill="#36646a" fill-opacity="0.2"/>
+        <text x="623.0" y="106" fill="#36646a" font-size="8" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">SHARED</text>
+        <text x="594" y="138" fill="#15171a" font-size="13" font-weight="600" font-family="'Inter', system-ui, sans-serif">Shared</text>
+        <text x="594" y="156" fill="#646a65" font-size="8.5" font-family="'Geist Mono', ui-monospace, monospace">only what was released</text>
+        <line x1="594" y1="172" x2="738" y2="172" stroke="#36646a" stroke-opacity="0.3" stroke-width="1"/>
+        <text x="594" y="198" fill="#36646a" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.12em">WRITTEN BY</text>
+        <text x="594" y="214" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">build_handoff</text>
+        <text x="594" y="243" fill="#36646a" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.12em">FORMAT</text>
+        <text x="594" y="259" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">the brief</text>
+        <text x="594" y="288" fill="#36646a" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.12em">HOLDS</text>
+        <text x="594" y="304" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">the fields the owner</text>
+        <text x="594" y="317" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">chose</text>
+        <text x="594" y="346" fill="#36646a" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.12em">WHO READS IT</text>
+        <text x="594" y="362" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">one advisor, once</text>
+        <text x="594" y="375" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">booked</text>
+        <rect x="16" y="422" width="820" height="56" rx="6" fill="#15171a"/>
+        <text x="418" y="446" fill="#faf9f6" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Nothing is promoted without the owner</text>
+        <text x="418" y="463" fill="#faf9f6" fill-opacity="0.72" font-size="8.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">export or hard delete removes every tier at once · the audit log keeps only that it happened</text>
+      </svg>
+      </div>
+      <figcaption>docs/diagrams/medallion.html</figcaption>
+    </figure>
+    <figure class="fig" id="dp-security-matrix">
+      <p class="figtype">Access matrix · StewardPath</p>
+      <h2>Who can read what, and who can read nothing</h2>
+      <p class="note">Most cells are no access. The empty audit-log row and the focal cell are both deliberate.</p>
+      <div class="scroller" style="--vbw:1112px">
+<svg viewBox="0 0 1112 580" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="sp-sec-title sp-sec-desc">
+        <title id="sp-sec-title">StewardPath access by role and resource</title>
+        <desc id="sp-sec-desc">Nine resources against five roles. Most intersections are no access. A signed-in owner holds everything of theirs; the advisor sees only the shared fields of a handoff brief; ops sees leads and orders behind a token; and whoever holds an unclaimed project id has full control of it.</desc>
+        <rect width="100%" height="100%" fill="#faf9f6"/>
+        <rect x="260" y="72" width="148" height="52" rx="4" fill="#15171a" fill-opacity="0.05" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="334" y="93" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Anyone</text>
+        <text x="334" y="110" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">no cookie, no id</text>
+        <rect x="424" y="72" width="148" height="52" rx="4" fill="#15171a" fill-opacity="0.05" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="498" y="93" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Holds the id</text>
+        <text x="498" y="110" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">unclaimed project</text>
+        <rect x="588" y="72" width="148" height="52" rx="4" fill="#15171a" fill-opacity="0.05" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="662" y="93" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Signed-in owner</text>
+        <text x="662" y="110" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">claimed by them</text>
+        <rect x="752" y="72" width="148" height="52" rx="4" fill="#15171a" fill-opacity="0.05" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="826" y="93" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">The advisor</text>
+        <text x="826" y="110" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">after a booking</text>
+        <rect x="916" y="72" width="148" height="52" rx="4" fill="#15171a" fill-opacity="0.05" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="990" y="93" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Ops</text>
+        <text x="990" y="110" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">X-Admin-Token</text>
+        <text x="16" y="156" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif">Unclaimed project</text>
+        <text x="16" y="170" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace">create, read, write</text>
+        <rect x="260" y="140" width="148" height="36" rx="4" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="334" y="162" fill="#5a615c" font-size="10" font-weight="400" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">No access</text>
+        <rect x="424" y="140" width="148" height="36" rx="4" fill="#4a6a55" fill-opacity="0.12" stroke="#4a6a55" stroke-opacity="0.9" stroke-width="1.4"/>
+        <text x="498" y="162" fill="#4a6a55" font-size="10" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Full</text>
+        <rect x="588" y="140" width="148" height="36" rx="4" fill="#15171a" fill-opacity="0.08" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="662" y="162" fill="#15171a" font-size="10" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Full</text>
+        <rect x="752" y="140" width="148" height="36" rx="4" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="826" y="162" fill="#5a615c" font-size="10" font-weight="400" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">No access</text>
+        <rect x="916" y="140" width="148" height="36" rx="4" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="990" y="162" fill="#5a615c" font-size="10" font-weight="400" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">No access</text>
+        <text x="16" y="196" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif">Claimed project</text>
+        <text x="16" y="210" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace">after first sign-in</text>
+        <rect x="260" y="180" width="148" height="36" rx="4" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="334" y="202" fill="#5a615c" font-size="10" font-weight="400" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">No access</text>
+        <rect x="424" y="180" width="148" height="36" rx="4" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="498" y="202" fill="#5a615c" font-size="10" font-weight="400" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">404</text>
+        <rect x="588" y="180" width="148" height="36" rx="4" fill="#15171a" fill-opacity="0.08" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="662" y="202" fill="#15171a" font-size="10" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Full</text>
+        <rect x="752" y="180" width="148" height="36" rx="4" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="826" y="202" fill="#5a615c" font-size="10" font-weight="400" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">No access</text>
+        <rect x="916" y="180" width="148" height="36" rx="4" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="990" y="202" fill="#5a615c" font-size="10" font-weight="400" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">No access</text>
+        <text x="16" y="236" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif">Export everything</text>
+        <text x="16" y="250" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace">GET /export</text>
+        <rect x="260" y="220" width="148" height="36" rx="4" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="334" y="242" fill="#5a615c" font-size="10" font-weight="400" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">No access</text>
+        <rect x="424" y="220" width="148" height="36" rx="4" fill="#15171a" fill-opacity="0.08" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="498" y="242" fill="#15171a" font-size="10" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Full</text>
+        <rect x="588" y="220" width="148" height="36" rx="4" fill="#15171a" fill-opacity="0.08" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="662" y="242" fill="#15171a" font-size="10" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Full</text>
+        <rect x="752" y="220" width="148" height="36" rx="4" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="826" y="242" fill="#5a615c" font-size="10" font-weight="400" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">No access</text>
+        <rect x="916" y="220" width="148" height="36" rx="4" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="990" y="242" fill="#5a615c" font-size="10" font-weight="400" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">No access</text>
+        <text x="16" y="276" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif">Hard delete</text>
+        <text x="16" y="290" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace">DELETE /projects</text>
+        <rect x="260" y="260" width="148" height="36" rx="4" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="334" y="282" fill="#5a615c" font-size="10" font-weight="400" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">No access</text>
+        <rect x="424" y="260" width="148" height="36" rx="4" fill="#15171a" fill-opacity="0.08" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="498" y="282" fill="#15171a" font-size="10" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Delete</text>
+        <rect x="588" y="260" width="148" height="36" rx="4" fill="#15171a" fill-opacity="0.08" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="662" y="282" fill="#15171a" font-size="10" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Delete</text>
+        <rect x="752" y="260" width="148" height="36" rx="4" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="826" y="282" fill="#5a615c" font-size="10" font-weight="400" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">No access</text>
+        <rect x="916" y="260" width="148" height="36" rx="4" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="990" y="282" fill="#5a615c" font-size="10" font-weight="400" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">No access</text>
+        <text x="16" y="316" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif">Sessions and codes</text>
+        <text x="16" y="330" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace">auth.db</text>
+        <rect x="260" y="300" width="148" height="36" rx="4" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="334" y="322" fill="#5a615c" font-size="10" font-weight="400" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">No access</text>
+        <rect x="424" y="300" width="148" height="36" rx="4" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="498" y="322" fill="#5a615c" font-size="10" font-weight="400" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">No access</text>
+        <rect x="588" y="300" width="148" height="36" rx="4" fill="#646a65" fill-opacity="0.08" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="662" y="322" fill="#646a65" font-size="10" font-weight="400" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Own only</text>
+        <rect x="752" y="300" width="148" height="36" rx="4" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="826" y="322" fill="#5a615c" font-size="10" font-weight="400" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">No access</text>
+        <rect x="916" y="300" width="148" height="36" rx="4" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="990" y="322" fill="#5a615c" font-size="10" font-weight="400" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">No access</text>
+        <text x="16" y="356" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif">Entitlements</text>
+        <text x="16" y="370" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace">what they bought</text>
+        <rect x="260" y="340" width="148" height="36" rx="4" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="334" y="362" fill="#5a615c" font-size="10" font-weight="400" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">No access</text>
+        <rect x="424" y="340" width="148" height="36" rx="4" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="498" y="362" fill="#5a615c" font-size="10" font-weight="400" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">No access</text>
+        <rect x="588" y="340" width="148" height="36" rx="4" fill="#646a65" fill-opacity="0.08" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="662" y="362" fill="#646a65" font-size="10" font-weight="400" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Read</text>
+        <rect x="752" y="340" width="148" height="36" rx="4" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="826" y="362" fill="#5a615c" font-size="10" font-weight="400" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">No access</text>
+        <rect x="916" y="340" width="148" height="36" rx="4" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="990" y="362" fill="#5a615c" font-size="10" font-weight="400" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">No access</text>
+        <text x="16" y="396" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif">Audit log</text>
+        <text x="16" y="410" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace">no route exposes it</text>
+        <rect x="260" y="380" width="148" height="36" rx="4" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="334" y="402" fill="#5a615c" font-size="10" font-weight="400" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">No access</text>
+        <rect x="424" y="380" width="148" height="36" rx="4" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="498" y="402" fill="#5a615c" font-size="10" font-weight="400" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">No access</text>
+        <rect x="588" y="380" width="148" height="36" rx="4" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="662" y="402" fill="#5a615c" font-size="10" font-weight="400" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">No access</text>
+        <rect x="752" y="380" width="148" height="36" rx="4" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="826" y="402" fill="#5a615c" font-size="10" font-weight="400" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">No access</text>
+        <rect x="916" y="380" width="148" height="36" rx="4" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="990" y="402" fill="#5a615c" font-size="10" font-weight="400" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">No access</text>
+        <text x="16" y="436" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif">Leads and orders</text>
+        <text x="16" y="450" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace">/leads /orders</text>
+        <rect x="260" y="420" width="148" height="36" rx="4" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="334" y="442" fill="#5a615c" font-size="10" font-weight="400" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">No access</text>
+        <rect x="424" y="420" width="148" height="36" rx="4" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="498" y="442" fill="#5a615c" font-size="10" font-weight="400" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">No access</text>
+        <rect x="588" y="420" width="148" height="36" rx="4" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="662" y="442" fill="#5a615c" font-size="10" font-weight="400" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">No access</text>
+        <rect x="752" y="420" width="148" height="36" rx="4" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="826" y="442" fill="#5a615c" font-size="10" font-weight="400" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">No access</text>
+        <rect x="916" y="420" width="148" height="36" rx="4" fill="#646a65" fill-opacity="0.08" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="990" y="442" fill="#646a65" font-size="10" font-weight="400" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Read</text>
+        <text x="16" y="476" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif">The handoff brief</text>
+        <text x="16" y="490" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace">build_handoff</text>
+        <rect x="260" y="460" width="148" height="36" rx="4" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="334" y="482" fill="#5a615c" font-size="10" font-weight="400" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">No access</text>
+        <rect x="424" y="460" width="148" height="36" rx="4" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="498" y="482" fill="#5a615c" font-size="10" font-weight="400" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">No access</text>
+        <rect x="588" y="460" width="148" height="36" rx="4" fill="#15171a" fill-opacity="0.08" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="662" y="482" fill="#15171a" font-size="10" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Full</text>
+        <rect x="752" y="460" width="148" height="36" rx="4" fill="#646a65" fill-opacity="0.08" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="826" y="482" fill="#646a65" font-size="10" font-weight="400" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Shared fields</text>
+        <rect x="916" y="460" width="148" height="36" rx="4" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="990" y="482" fill="#5a615c" font-size="10" font-weight="400" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">No access</text>
+        <line x1="12" y1="516" x2="1088" y2="516" stroke="#15171a" stroke-opacity="0.12" stroke-width="1"/>
+        <rect x="12" y="532" width="18" height="12" rx="3" fill="#15171a" fill-opacity="0.08" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="38" y="542" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">FULL CONTROL</text>
+        <rect x="202" y="532" width="18" height="12" rx="3" fill="#646a65" fill-opacity="0.08" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="228" y="542" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">READ ONLY</text>
+        <rect x="392" y="532" width="18" height="12" rx="3" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-opacity="0.12" stroke-width="0.6"/>
+        <text x="418" y="542" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">NO ACCESS</text>
+        <rect x="582" y="532" width="18" height="12" rx="3" fill="#4a6a55" fill-opacity="0.12" stroke="#4a6a55" stroke-width="1.4"/>
+        <text x="608" y="542" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">THE SHARPEST EDGE IN THE DESIGN</text>
+        <text x="12" y="564" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">A PROJECT IS ANONYMOUS UNTIL ITS FIRST SIGN-IN. UNTIL THEN THE ID IS THE ONLY KEY, AND IT IS A UUID4.</text>
+      </svg>
+      </div>
+      <figcaption>docs/diagrams/dp-security-matrix.html</figcaption>
+    </figure>
+    <section class="band" id="g3">
+      <p class="eyebrow">The owner's experience</p>
+      <p class="bandsub">What it is like to be on the other side of it.</p>
+    </section>
+    <figure class="fig" id="service-blueprint">
+      <p class="figtype">Service blueprint · StewardPath</p>
+      <h2>The promise is kept below the line</h2>
+      <p class="note">Above the line, an owner taps three answers. Below it, the promise is actually kept.</p>
+      <div class="scroller" style="--vbw:1280px">
+<svg viewBox="0 0 1280 520" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="sp-blueprint-title sp-blueprint-desc">
+        <title id="sp-blueprint-title">What a StewardPath owner sees, and what stays hidden</title>
+        <desc id="sp-blueprint-desc">Five stages across five layers, split by a line of visibility. Above it the owner recognises their own sentence, taps three answers and reads a score. Below it the system serves structured data, creates an anonymous project, merges answers atomically and builds a handoff from shared fields only.</desc>
+        <rect width="100%" height="100%" fill="#faf9f6"/>
+        <rect x="96" y="24" width="208" height="48" fill="none" data-stage="s0"/>
+        <text x="200" y="56" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Find the page</text>
+        <rect x="320" y="24" width="208" height="48" fill="none" data-stage="s1"/>
+        <text x="424" y="56" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Three questions</text>
+        <rect x="544" y="24" width="208" height="48" fill="none" data-stage="s2"/>
+        <text x="648" y="56" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Guided intake</text>
+        <rect x="768" y="24" width="208" height="48" fill="none" data-stage="s3"/>
+        <text x="872" y="56" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Score and plan</text>
+        <rect x="992" y="24" width="208" height="48" fill="none" data-stage="s4"/>
+        <text x="1096" y="56" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Private review</text>
+        <text x="88" y="107" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end" letter-spacing="0.14em">EVIDENCE</text>
+        <g data-layer="evidence">
+          <rect x="96" y="80" width="208" height="48" rx="6" fill="#ffffff" fill-opacity="1" stroke="#ddd9d0" stroke-width="1" data-stage="s0" data-name="a search result"/>
+          <text x="200" y="108" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">a search result</text>
+          <rect x="320" y="80" width="208" height="48" rx="6" fill="#ffffff" fill-opacity="1" stroke="#ddd9d0" stroke-width="1" data-stage="s1" data-name="a card, not a form"/>
+          <text x="424" y="108" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">a card, not a form</text>
+          <rect x="544" y="80" width="208" height="48" rx="6" fill="#ffffff" fill-opacity="1" stroke="#ddd9d0" stroke-width="1" data-stage="s2" data-name="a privacy note"/>
+          <text x="648" y="108" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">a privacy note</text>
+          <rect x="768" y="80" width="208" height="48" rx="6" fill="#ffffff" fill-opacity="1" stroke="#ddd9d0" stroke-width="1" data-stage="s3" data-name="one number, 0 to 100"/>
+          <text x="872" y="108" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">one number, 0 to 100</text>
+          <rect x="992" y="80" width="208" height="48" rx="6" fill="#ffffff" fill-opacity="1" stroke="#ddd9d0" stroke-width="1" data-stage="s4" data-name="a time in the diary"/>
+          <text x="1096" y="108" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">a time in the diary</text>
+        </g>
+        <text x="88" y="171" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end" letter-spacing="0.14em">OWNER DOES</text>
+        <g data-layer="customer">
+          <rect x="96" y="136" width="208" height="64" rx="6" fill="#ffffff" fill-opacity="1" stroke="#ddd9d0" stroke-width="1" data-stage="s0" data-name="Recognises their own sentence"/>
+          <text x="200" y="165" fill="#15171a" font-size="12" font-family="'Inter', system-ui, sans-serif" font-weight="500" text-anchor="middle">Recognises their own</text>
+          <text x="200" y="179" fill="#15171a" font-size="12" font-family="'Inter', system-ui, sans-serif" font-weight="500" text-anchor="middle">sentence</text>
+          <rect x="320" y="136" width="208" height="64" rx="6" fill="#ffffff" fill-opacity="1" stroke="#ddd9d0" stroke-width="1" data-stage="s1" data-name="Taps three answers"/>
+          <text x="424" y="172" fill="#15171a" font-size="12" font-family="'Inter', system-ui, sans-serif" font-weight="500" text-anchor="middle">Taps three answers</text>
+          <rect x="544" y="136" width="208" height="64" rx="6" fill="#ffffff" fill-opacity="1" stroke="#ddd9d0" stroke-width="1" data-stage="s2" data-name="Answers nine sections"/>
+          <text x="648" y="172" fill="#15171a" font-size="12" font-family="'Inter', system-ui, sans-serif" font-weight="500" text-anchor="middle">Answers nine sections</text>
+          <rect x="768" y="136" width="208" height="64" rx="6" fill="#ffffff" fill-opacity="1" stroke="#ddd9d0" stroke-width="1" data-stage="s3" data-name="Reads the gaps"/>
+          <text x="872" y="172" fill="#15171a" font-size="12" font-family="'Inter', system-ui, sans-serif" font-weight="500" text-anchor="middle">Reads the gaps</text>
+          <rect x="992" y="136" width="208" height="64" rx="6" fill="#ffffff" fill-opacity="1" stroke="#ddd9d0" stroke-width="1" data-stage="s4" data-name="Talks to a person"/>
+          <text x="1096" y="172" fill="#15171a" font-size="12" font-family="'Inter', system-ui, sans-serif" font-weight="500" text-anchor="middle">Talks to a person</text>
+        </g>
+        <text x="88" y="251" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end" letter-spacing="0.14em">THEY SEE</text>
+        <g data-layer="frontstage">
+          <rect x="96" y="216" width="208" height="64" rx="6" fill="#ffffff" fill-opacity="1" stroke="#ddd9d0" stroke-width="1" data-stage="s0" data-name="Moment page for that sentence"/>
+          <text x="200" y="245" fill="#15171a" font-size="12" font-family="'Inter', system-ui, sans-serif" font-weight="500" text-anchor="middle">Moment page</text>
+          <text x="200" y="259" fill="#15171a" font-size="12" font-family="'Inter', system-ui, sans-serif" font-weight="500" text-anchor="middle">for that sentence</text>
+          <rect x="320" y="216" width="208" height="64" rx="6" fill="#ffffff" fill-opacity="1" stroke="#ddd9d0" stroke-width="1" data-stage="s1" data-name="Homepage card"/>
+          <text x="424" y="252" fill="#15171a" font-size="12" font-family="'Inter', system-ui, sans-serif" font-weight="500" text-anchor="middle">Homepage card</text>
+          <rect x="544" y="216" width="208" height="64" rx="6" fill="#ffffff" fill-opacity="1" stroke="#ddd9d0" stroke-width="1" data-stage="s2" data-name="Reassurance before money and family"/>
+          <text x="648" y="245" fill="#15171a" font-size="12" font-family="'Inter', system-ui, sans-serif" font-weight="500" text-anchor="middle">Reassurance before</text>
+          <text x="648" y="259" fill="#15171a" font-size="12" font-family="'Inter', system-ui, sans-serif" font-weight="500" text-anchor="middle">money and family</text>
+          <rect x="768" y="216" width="208" height="64" rx="6" fill="#ffffff" fill-opacity="1" stroke="#ddd9d0" stroke-width="1" data-stage="s3" data-name="Action plan with one-click steps"/>
+          <text x="872" y="245" fill="#15171a" font-size="12" font-family="'Inter', system-ui, sans-serif" font-weight="500" text-anchor="middle">Action plan with</text>
+          <text x="872" y="259" fill="#15171a" font-size="12" font-family="'Inter', system-ui, sans-serif" font-weight="500" text-anchor="middle">one-click steps</text>
+          <rect x="992" y="216" width="208" height="64" rx="6" fill="#ffffff" fill-opacity="1" stroke="#ddd9d0" stroke-width="1" data-stage="s4" data-name="Handoff brief"/>
+          <text x="1096" y="252" fill="#15171a" font-size="12" font-family="'Inter', system-ui, sans-serif" font-weight="500" text-anchor="middle">Handoff brief</text>
+        </g>
+        <text x="88" y="331" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end" letter-spacing="0.14em">HIDDEN WORK</text>
+        <g data-layer="backstage">
+          <rect x="96" y="296" width="208" height="64" rx="6" fill="#15171a" fill-opacity="0.04" stroke="#ddd9d0" stroke-width="1" data-stage="s0" data-name="Article + FAQPage JSON-LD served"/>
+          <text x="200" y="325" fill="#15171a" font-size="12" font-family="'Inter', system-ui, sans-serif" font-weight="500" text-anchor="middle">Article + FAQPage</text>
+          <text x="200" y="339" fill="#15171a" font-size="12" font-family="'Inter', system-ui, sans-serif" font-weight="500" text-anchor="middle">JSON-LD served</text>
+          <rect x="320" y="296" width="208" height="64" rx="6" fill="#15171a" fill-opacity="0.04" stroke="#ddd9d0" stroke-width="1" data-stage="s1" data-name="Project created, anonymous"/>
+          <text x="424" y="325" fill="#15171a" font-size="12" font-family="'Inter', system-ui, sans-serif" font-weight="500" text-anchor="middle">Project created,</text>
+          <text x="424" y="339" fill="#15171a" font-size="12" font-family="'Inter', system-ui, sans-serif" font-weight="500" text-anchor="middle">anonymous</text>
+          <rect x="544" y="296" width="208" height="64" rx="6" fill="#15171a" fill-opacity="0.04" stroke="#ddd9d0" stroke-width="1" data-stage="s2" data-name="Answers merged, written atomically"/>
+          <text x="648" y="325" fill="#15171a" font-size="12" font-family="'Inter', system-ui, sans-serif" font-weight="500" text-anchor="middle">Answers merged,</text>
+          <text x="648" y="339" fill="#15171a" font-size="12" font-family="'Inter', system-ui, sans-serif" font-weight="500" text-anchor="middle">written atomically</text>
+          <rect x="768" y="296" width="208" height="64" rx="6" fill="#15171a" fill-opacity="0.04" stroke="#ddd9d0" stroke-width="1" data-stage="s3" data-name="Five drivers scored, weakest-link weighted"/>
+          <text x="872" y="325" fill="#15171a" font-size="12" font-family="'Inter', system-ui, sans-serif" font-weight="500" text-anchor="middle">Five drivers scored,</text>
+          <text x="872" y="339" fill="#15171a" font-size="12" font-family="'Inter', system-ui, sans-serif" font-weight="500" text-anchor="middle">weakest-link weighted</text>
+          <rect x="992" y="296" width="208" height="64" rx="6" fill="#4a6a55" fill-opacity="0.12" stroke="#4a6a55" stroke-width="1" data-stage="s4" data-name="Package built from shared fields only" data-focal="true"/>
+          <text x="1096" y="325" fill="#4a6a55" font-size="12" font-family="'Inter', system-ui, sans-serif" font-weight="500" text-anchor="middle">Package built from</text>
+          <text x="1096" y="339" fill="#4a6a55" font-size="12" font-family="'Inter', system-ui, sans-serif" font-weight="500" text-anchor="middle">shared fields only</text>
+        </g>
+        <text x="88" y="403" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end" letter-spacing="0.14em">SUPPORT</text>
+        <g data-layer="support">
+          <rect x="96" y="376" width="208" height="48" rx="6" fill="#15171a" fill-opacity="0.04" stroke="#ddd9d0" stroke-width="1" data-stage="s0" data-name="sitemap · llms.txt"/>
+          <text x="200" y="404" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">sitemap · llms.txt</text>
+          <rect x="320" y="376" width="208" height="48" rx="6" fill="#15171a" fill-opacity="0.04" stroke="#ddd9d0" stroke-width="1" data-stage="s1" data-name="no account yet"/>
+          <text x="424" y="404" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">no account yet</text>
+          <rect x="544" y="376" width="208" height="48" rx="6" fill="#15171a" fill-opacity="0.04" stroke="#ddd9d0" stroke-width="1" data-stage="s2" data-name="audit log, metadata only"/>
+          <text x="648" y="404" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">audit log, metadata only</text>
+          <rect x="768" y="376" width="208" height="48" rx="6" fill="#15171a" fill-opacity="0.04" stroke="#ddd9d0" stroke-width="1" data-stage="s3" data-name="snapshot appended"/>
+          <text x="872" y="404" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">snapshot appended</text>
+          <rect x="992" y="376" width="208" height="48" rx="6" fill="#15171a" fill-opacity="0.04" stroke="#ddd9d0" stroke-width="1" data-stage="s4" data-name="lead captured"/>
+          <text x="1096" y="404" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">lead captured</text>
+        </g>
+        <line x1="96" y1="208" x2="1200" y2="208" stroke="#ddd9d0" stroke-width="1" data-role="interaction"/>
+        <text x="88" y="211" fill="#646a65" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end" letter-spacing="0.14em">INTERACTION</text>
+        <line x1="96" y1="288" x2="1200" y2="288" stroke="#15171a" stroke-opacity="0.55" stroke-width="2" data-role="visibility"/>
+        <text x="88" y="291" fill="#15171a" font-size="7" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end" letter-spacing="0.14em">VISIBILITY</text>
+        <line x1="96" y1="368" x2="1200" y2="368" stroke="#ddd9d0" stroke-width="1" data-role="internal-interaction"/>
+        <text x="88" y="371" fill="#646a65" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end" letter-spacing="0.14em">INTERNAL</text>
+        <line x1="24" y1="462" x2="1256" y2="462" stroke="#15171a" stroke-opacity="0.12" stroke-width="1"/>
+        <line x1="24" y1="492" x2="52" y2="492" stroke="#15171a" stroke-opacity="0.55" stroke-width="2"/>
+        <text x="62" y="495" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">THE LINE OF VISIBILITY</text>
+        <rect x="360" y="486" width="18" height="12" rx="2" fill="#15171a" fill-opacity="0.04" stroke="#ddd9d0" stroke-width="1"/>
+        <text x="388" y="495" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">WORK THE OWNER NEVER SEES</text>
+        <rect x="760" y="486" width="18" height="12" rx="2" fill="#4a6a55" fill-opacity="0.12" stroke="#4a6a55" stroke-width="1"/>
+        <text x="788" y="495" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">WHERE THE PRIVACY PROMISE IS KEPT</text>
+      </svg>
+      </div>
+      <figcaption>docs/diagrams/service-blueprint.html</figcaption>
+    </figure>
+    <figure class="fig" id="owner-journey">
+      <p class="figtype">User journey · StewardPath</p>
+      <h2>The hard part comes third</h2>
+      <p class="note">Confidence drops hardest at money and family. The account row reads none, none, none, none.</p>
+      <div class="scroller" style="--vbw:1200px">
+<svg viewBox="0 0 1200 576" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="sp-journey-title sp-journey-desc">
+        <title id="sp-journey-title">A business owner's journey through StewardPath</title>
+        <desc id="sp-journey-desc">Across five stages the owner's confidence rises through three free questions, dips sharply at the sections about money and family, then recovers once a readiness score and a plan appear and a real person takes over.</desc>
+
+        <rect width="100%" height="100%" fill="#faf9f6"/>
+
+        <!-- STAGE HEADERS: 5 columns of 200px, 24px gutters, left margin 64 -->
+        <text x="164" y="40" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.18em">STAGE 1</text>
+        <text x="164" y="60" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Three questions</text>
+
+        <text x="388" y="40" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.18em">STAGE 2</text>
+        <text x="388" y="60" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Guided intake</text>
+
+        <text x="612" y="40" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.18em">STAGE 3</text>
+        <text x="612" y="60" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Money and family</text>
+
+        <text x="836" y="40" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.18em">STAGE 4</text>
+        <text x="836" y="60" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Score and plan</text>
+
+        <text x="1060" y="40" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.18em">STAGE 5</text>
+        <text x="1060" y="60" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">A real person</text>
+
+        <!-- SENTIMENT BAND: 160px tall, hairlines at HIGH / NEUTRAL / LOW -->
+        <line x1="64" y1="96" x2="1160" y2="96" stroke="#15171a" stroke-opacity="0.1" stroke-width="1"/>
+        <line x1="64" y1="176" x2="1160" y2="176" stroke="#15171a" stroke-opacity="0.1" stroke-width="1"/>
+        <line x1="64" y1="256" x2="1160" y2="256" stroke="#15171a" stroke-opacity="0.1" stroke-width="1"/>
+
+        <text x="56" y="99" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end" letter-spacing="0.14em">HIGH</text>
+        <text x="56" y="179" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end" letter-spacing="0.14em">NEUTRAL</text>
+        <text x="56" y="259" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end" letter-spacing="0.14em">LOW</text>
+
+        <!-- Curve: the approach to the trough is accent, the rest muted -->
+        <polyline points="164,136 388,176" fill="none" stroke="#646a65" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <polyline points="388,176 612,256" fill="none" stroke="#4a6a55" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <polyline points="612,256 836,136 1060,96" fill="none" stroke="#646a65" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+        <circle cx="164" cy="136" r="5" fill="#faf9f6" stroke="#646a65" stroke-width="1.5"/>
+        <circle cx="388" cy="176" r="5" fill="#faf9f6" stroke="#646a65" stroke-width="1.5"/>
+        <circle cx="612" cy="256" r="5" fill="#4a6a55"/>
+        <circle cx="836" cy="136" r="5" fill="#faf9f6" stroke="#646a65" stroke-width="1.5"/>
+        <circle cx="1060" cy="96" r="5" fill="#faf9f6" stroke="#646a65" stroke-width="1.5"/>
+
+        <!-- CONTENT ROW 1: ACTIONS -->
+        <line x1="64" y1="300" x2="1160" y2="300" stroke="#15171a" stroke-opacity="0.1" stroke-width="1"/>
+        <text x="56" y="325" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end" letter-spacing="0.14em">ACTIONS</text>
+
+        <text x="164" y="325" fill="#15171a" font-size="12" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Taps three answers,</text>
+        <text x="164" y="341" fill="#15171a" font-size="12" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">no account asked</text>
+
+        <text x="388" y="325" fill="#15171a" font-size="12" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Works through nine</text>
+        <text x="388" y="341" fill="#15171a" font-size="12" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">sections, easy ones first</text>
+
+        <text x="612" y="325" fill="#15171a" font-size="12" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Says what the books</text>
+        <text x="612" y="341" fill="#15171a" font-size="12" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">and the family look like</text>
+
+        <text x="836" y="325" fill="#15171a" font-size="12" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Reads one number and</text>
+        <text x="836" y="341" fill="#15171a" font-size="12" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">the steps that move it</text>
+
+        <text x="1060" y="325" fill="#15171a" font-size="12" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Books a private review</text>
+        <text x="1060" y="341" fill="#15171a" font-size="12" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">and hands over notes</text>
+
+        <!-- Pain marker: trough only -->
+        <rect x="528" y="358" width="168" height="16" rx="2" fill="#4a6a55" fill-opacity="0.05" stroke="#4a6a55" stroke-opacity="0.5" stroke-width="1" stroke-dasharray="3,3"/>
+        <text x="612" y="369" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">THE SENSITIVE ANSWERS</text>
+
+        <!-- CONTENT ROW 2: TOUCHPOINT -->
+        <line x1="64" y1="392" x2="1160" y2="392" stroke="#15171a" stroke-opacity="0.1" stroke-width="1"/>
+        <text x="56" y="417" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end" letter-spacing="0.14em">SURFACE</text>
+
+        <text x="164" y="417" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">homepage card</text>
+        <text x="388" y="417" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">/intake</text>
+        <text x="612" y="417" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">/intake + privacy note</text>
+        <text x="836" y="417" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">report view</text>
+        <text x="1060" y="417" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">email, then Stripe</text>
+
+        <!-- CONTENT ROW 3: ACCOUNT -->
+        <line x1="64" y1="440" x2="1160" y2="440" stroke="#15171a" stroke-opacity="0.1" stroke-width="1"/>
+        <text x="56" y="465" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end" letter-spacing="0.14em">ACCOUNT</text>
+
+        <text x="164" y="465" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">none</text>
+        <text x="388" y="465" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">none</text>
+        <text x="612" y="465" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">none</text>
+        <text x="836" y="465" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">none · email to return</text>
+        <text x="1060" y="465" fill="#4a6a55" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">sign in, then pay</text>
+
+        <line x1="64" y1="488" x2="1160" y2="488" stroke="#15171a" stroke-opacity="0.1" stroke-width="1"/>
+
+        <!-- LEGEND -->
+        <line x1="24" y1="512" x2="1176" y2="512" stroke="#15171a" stroke-opacity="0.12" stroke-width="1"/>
+
+        <line x1="24" y1="546" x2="52" y2="546" stroke="#646a65" stroke-width="1.5"/>
+        <circle cx="38" cy="546" r="5" fill="#faf9f6" stroke="#646a65" stroke-width="1.5"/>
+        <text x="64" y="549" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">HOW IT FEELS, STAGE BY STAGE</text>
+
+        <line x1="304" y1="546" x2="332" y2="546" stroke="#4a6a55" stroke-width="1.5"/>
+        <circle cx="318" cy="546" r="5" fill="#4a6a55"/>
+        <text x="344" y="549" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">THE TROUGH, AND THE RUN INTO IT</text>
+
+        <rect x="608" y="538" width="24" height="16" rx="2" fill="#4a6a55" fill-opacity="0.05" stroke="#4a6a55" stroke-opacity="0.5" stroke-width="1" stroke-dasharray="3,3"/>
+        <text x="644" y="549" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">WHERE THE FRICTION IS</text>
+      </svg>
+      </div>
+      <figcaption>docs/diagrams/owner-journey.html</figcaption>
+    </figure>
+    <figure class="fig" id="readiness-waterfall">
+      <p class="figtype">Waterfall · StewardPath</p>
+      <h2>Fixing the worst thing first barely moves the number</h2>
+      <p class="note">Computed by running the production formula. Fixing the single worst driver is worth five points.</p>
+      <div class="scroller" style="--vbw:1000px">
+<svg viewBox="0 0 1000 520" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="sp-waterfall-title sp-waterfall-desc">
+        <title id="sp-waterfall-title">How a readiness score of 26 becomes 100</title>
+        <desc id="sp-waterfall-desc">A readiness score walks from 26 to 100 as five drivers are each raised to full. The first fix adds only five points because a second driver is equally weak and still holds the score down; the next two add twenty-one each.</desc>
+        <line x1="80" y1="420.0" x2="960" y2="420.0" stroke="#15171a" stroke-opacity="0.08" stroke-width="0.8"/>\n        <text x="72" y="423.0" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end">0</text>\n        <line x1="80" y1="344.0" x2="960" y2="344.0" stroke="#15171a" stroke-opacity="0.08" stroke-width="0.8"/>\n        <text x="72" y="347.0" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end">20</text>\n        <line x1="80" y1="268.0" x2="960" y2="268.0" stroke="#15171a" stroke-opacity="0.08" stroke-width="0.8"/>\n        <text x="72" y="271.0" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end">40</text>\n        <line x1="80" y1="192.0" x2="960" y2="192.0" stroke="#15171a" stroke-opacity="0.08" stroke-width="0.8"/>\n        <text x="72" y="195.0" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end">60</text>\n        <line x1="80" y1="116.0" x2="960" y2="116.0" stroke="#15171a" stroke-opacity="0.08" stroke-width="0.8"/>\n        <text x="72" y="119.0" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end">80</text>\n        <line x1="80" y1="40.0" x2="960" y2="40.0" stroke="#15171a" stroke-opacity="0.08" stroke-width="0.8"/>\n        <text x="72" y="43.0" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end">100</text>\n        <line x1="80" y1="40" x2="80" y2="420" stroke="#15171a" stroke-opacity="0.25" stroke-width="1"/>\n        <line x1="80" y1="420" x2="960" y2="420" stroke="#15171a" stroke-opacity="0.25" stroke-width="1"/>\n        <rect x="104" y="321.2" width="80" height="98.8" fill="#faf9f6"/>\n        <rect x="104" y="321.2" width="80" height="98.8" fill="#15171a" fill-opacity="0.08" stroke="#15171a" stroke-width="1" data-role="total" data-value="26" data-name="Where they\nstart"/>\n        <text x="144" y="313.2" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">26</text>\n        <line x1="184" y1="321.2" x2="224" y2="321.2" stroke="#15171a" stroke-opacity="0.55" stroke-width="1" data-carry="26"/>\n        <text x="144" y="440" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Where they</text>\n        <text x="144" y="454" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">start</text>\n        <rect x="224" y="302.2" width="80" height="19.0" fill="#faf9f6"/>\n        <rect x="224" y="302.2" width="80" height="19.0" fill="#646a65" fill-opacity="0.15" stroke="#646a65" stroke-width="1" data-role="delta" data-value="+5" data-name="Operational\nindependence"/>\n        <text x="264" y="294.2" fill="#4a6a55" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">+5</text>\n        <line x1="304" y1="302.2" x2="344" y2="302.2" stroke="#15171a" stroke-opacity="0.55" stroke-width="1" data-carry="31"/>\n        <text x="264" y="440" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Operational</text>\n        <text x="264" y="454" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">independence</text>\n        <rect x="344" y="222.4" width="80" height="79.8" fill="#faf9f6"/>\n        <rect x="344" y="222.4" width="80" height="79.8" fill="#646a65" fill-opacity="0.15" stroke="#646a65" stroke-width="1" data-role="delta" data-value="+21" data-name="Work written\ndown"/>\n        <text x="384" y="214.4" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">+21</text>\n        <line x1="424" y1="222.4" x2="464" y2="222.4" stroke="#15171a" stroke-opacity="0.55" stroke-width="1" data-carry="52"/>\n        <text x="384" y="440" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Work written</text>\n        <text x="384" y="454" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">down</text>\n        <rect x="464" y="142.6" width="80" height="79.8" fill="#faf9f6"/>\n        <rect x="464" y="142.6" width="80" height="79.8" fill="#646a65" fill-opacity="0.15" stroke="#646a65" stroke-width="1" data-role="delta" data-value="+21" data-name="Financial\nclarity"/>\n        <text x="504" y="134.6" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">+21</text>\n        <line x1="544" y1="142.6" x2="584" y2="142.6" stroke="#15171a" stroke-opacity="0.55" stroke-width="1" data-carry="73"/>\n        <text x="504" y="440" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Financial</text>\n        <text x="504" y="454" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">clarity</text>\n        <rect x="584" y="70.4" width="80" height="72.2" fill="#faf9f6"/>\n        <rect x="584" y="70.4" width="80" height="72.2" fill="#646a65" fill-opacity="0.15" stroke="#646a65" stroke-width="1" data-role="delta" data-value="+19" data-name="Family\nalignment"/>\n        <text x="624" y="62.4" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">+19</text>\n        <line x1="664" y1="70.4" x2="704" y2="70.4" stroke="#15171a" stroke-opacity="0.55" stroke-width="1" data-carry="92"/>\n        <text x="624" y="440" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Family</text>\n        <text x="624" y="454" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">alignment</text>\n        <rect x="704" y="40.0" width="80" height="30.4" fill="#faf9f6"/>\n        <rect x="704" y="40.0" width="80" height="30.4" fill="#646a65" fill-opacity="0.15" stroke="#646a65" stroke-width="1" data-role="delta" data-value="+8" data-name="Ready to\nlet go"/>\n        <text x="744" y="32.0" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">+8</text>\n        <line x1="784" y1="40.0" x2="824" y2="40.0" stroke="#15171a" stroke-opacity="0.55" stroke-width="1" data-carry="100"/>\n        <text x="744" y="440" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Ready to</text>\n        <text x="744" y="454" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">let go</text>\n        <rect x="824" y="40.0" width="80" height="380.0" fill="#faf9f6"/>\n        <rect x="824" y="40.0" width="80" height="380.0" fill="#15171a" fill-opacity="0.08" stroke="#15171a" stroke-width="1" data-role="total" data-value="100" data-name="Fully\nready"/>\n        <text x="864" y="32.0" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">100</text>\n        <text x="864" y="440" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Fully</text>\n        <text x="864" y="454" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">ready</text>\n        <line x1="24" y1="478" x2="976" y2="478" stroke="#15171a" stroke-opacity="0.12" stroke-width="1"/>\n        <rect x="24" y="494" width="16" height="10" fill="#15171a" fill-opacity="0.08" stroke="#15171a" stroke-width="1"/>\n        <text x="50" y="503" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">WHERE THE SCORE STANDS</text>\n        <rect x="300" y="494" width="16" height="10" fill="#646a65" fill-opacity="0.15" stroke="#646a65" stroke-width="1"/>\n        <text x="326" y="503" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">WHAT ONE FIX ADDS</text>\n        <line x1="560" y1="499" x2="588" y2="499" stroke="#15171a" stroke-opacity="0.55" stroke-width="1"/>\n        <text x="598" y="503" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">THE RUNNING TOTAL, CARRIED ACROSS</text>
+      </svg>
+      </div>
+      <figcaption>docs/diagrams/readiness-waterfall.html</figcaption>
+    </figure>
+    <section class="band" id="g4">
+      <p class="eyebrow">The arguments</p>
+      <p class="bandsub">Three claims, drawn precisely enough to disagree with.</p>
+    </section>
+    <figure class="fig" id="successor-radar">
+      <p class="figtype">Radar · StewardPath</p>
+      <h2>The best price is rarely the best fit</h2>
+      <p class="note">Real shipped ratings. The two highest-paying paths score lowest on legacy and fit.</p>
+      <div class="scroller" style="--vbw:1000px">
+<svg viewBox="0 0 1000 520" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="sp-radar-title sp-radar-desc">
+        <title id="sp-radar-title">Four transfer paths scored on legacy, proceeds and fit</title>
+        <desc id="sp-radar-desc">Four ways to hand a business on, each scored one to five on how much legacy survives, how much money is on the table, and how well the path fits the owner. The two highest-paying paths score lowest on the other two axes.</desc>
+        <polygon points="500,230 527,278 473,278" fill="none" stroke="#15171a" stroke-opacity="0.1" stroke-width="1"/>\n        <polygon points="500,199 555,294 445,294" fill="none" stroke="#15171a" stroke-opacity="0.1" stroke-width="1"/>\n        <polygon points="500,167 582,309 418,309" fill="none" stroke="#15171a" stroke-opacity="0.1" stroke-width="1"/>\n        <polygon points="500,136 609,325 391,325" fill="none" stroke="#15171a" stroke-opacity="0.1" stroke-width="1"/>\n        <polygon points="500,104 637,341 363,341" fill="none" stroke="#ddd9d0" stroke-opacity="0.2" stroke-width="1"/>\n        <line x1="500" y1="262" x2="500" y2="104" stroke="#ddd9d0" stroke-opacity="0.6" stroke-width="1"/>\n        <line x1="500" y1="262" x2="637" y2="341" stroke="#ddd9d0" stroke-opacity="0.6" stroke-width="1"/>\n        <line x1="500" y1="262" x2="363" y2="341" stroke="#ddd9d0" stroke-opacity="0.6" stroke-width="1"/>\n        <text x="500" y="82" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Legacy kept</text>\n        <text x="656" y="356" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="start">Money on the table</text>\n        <text x="344" y="356" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="end">Fit with you</text>\n        <text x="492" y="233" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end">1</text>\n        <text x="492" y="202" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end">2</text>\n        <text x="492" y="170" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end">3</text>\n        <text x="492" y="139" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end">4</text>\n        <text x="492" y="107" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end">5</text>\n        <polygon points="500,199 637,341 445,294" fill="#9c6b50" fill-opacity="0.18" stroke="#9c6b50" stroke-width="1.5"/>\n        <polygon points="500,167 637,341 445,294" fill="#b8915a" fill-opacity="0.18" stroke="#b8915a" stroke-width="1.5"/>\n        <polygon points="500,104 582,309 391,325" fill="#7c8f6f" fill-opacity="0.18" stroke="#7c8f6f" stroke-width="1.5"/>\n        <polygon points="500,136 609,325 391,325" fill="#4a6a55" fill-opacity="0.18" stroke="#4a6a55" stroke-width="1.8"/>\n        <circle cx="500" cy="136" r="4" fill="#4a6a55"/>\n        <circle cx="609" cy="325" r="4" fill="#4a6a55"/>\n        <circle cx="391" cy="325" r="4" fill="#4a6a55"/>\n        <line x1="24" y1="470" x2="976" y2="470" stroke="#15171a" stroke-opacity="0.12" stroke-width="1"/>\n        <rect x="24" y="492" width="16" height="8" rx="1" fill="#7c8f6f" fill-opacity="0.18" stroke="#7c8f6f" stroke-width="1.5"/>\n        <text x="50" y="500" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">FAMILY TRANSFER</text>\n        <rect x="256" y="492" width="16" height="8" rx="1" fill="#4a6a55" fill-opacity="0.18" stroke="#4a6a55" stroke-width="1.8"/>\n        <text x="282" y="500" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">MANAGEMENT BUYOUT</text>\n        <rect x="488" y="492" width="16" height="8" rx="1" fill="#b8915a" fill-opacity="0.18" stroke="#b8915a" stroke-width="1.5"/>\n        <text x="514" y="500" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">STRATEGIC BUYER</text>\n        <rect x="720" y="492" width="16" height="8" rx="1" fill="#9c6b50" fill-opacity="0.18" stroke="#9c6b50" stroke-width="1.5"/>\n        <text x="746" y="500" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">PRIVATE EQUITY</text>
+      </svg>
+      </div>
+      <figcaption>docs/diagrams/successor-radar.html</figcaption>
+    </figure>
+    <figure class="fig" id="marketing-flywheel">
+      <p class="figtype">Loop · StewardPath</p>
+      <h2>Each turn hands the next owner in</h2>
+      <p class="note">Every station exists in the code. That they compound is a hypothesis, not a record.</p>
+      <div class="scroller" style="--vbw:1040px">
+<svg viewBox="0 0 1040 716" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="sp-flywheel-title sp-flywheel-desc">
+        <title id="sp-flywheel-title">The StewardPath marketing flywheel</title>
+        <desc id="sp-flywheel-desc">Six stations turn clockwise from pages written in an owner's own words, through three free questions, a guided intake, a readiness score, a human review, and an advisor pilot that points the next owner back at those pages. Every station writes to one shared readiness record at the centre.</desc>
+
+        <defs>
+          <marker id="m0" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#77465f"/></marker>
+          <marker id="m1" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4a6a55"/></marker>
+          <marker id="m2" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4d6a8a"/></marker>
+          <marker id="m3" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#36646a"/></marker>
+          <marker id="m4" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#8a5942"/></marker>
+          <marker id="m5" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#7d6329"/></marker>
+        </defs>
+
+        <rect width="100%" height="100%" fill="#faf9f6"/>
+
+        <!-- RING: clockwise flow, each arc in the hue of the station it enters -->
+        <path d="M 600.0 113.726 A 240.0 240.0 0 0 1 704.969 187.073" fill="none" stroke="#4a6a55" stroke-width="1.4" marker-end="url(#m1)"/>
+        <path d="M 743.285 252.0 A 240.0 240.0 0 0 1 743.722 426.882" fill="none" stroke="#4d6a8a" stroke-width="1.4" marker-end="url(#m2)"/>
+        <path d="M 705.731 492.0 A 240.0 240.0 0 0 1 601.13 565.871" fill="none" stroke="#36646a" stroke-width="1.4" marker-end="url(#m3)"/>
+        <path d="M 440 566.274 A 240.0 240.0 0 0 1 335.031 492.927" fill="none" stroke="#8a5942" stroke-width="1.4" marker-end="url(#m4)"/>
+        <path d="M 296.715 428 A 240.0 240.0 0 0 1 296.278 253.118" fill="none" stroke="#7d6329" stroke-width="1.4" marker-end="url(#m5)"/>
+        <path d="M 334.269 188 A 240.0 240.0 0 0 1 438.87 114.129" fill="none" stroke="#77465f" stroke-width="1.4" marker-end="url(#m0)"/>
+
+        <!-- SPOKES: what each station writes to the shared record -->
+        <path d="M 520.0 132.0 L 520.0 282.0" fill="none" class="spoke" stroke="#77465f" stroke-width="1" stroke-opacity="0.7" stroke-dasharray="5,4" marker-end="url(#m0)"/>
+        <path d="M 672.42 252.0 L 615.263 285.0" fill="none" class="spoke" stroke="#4a6a55" stroke-width="1" stroke-opacity="0.7" stroke-dasharray="5,4" marker-end="url(#m1)"/>
+        <path d="M 672.42 428.0 L 615.263 395.0" fill="none" class="spoke" stroke="#4d6a8a" stroke-width="1" stroke-opacity="0.7" stroke-dasharray="5,4" marker-end="url(#m2)"/>
+        <rect x="611.9" y="415.4" width="47.8" height="12" rx="2" fill="#faf9f6"/>
+        <text x="635.8" y="424.4" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">ANSWERS</text>
+        <path d="M 520.0 548.0 L 520.0 398.0" fill="none" class="spoke" stroke="#36646a" stroke-width="1" stroke-opacity="0.7" stroke-dasharray="5,4" marker-end="url(#m3)"/>
+        <rect x="485.5" y="463.0" width="37.0" height="12" rx="2" fill="#faf9f6"/>
+        <text x="504.0" y="472.0" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">SCORE</text>
+        <path d="M 367.58 428.0 L 424.737 395.0" fill="none" class="spoke" stroke="#8a5942" stroke-width="1" stroke-opacity="0.7" stroke-dasharray="5,4" marker-end="url(#m4)"/>
+        <path d="M 367.58 252.0 L 424.737 285.0" fill="none" class="spoke" stroke="#7d6329" stroke-width="1" stroke-opacity="0.7" stroke-dasharray="5,4" marker-end="url(#m5)"/>
+        <rect x="358.9" y="272.4" width="58.6" height="12" rx="2" fill="#faf9f6"/>
+        <text x="388.2" y="281.4" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">REFERRALS</text>
+
+        <!-- STATIONS -->
+        <rect x="440" y="68" width="160" height="64" rx="6" fill="#77465f" fill-opacity="0.06" stroke="#77465f" stroke-width="1.2"/>
+        <text x="456" y="96" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif">Owner's own words</text>
+        <text x="456" y="114" fill="#77465f" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">six moment pages</text>
+        <rect x="648" y="188" width="160" height="64" rx="6" fill="#4a6a55" fill-opacity="0.06" stroke="#4a6a55" stroke-width="1.2"/>
+        <text x="664" y="216" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif">Three free questions</text>
+        <text x="664" y="234" fill="#4a6a55" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">no account, no price</text>
+        <rect x="648" y="428" width="160" height="64" rx="6" fill="#4d6a8a" fill-opacity="0.06" stroke="#4d6a8a" stroke-width="1.2"/>
+        <text x="664" y="456" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif">Guided intake</text>
+        <text x="664" y="474" fill="#4d6a8a" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">nine sections</text>
+        <rect x="440" y="548" width="160" height="64" rx="6" fill="#36646a" fill-opacity="0.06" stroke="#36646a" stroke-width="1.2"/>
+        <text x="456" y="576" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif">Score and plan</text>
+        <text x="456" y="594" fill="#36646a" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">the number moves</text>
+        <rect x="232" y="428" width="160" height="64" rx="6" fill="#8a5942" fill-opacity="0.06" stroke="#8a5942" stroke-width="1.2"/>
+        <text x="248" y="456" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif">A person reviews</text>
+        <text x="248" y="474" fill="#8a5942" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">handoff package</text>
+        <rect x="232" y="188" width="160" height="64" rx="6" fill="#7d6329" fill-opacity="0.12" stroke="#7d6329" stroke-width="1.8"/>
+        <text x="248" y="216" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif">Advisor pilot</text>
+        <text x="248" y="234" fill="#7d6329" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">ten owners each</text>
+
+        <!-- HUB: the one dark element, and the only thing that accumulates -->
+        <rect x="420" y="288" width="200" height="104" rx="8" fill="#15171a"/>
+        <text x="520" y="326" fill="#faf9f6" font-size="13" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">The readiness record</text>
+        <text x="520" y="348" fill="#faf9f6" fill-opacity="0.72" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">one per owner, kept private</text>
+        <text x="520" y="366" fill="#faf9f6" fill-opacity="0.72" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">richer on every pass</text>
+
+        <!-- LEGEND -->
+        <line x1="24" y1="648" x2="1016" y2="648" stroke="#15171a" stroke-opacity="0.12" stroke-width="1"/>
+
+        <path d="M 24 676 A 40 40 0 0 1 56 676" fill="none" stroke="#5a615c" stroke-width="1.4"/>
+        <text x="68" y="679" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">THE TURN, IN THE COLOUR OF WHERE IT LANDS</text>
+
+        <line x1="476" y1="676" x2="504" y2="676" stroke="#5a615c" stroke-width="1" stroke-opacity="0.7" stroke-dasharray="5,4"/>
+        <text x="516" y="679" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">WHAT THAT STATION WRITES DOWN</text>
+
+        <rect x="836" y="668" width="18" height="16" rx="3" fill="#7d6329" fill-opacity="0.12" stroke="#7d6329" stroke-width="1.8"/>
+        <text x="864" y="679" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">WHERE IT COMPOUNDS</text>
+      </svg>
+      </div>
+      <figcaption>docs/diagrams/marketing-flywheel.html</figcaption>
+    </figure>
+    <figure class="fig" id="wardley-map">
+      <p class="figtype">Wardley map · StewardPath</p>
+      <h2>What is worth building, and what to just buy</h2>
+      <p class="note">The weakest of the set. Component positions are a reading; nothing in the repo documents them.</p>
+      <div class="scroller" style="--vbw:1040px">
+<svg viewBox="0 0 1040 580" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="sp-wardley-title sp-wardley-desc">
+        <title id="sp-wardley-title">StewardPath's value chain against evolution</title>
+        <desc id="sp-wardley-desc">Nine components of StewardPath placed by how visible each is to the owner and how commoditised it has become. The scoring and successor work sit custom-built near genesis; sign-in, payments and hosting sit at commodity. Guided intake is drawn as moving toward product.</desc>
+        <defs>
+          <marker id="wm-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4a6a55"/></marker>
+        </defs>
+        <rect width="100%" height="100%" fill="#faf9f6"/>
+        <line x1="150" y1="50" x2="150" y2="490" stroke="#ddd9d0" stroke-width="1"/>
+        <line x1="150" y1="490" x2="980" y2="490" stroke="#ddd9d0" stroke-width="1"/>
+        <line x1="357.5" y1="50" x2="357.5" y2="490" stroke="#15171a" stroke-opacity="0.1" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="565.0" y1="50" x2="565.0" y2="490" stroke="#15171a" stroke-opacity="0.1" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="772.5" y1="50" x2="772.5" y2="490" stroke="#15171a" stroke-opacity="0.1" stroke-width="1" stroke-dasharray="4,4"/>
+        <text x="254" y="512" fill="#646a65" font-size="8" font-family="Geist Mono', ui-monospace, monospac" text-anchor="middle" letter-spacing="0.14em">GENESIS</text>
+        <text x="461" y="512" fill="#646a65" font-size="8" font-family="Geist Mono', ui-monospace, monospac" text-anchor="middle" letter-spacing="0.14em">CUSTOM-BUILT</text>
+        <text x="669" y="512" fill="#646a65" font-size="8" font-family="Geist Mono', ui-monospace, monospac" text-anchor="middle" letter-spacing="0.14em">PRODUCT</text>
+        <text x="876" y="512" fill="#646a65" font-size="8" font-family="Geist Mono', ui-monospace, monospac" text-anchor="middle" letter-spacing="0.14em">COMMODITY</text>
+        <text x="136" y="42" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end" letter-spacing="0.14em">VISIBLE</text>
+        <text x="136" y="56" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end" letter-spacing="0.14em">TO THE OWNER</text>
+        <text x="136" y="480" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end" letter-spacing="0.14em">INVISIBLE</text>
+        <text x="136" y="494" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end" letter-spacing="0.14em">PLUMBING</text>
+        <line x1="430" y1="96" x2="400" y2="172" stroke="#646a65" stroke-opacity="0.45" stroke-width="0.8"/>
+        <line x1="430" y1="96" x2="250" y2="172" stroke="#646a65" stroke-opacity="0.45" stroke-width="0.8"/>
+        <line x1="430" y1="96" x2="660" y2="248" stroke="#646a65" stroke-opacity="0.45" stroke-width="0.8"/>
+        <line x1="400" y1="172" x2="250" y2="172" stroke="#646a65" stroke-opacity="0.45" stroke-width="0.8"/>
+        <line x1="250" y1="172" x2="215" y2="248" stroke="#646a65" stroke-opacity="0.45" stroke-width="0.8"/>
+        <line x1="430" y1="96" x2="300" y2="324" stroke="#646a65" stroke-opacity="0.45" stroke-width="0.8"/>
+        <line x1="400" y1="172" x2="812" y2="372" stroke="#646a65" stroke-opacity="0.45" stroke-width="0.8"/>
+        <line x1="430" y1="96" x2="812" y2="372" stroke="#646a65" stroke-opacity="0.45" stroke-width="0.8"/>
+        <line x1="300" y1="324" x2="930" y2="416" stroke="#646a65" stroke-opacity="0.45" stroke-width="0.8"/>
+        <line x1="400" y1="172" x2="858" y2="462" stroke="#646a65" stroke-opacity="0.45" stroke-width="0.8"/>
+        <line x1="812" y1="372" x2="858" y2="462" stroke="#646a65" stroke-opacity="0.45" stroke-width="0.8"/>
+        <line x1="660" y1="248" x2="858" y2="462" stroke="#646a65" stroke-opacity="0.45" stroke-width="0.8"/>
+        <circle cx="430" cy="96" r="6" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-width="1"/>
+        <text x="430" y="82" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">A handoff on your terms</text>
+        <text x="430" y="116" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">the job the owner hires us for</text>
+        <path d="M 412 172 L 492 172" fill="none" stroke="#4a6a55" stroke-width="1.4" stroke-dasharray="5,4" marker-end="url(#wm-accent)"/>
+        <circle cx="400" cy="172" r="6" fill="#4a6a55" fill-opacity="0.12" stroke="#4a6a55" stroke-width="1.4"/>
+        <text x="400" y="158" fill="#4a6a55" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Guided intake</text>
+        <circle cx="250" cy="172" r="6" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-width="1"/>
+        <text x="250" y="158" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Readiness score</text>
+        <text x="250" y="192" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">weakest-link weighted</text>
+        <circle cx="215" cy="248" r="6" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-width="1"/>
+        <text x="215" y="234" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Successor scorecard</text>
+        <text x="215" y="268" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">fit, not price</text>
+        <circle cx="660" cy="248" r="6" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-width="1"/>
+        <text x="660" y="234" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Moment pages</text>
+        <circle cx="300" cy="324" r="6" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-width="1"/>
+        <text x="300" y="310" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">A person who reviews</text>
+        <text x="300" y="344" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">the one human touch</text>
+        <circle cx="812" cy="372" r="6" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-width="1"/>
+        <text x="812" y="358" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Passwordless sign-in</text>
+        <circle cx="930" cy="416" r="6" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-width="1"/>
+        <text x="930" y="402" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Payments</text>
+        <circle cx="858" cy="462" r="6" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-width="1"/>
+        <text x="858" y="448" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Hosting and TLS</text>
+        <line x1="24" y1="530" x2="1016" y2="530" stroke="#15171a" stroke-opacity="0.12" stroke-width="1"/>
+        <circle cx="32" cy="560" r="6" fill="#faf9f6" stroke="#15171a" stroke-width="1"/>
+        <text x="48" y="563" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">A THING WE DEPEND ON</text>
+        <circle cx="352" cy="560" r="6" fill="#4a6a55" fill-opacity="0.12" stroke="#4a6a55" stroke-width="1.4"/>
+        <path d="M 364 560 L 400 560" fill="none" stroke="#4a6a55" stroke-width="1.4" stroke-dasharray="5,4" marker-end="url(#wm-accent)"/>
+        <text x="412" y="563" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">MOVING TOWARD COMMODITY</text>
+        <line x1="760" y1="560" x2="796" y2="560" stroke="#646a65" stroke-opacity="0.45" stroke-width="0.8"/>
+        <text x="808" y="563" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">DEPENDS ON THE ONE BELOW</text>
+      </svg>
+      </div>
+      <figcaption>docs/diagrams/wardley-map.html</figcaption>
+    </figure>
+  <footer>
+    Drawn with the diagram-design skill and checked by its own verifiers: verify-geometry for the six
+    connector rules, self_check for the accessible-SVG contract, plus the waterfall and service-blueprint
+    gates. Scroll any figure sideways on a narrow screen; the page itself never scrolls sideways.
+  </footer>
+</div>
+</body>
+</html>

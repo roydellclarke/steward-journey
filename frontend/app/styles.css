@@ -1,114 +1,4 @@
-.mvpShell {
-  /* Consume the shared StewardPath tokens (theme.css) so the workbench matches
-     the rest of the system. mode-* presets below still shift these per report. */
-  --bg: var(--sp-paper);
-  --surface: var(--sp-card);
-  --surface-strong: #f8f5ee;
-  --ink: var(--sp-ink);
-  --muted: var(--sp-muted);
-  --line: var(--sp-line);
-  --accent: var(--sp-green);
-  --accent-strong: var(--sp-green-strong);
-  --accent-soft: var(--sp-soft);
-  --signal: #b9d2bc;
-  min-height: 100vh;
-  background: var(--bg);
-  color: var(--ink);
-  font-family: Arial, Helvetica, sans-serif;
-}
 
-.mode-legacy {
-  --bg: #f7f1e8;
-  --surface: #fffaf2;
-  --surface-strong: #f3e5d1;
-  --accent: #7a4f2b;
-  --accent-strong: #3b2b22;
-  --accent-soft: #fbf0e2;
-  --signal: #f2c891;
-}
-
-.mode-operator {
-  --bg: #eef2f3;
-  --surface: #ffffff;
-  --surface-strong: #e5ecef;
-  --accent: #245366;
-  --accent-strong: #162f3a;
-  --accent-soft: #eaf3f6;
-  --signal: #b4d8e4;
-}
-
-.mode-premium {
-  --bg: #f3f1eb;
-  --surface: #fffef9;
-  --surface-strong: #ebe5d7;
-  --accent: #493d2b;
-  --accent-strong: #16120d;
-  --accent-soft: #f5efe0;
-  --signal: #d9bf7d;
-}
-
-.heroBand {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
-  gap: 28px;
-  align-items: end;
-  padding: 44px min(5vw, 64px) 28px;
-  background:
-    linear-gradient(120deg, color-mix(in srgb, var(--accent-strong) 92%, #000 8%), var(--accent));
-  color: #fffaf0;
-}
-
-.heroCopy h1 {
-  max-width: 760px;
-  margin: 0;
-  font-size: 48px;
-  line-height: 1.04;
-}
-
-.heroCopy p {
-  max-width: 760px;
-  color: #e4ddd0;
-  line-height: 1.55;
-}
-
-.mvpEyebrow {
-  margin: 0 0 8px;
-  color: var(--signal);
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-}
-
-.heroSignal {
-  border: 1px solid rgba(255,255,255,.24);
-  border-radius: 8px;
-  padding: 18px;
-  background: rgba(255,255,255,.08);
-}
-
-.heroSignal span,
-.heroSignal strong {
-  display: block;
-}
-
-.heroSignal span {
-  color: #c8d7ca;
-  font-size: 13px;
-  margin-bottom: 8px;
-}
-
-.heroSignal strong {
-  font-size: 20px;
-  line-height: 1.2;
-}
-
-.mvpGrid {
-  display: grid;
-  grid-template-columns: minmax(340px, 420px) minmax(0, 1fr);
-  gap: 18px;
-  padding: 18px min(5vw, 64px) 28px;
-}
 
 .intakePanel,
 .analysisPanel,
@@ -125,74 +15,9 @@
 .experimentCard,
 .narrativeSheet,
 .disclaimerBand {
-  border: 1px solid var(--line);
+  border: 1px solid var(--sp-line);
   border-radius: 8px;
-  background: var(--surface);
-}
-
-.intakePanel,
-.analysisPanel {
-  padding: 18px;
-}
-
-.projectWorkspace {
-  display: grid;
-  gap: 12px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  margin-bottom: 18px;
-  padding: 14px;
-  background: var(--accent-soft);
-}
-
-.projectWorkspace .panelTitle {
-  align-items: flex-start;
-}
-
-.projectWorkspace h2 {
-  margin: 0;
-  color: var(--accent-strong);
-  font-size: 20px;
-}
-
-.projectActions {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-}
-
-.historyList {
-  display: grid;
-  gap: 8px;
-}
-
-.historyList > span {
-  color: var(--muted);
-  font-size: 13px;
-  font-weight: 800;
-}
-
-.historyList p {
-  margin: 0;
-  color: var(--muted);
-  font-size: 13px;
-}
-
-.historyList button {
-  min-height: 34px;
-  justify-content: flex-start;
-  overflow-wrap: anywhere;
-  border-color: var(--line);
-  background: #fff;
-  color: var(--accent);
-  text-align: left;
-  font-size: 12px;
-}
-
-.historyList button:hover {
-  background: var(--accent);
-  color: #fff;
-  -webkit-text-fill-color: #fff;
+  background: var(--sp-card);
 }
 
 .panelTitle,
@@ -212,25 +37,10 @@
   margin: 0;
 }
 
-.scoreHeader {
-  border-bottom: 1px solid var(--line);
-  padding-bottom: 16px;
-  margin-bottom: 14px;
-}
-
-.scoreHeader h2 {
-  font-size: 52px;
-}
-
-.scoreHeader p {
-  max-width: 640px;
-  color: var(--muted);
-}
-
 button {
-  border: 1px solid color-mix(in srgb, var(--accent) 45%, #fff 55%);
+  border: 1px solid color-mix(in srgb, var(--sp-green) 45%, #fff 55%);
   border-radius: 6px;
-  background: var(--accent);
+  background: var(--sp-green);
   color: #ffffff;
   -webkit-text-fill-color: currentColor;
   min-height: 38px;
@@ -242,36 +52,17 @@ button {
 
 button:hover,
 button:focus-visible {
-  background: var(--accent-strong);
-  border-color: var(--accent-strong);
+  background: var(--sp-green-strong);
+  border-color: var(--sp-green-strong);
   color: #ffffff;
   -webkit-text-fill-color: #ffffff;
-}
-
-.statusLine {
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 10px;
-  color: var(--accent);
-  background: var(--accent-soft);
-  font-weight: 800;
-}
-
-.sourceLine {
-  margin: -4px 0 4px;
-  color: var(--muted);
-  font-size: 13px;
-}
-
-.sourceLine strong {
-  color: var(--accent-strong);
 }
 
 .mvpShell .progressRail {
   height: 8px;
   overflow: hidden;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--accent-soft) 70%, #fff 30%);
+  background: color-mix(in srgb, var(--sp-soft) 70%, #fff 30%);
 }
 
 .mvpShell .progressRail i {
@@ -279,7 +70,7 @@ button:focus-visible {
   width: 38%;
   height: 100%;
   border-radius: inherit;
-  background: var(--accent);
+  background: var(--sp-green);
   animation: analyzePulse 1.25s ease-in-out infinite;
 }
 
@@ -297,228 +88,9 @@ button:disabled {
   opacity: .6;
 }
 
-.designModePanel {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 14px;
-  align-items: start;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  margin-bottom: 16px;
-  padding: 16px;
-  background: linear-gradient(135deg, var(--surface), var(--accent-soft));
-}
-
-.designModePanel h2,
-.designModePanel p {
-  margin: 0;
-}
-
-.designModePanel h2 {
-  color: var(--accent-strong);
-  font-size: 24px;
-}
-
-.designModePanel p {
-  color: var(--muted);
-  line-height: 1.45;
-}
-
-.modePicker {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(92px, 1fr));
-  gap: 8px;
-}
-
-.modePicker button,
-.modeHint button {
-  background: #fff;
-  color: var(--accent);
-}
-
-.modePicker button.active,
-.modePicker button:hover,
-.modePicker button:focus-visible,
-.modeHint button:hover,
-.modeHint button:focus-visible {
-  background: var(--accent);
-  color: #fff;
-  -webkit-text-fill-color: #fff;
-}
-
-.modeHint {
-  grid-column: 1 / -1;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-}
-
-.mvpField {
-  display: grid;
-  gap: 6px;
-  margin-top: 12px;
-}
-
-.intakeDivider {
-  border-top: 1px solid var(--line);
-  margin-top: 18px;
-  padding-top: 16px;
-}
-
-.intakeDivider span {
-  color: var(--accent-strong);
-  font-size: 15px;
-  font-weight: 900;
-}
-
-.intakeDivider p {
-  margin: 6px 0 0;
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.4;
-}
-
-.intakeActionBar {
-  display: grid;
-  gap: 12px;
-  margin-top: 18px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 14px;
-  background: var(--accent-soft);
-}
-
-.intakeActionBar strong,
-.intakeActionBar span {
-  display: block;
-}
-
-.intakeActionBar strong {
-  color: var(--accent-strong);
-  font-size: 16px;
-}
-
-.intakeActionBar span {
-  margin-top: 4px;
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.4;
-}
-
-.intakeActionBar button {
-  width: 100%;
-}
-
-.mvpField span,
-.mvpCard span,
-.riskBox span,
-.readinessSummary span,
-.readinessTile span,
-.forceColumn span,
-.jobBand span,
-.qualityMemo span,
-.scoreDial span,
-.buyerCard span,
-.northStarCard span,
-.hypothesisStrip span,
-.narrativeSheet span {
-  color: var(--muted);
-  font-size: 13px;
-  font-weight: 800;
-}
-
-.mvpField input,
-.mvpField textarea,
-.mvpField select {
-  width: 100%;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: #fff;
-  color: var(--ink);
-  padding: 10px;
-  font: inherit;
-}
-
-.mvpField textarea {
-  min-height: 72px;
-  resize: vertical;
-}
-
-.twoCol,
-.sectionGrid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.riskBox {
-  min-width: 220px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 14px;
-  background: var(--surface-strong);
-}
-
-.riskBox strong {
-  display: block;
-  margin-top: 6px;
-}
-
-.mvpTabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 14px;
-}
-
-.mvpTabs a {
-  background: #ffffff;
-  color: var(--accent);
-  border: 1px solid color-mix(in srgb, var(--accent) 45%, #fff 55%);
-  border-radius: 6px;
-  min-height: 38px;
-  padding: 8px 12px;
-  font-weight: 800;
-  text-decoration: none;
-}
-
-.mvpTabs a:hover,
-.mvpTabs a:focus {
-  background: var(--accent);
-  color: #ffffff;
-}
-
-.analysisSections {
-  display: grid;
-  gap: 22px;
-}
-
-.analysisSection {
-  scroll-margin-top: 18px;
-}
-
-.analysisSection > h3 {
-  margin: 0 0 10px;
-  color: var(--accent-strong);
-  font-size: 20px;
-}
-
-.stack {
-  display: grid;
-  gap: 12px;
-}
-
 .mvpCard,
 .pathCard {
   padding: 16px;
-}
-
-.mvpCard strong {
-  display: block;
-  margin: 8px 0;
-  font-size: 30px;
 }
 
 .mvpCard p,
@@ -535,210 +107,6 @@ button:disabled {
 .narrativeSheet p {
   color: #4d574f;
   line-height: 1.48;
-}
-
-.wide {
-  grid-column: 1 / -1;
-}
-
-.readinessDrivers {
-  display: grid;
-  gap: 12px;
-}
-
-.readinessSummary {
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 14px;
-  background: var(--accent-soft);
-}
-
-.readinessSummary p {
-  max-width: 760px;
-  margin: 6px 0 0;
-  color: var(--muted);
-  line-height: 1.45;
-}
-
-.readinessMatrix {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(120px, 1fr));
-  gap: 10px;
-}
-
-.readinessTile {
-  min-height: 118px;
-  display: grid;
-  align-content: space-between;
-  padding: 14px;
-}
-
-.readinessTile small {
-  color: var(--accent-strong);
-  font-size: 13px;
-  font-weight: 900;
-}
-
-.jtbdCanvas {
-  display: grid;
-  grid-template-columns: minmax(260px, 1.2fr) repeat(2, minmax(170px, 1fr));
-  gap: 12px;
-}
-
-.jtbdCanvas.storyWeighted {
-  grid-template-columns: minmax(320px, 1.5fr) repeat(2, minmax(160px, 1fr));
-}
-
-.strugglePanel,
-.forceColumn,
-.jobBand,
-.qualityMemo,
-.scoreDial,
-.buyerCard,
-.northStarCard,
-.hypothesisStrip,
-.experimentCard,
-.narrativeSheet {
-  padding: 16px;
-}
-
-.strugglePanel {
-  grid-row: span 2;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--accent-strong);
-  color: #fffaf0;
-}
-
-.strugglePanel span {
-  color: var(--signal);
-  font-size: 13px;
-  font-weight: 800;
-}
-
-.strugglePanel h4 {
-  margin: 12px 0;
-  font-size: 24px;
-  line-height: 1.18;
-}
-
-.strugglePanel p {
-  color: #efe8dc;
-  line-height: 1.55;
-}
-
-.forceColumn {
-  border-top-width: 4px;
-}
-
-.forceColumn.push {
-  border-top-color: #a56b4a;
-}
-
-.forceColumn.pull {
-  border-top-color: var(--accent);
-}
-
-.forceColumn.anxiety {
-  border-top-color: #8d4646;
-}
-
-.forceColumn.habit {
-  border-top-color: #6f7480;
-}
-
-.forceColumn ul,
-.mvpCard ul {
-  margin: 10px 0 0;
-  padding-left: 18px;
-}
-
-.jobBand {
-  display: grid;
-  grid-column: span 1;
-  gap: 10px;
-  background: var(--surface-strong);
-}
-
-.jobBand div {
-  display: grid;
-  gap: 8px;
-}
-
-.jobBand p {
-  margin: 0;
-}
-
-.buffettBoard {
-  display: grid;
-  grid-template-columns: minmax(240px, .8fr) minmax(320px, 1.2fr);
-  gap: 12px;
-}
-
-.qualityMemo {
-  background: var(--accent-strong);
-}
-
-.qualityMemo span {
-  color: var(--signal);
-}
-
-.qualityMemo p {
-  color: #fff8ea;
-  font-size: 18px;
-}
-
-.scoreDialGrid {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(100px, 1fr));
-  gap: 10px;
-}
-
-.scoreDial {
-  display: grid;
-  align-content: space-between;
-  min-height: 138px;
-}
-
-.scoreDial strong {
-  color: var(--accent-strong);
-  font-size: 42px;
-  line-height: 1;
-}
-
-.buyerQuestions {
-  grid-column: 1 / -1;
-}
-
-.buyerMap {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(240px, 1fr));
-  gap: 12px;
-}
-
-.buyerCard {
-  display: grid;
-  gap: 14px;
-}
-
-.buyerCard h3 {
-  margin: 4px 0 0;
-}
-
-.fitBars,
-.metricBar {
-  display: grid;
-  gap: 8px;
-}
-
-.metricBar {
-  grid-template-columns: 76px minmax(80px, 1fr) 44px;
-  align-items: center;
-}
-
-.metricBar strong {
-  color: var(--accent-strong);
-  font-size: 13px;
 }
 
 .roadmap {
@@ -759,210 +127,27 @@ button:disabled {
   height: 44px;
   place-items: center;
   border-radius: 999px;
-  background: var(--accent);
+  background: var(--sp-green);
   color: #fff;
   font-weight: 800;
 }
 
 .roadmap strong {
-  color: var(--accent-strong);
-}
-
-.growthLab {
-  display: grid;
-  gap: 12px;
-}
-
-.northStarCard {
-  background: var(--accent-strong);
-}
-
-.northStarCard span {
-  color: var(--signal);
-}
-
-.northStarCard h3 {
-  margin: 8px 0;
-  color: #fffaf0;
-  font-size: 28px;
-}
-
-.northStarCard p {
-  color: #efe8dc;
-}
-
-.growthColumns,
-.experimentGrid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.experimentGrid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.hypothesisStrip {
-  background: var(--surface-strong);
-}
-
-.experimentCard h3 {
-  margin: 0;
-}
-
-.narrativeDesk {
-  display: grid;
-  gap: 12px;
-}
-
-.reportImageCard {
-  display: grid;
-  grid-template-columns: minmax(260px, .78fr) minmax(320px, 1fr) auto;
-  gap: 16px;
-  align-items: center;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 16px;
-  background: var(--surface);
-}
-
-.reportImageCard span {
-  color: var(--muted);
-  font-size: 13px;
-  font-weight: 900;
-}
-
-.reportImageCard h4 {
-  margin: 8px 0;
-  color: var(--accent-strong);
-  font-size: 22px;
-}
-
-.reportImageCard p {
-  color: var(--muted);
-  line-height: 1.45;
-}
-
-.reportImageCard a {
-  display: inline-flex;
-  min-height: 40px;
-  align-items: center;
-  justify-content: center;
-  border-radius: 6px;
-  padding: 9px 12px;
-  background: var(--accent);
-  color: #fff;
-  -webkit-text-fill-color: #fff;
-  font-weight: 900;
-  text-decoration: none;
-}
-
-.reportImageCard a:hover,
-.reportImageCard a:focus-visible {
-  background: var(--accent-strong);
-  color: #fff;
-  -webkit-text-fill-color: #fff;
-}
-
-.reportImagePreview {
-  overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: #f4f1ea;
-}
-
-.reportImagePreview svg {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
-.exportCenter {
-  display: grid;
-  gap: 12px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 16px;
-  background: var(--accent-soft);
-}
-
-.exportCenter > span {
-  color: var(--accent-strong);
-  font-size: 13px;
-  font-weight: 900;
-}
-
-.exportCenter > div {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.exportCenter section {
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 14px;
-  background: var(--surface);
-}
-
-.exportCenter h4 {
-  margin: 0;
-  color: var(--accent-strong);
-}
-
-.exportCenter p {
-  color: var(--muted);
-  font-size: 14px;
-  line-height: 1.45;
-}
-
-.narrativeSheet {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 16px;
-  align-items: start;
-  background:
-    linear-gradient(90deg, var(--accent-soft) 0 8px, transparent 8px),
-    var(--surface);
-}
-
-.narrativeSheet p {
-  margin-bottom: 0;
-  font-size: 15px;
+  color: var(--sp-green-strong);
 }
 
 .bar {
   height: 8px;
   overflow: hidden;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--line) 70%, #fff 30%);
+  background: color-mix(in srgb, var(--sp-line) 70%, #fff 30%);
 }
 
 .bar i {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: var(--accent);
-}
-
-.pathList {
-  display: grid;
-  gap: 12px;
-}
-
-.pathScores {
-  justify-content: flex-start;
-  flex-wrap: wrap;
-  margin-top: 12px;
-}
-
-.pathScores span {
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  padding: 6px 9px;
-  color: var(--accent);
-  font-size: 12px;
-  font-weight: 800;
+  background: var(--sp-green);
 }
 
 .roadmap {
@@ -974,10 +159,10 @@ button:disabled {
 }
 
 .roadmap li {
-  border-left: 4px solid var(--accent);
+  border-left: 4px solid var(--sp-green);
   border-radius: 6px;
   padding: 12px 14px;
-  background: var(--surface-strong);
+  background: var(--sp-surface-strong);
 }
 
 .disclaimerBand {
@@ -989,71 +174,17 @@ button:disabled {
 
 .disclaimerBand span {
   color: #5f665f;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 800;
 }
 
-@media (max-width: 980px) {
-  .heroBand,
-  .mvpGrid,
-  .designModePanel,
-  .buffettBoard {
-    grid-template-columns: 1fr;
-  }
-
-  .heroCopy h1 {
-    font-size: 38px;
-  }
-
-  .scoreHeader,
-  .panelTitle {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .readinessMatrix,
-  .scoreDialGrid,
-  .jtbdCanvas,
-  .jtbdCanvas.storyWeighted,
-  .buyerMap,
-  .growthColumns,
-  .experimentGrid {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .strugglePanel {
-    grid-column: 1 / -1;
-    grid-row: auto;
-  }
-}
-
 @media (max-width: 640px) {
-  .twoCol,
-  .sectionGrid,
-  .readinessMatrix,
-  .scoreDialGrid,
-  .jtbdCanvas,
-  .jtbdCanvas.storyWeighted,
-  .buyerMap,
-  .growthColumns,
-  .experimentGrid,
-  .modePicker {
-    grid-template-columns: 1fr;
-  }
 
   .narrativeSheet,
   .roadmap li,
   .reportImageCard,
   .exportCenter > div {
     grid-template-columns: 1fr;
-  }
-
-  .heroCopy h1 {
-    font-size: 32px;
-  }
-
-  .scoreHeader h2 {
-    font-size: 42px;
   }
 }
 
@@ -1119,7 +250,7 @@ button:focus-visible,
      strongest behind the text on the left and lighter on the right, so the dark
      copy stays readable while the image shows through. */
   background-image:
-    linear-gradient(100deg, rgba(250, 249, 246, 0.97) 0%, rgba(250, 249, 246, 0.9) 38%, rgba(250, 249, 246, 0.62) 70%, rgba(250, 249, 246, 0.42) 100%),
+    linear-gradient(100deg, rgba(250, 249, 246, 0.985) 0%, rgba(250, 249, 246, 0.95) 38%, rgba(250, 249, 246, 0.84) 70%, rgba(250, 249, 246, 0.76) 100%),
     url("/bg/hero.jpeg");
   background-size: cover;
   background-position: center right;
@@ -1128,10 +259,25 @@ button:focus-visible,
 
 .heroLower {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 380px;
-  gap: 56px;
+  /* The right column holds the three-question card, which needs room to show
+     four full-width answers without wrapping them onto two lines. */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 560px);
+  gap: clamp(28px, 4vw, 56px);
   align-items: start;
   margin-top: 36px;
+}
+
+/* The one quiet way out of the hero, for a reader who wants proof before
+   they answer anything. */
+.heroQuiet {
+  margin-top: 18px;
+  font-size: 17px;
+  color: var(--sp-muted);
+}
+
+.heroQuiet a {
+  color: var(--sp-sage-strong);
+  text-underline-offset: 3px;
 }
 
 .heroLead p {
@@ -1141,13 +287,10 @@ button:focus-visible,
   line-height: 1.62;
 }
 
-.heroAlt { margin-top: 18px; font-size: 0.9rem; }
-.heroAlt a { color: var(--sp-sage); }
-
 .publicEyebrow {
   margin: 0 0 18px;
   color: var(--sp-sage);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 600;
   letter-spacing: var(--sp-tracking-eyebrow);
   text-transform: uppercase;
@@ -1252,12 +395,6 @@ button:focus-visible,
   background: var(--sp-card);
 }
 
-.heroReport {
-  padding: 30px;
-  background: var(--sp-card);
-  border-color: var(--sp-line);
-}
-
 .heroReport span,
 .offerBand span {
   display: block;
@@ -1269,24 +406,8 @@ button:focus-visible,
   margin-bottom: 12px;
 }
 
-.heroReport strong {
-  display: block;
-  color: var(--sp-ink);
-  font-size: 22px;
-  line-height: 1.25;
-  letter-spacing: var(--sp-tracking-tight);
-}
-
-.heroReport ul { margin: 18px 0 0; padding-left: 16px; }
-.heroReport li {
-  color: var(--sp-muted);
-  margin: 10px 0;
-  font-size: 0.95rem;
-  white-space: nowrap;
-}
-
 .publicBand {
-  padding: clamp(56px, 8vw, 104px) var(--sp-pad-x);
+  padding: clamp(48px, 5.5vw, 76px) var(--sp-pad-x);
   border-top: 1px solid var(--sp-line);
 }
 
@@ -1343,26 +464,105 @@ button:focus-visible,
 .publicGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 24px;
-  margin-top: 40px;
+  align-items: start;
+  gap: 20px;
+  margin-top: 36px;
 }
 
-/* Full-width supporting image inside a content band. */
-.bandImage {
-  margin: 36px 0 0;
+.journeySteps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 40px 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--sp-line);
 }
-.bandImage img {
+
+.journeySteps li {
+  padding: 26px 26px 2px 0;
+}
+
+.journeySteps li + li {
+  padding-left: 26px;
+  border-left: 1px solid var(--sp-line);
+}
+
+.journeySteps b {
   display: block;
-  width: 100%;
-  height: auto;
-  border: 1px solid var(--sp-line);
-  border-radius: var(--sp-radius-lg);
+  margin-bottom: 10px;
+  color: var(--sp-sage);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: var(--sp-tracking-eyebrow);
+  text-transform: uppercase;
 }
-.bandImage figcaption {
-  margin-top: 12px;
+
+.journeySteps strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 18px;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.journeySteps p {
+  margin: 0;
   color: var(--sp-muted);
-  font-size: 0.92rem;
-  text-align: center;
+  line-height: 1.6;
+}
+
+/* FAQ: every answer stays in the DOM for the FAQPage schema, but the reader
+   sees a scannable list of questions instead of eight open boxes. */
+.faqList {
+  max-width: 760px;
+  margin-top: 36px;
+  border-top: 1px solid var(--sp-line);
+}
+
+.faqList details {
+  border-bottom: 1px solid var(--sp-line);
+}
+
+.faqList summary {
+  position: relative;
+  padding: 20px 40px 20px 0;
+  cursor: pointer;
+  list-style: none;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+
+.faqList summary::-webkit-details-marker {
+  display: none;
+}
+
+.faqList summary::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  width: 9px;
+  height: 9px;
+  margin-top: -7px;
+  border-right: 1.5px solid var(--sp-muted);
+  border-bottom: 1.5px solid var(--sp-muted);
+  transform: rotate(45deg);
+  transition: transform 160ms ease;
+}
+
+.faqList details[open] summary::after {
+  margin-top: -2px;
+  transform: rotate(-135deg);
+}
+
+.faqList p {
+  margin: 0 0 22px;
+  padding-right: 40px;
+  max-width: 68ch;
+  color: var(--sp-muted);
+  line-height: 1.65;
 }
 
 .publicGrid.three {
@@ -1378,7 +578,7 @@ button:focus-visible,
 .publicGrid article,
 .offerBand article,
 .privacyBox {
-  padding: 30px;
+  padding: 26px;
 }
 
 .publicGrid strong,
@@ -1517,12 +717,84 @@ textarea:focus { outline: none; border-color: var(--sp-sage); }
 }
 
 @media (max-width: 980px) {
+  /* minmax(0, 1fr) rather than 1fr: a plain 1fr track refuses to shrink below
+     the content's own minimum, so a wide card pushed the whole homepage 36px
+     past the viewport on a 390px phone. The 0 minimum lets the track shrink
+     and the content wrap instead. */
   .heroLower,
   .split,
   .publicGrid,
   .publicGrid.three,
   .offerBand,
   .leadForm {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
+
+  /* Stacked, the three-question card fell below three paragraphs of copy, so
+     the one thing to do above the fold was roughly 900px down the phone.
+     Ordering it first keeps the hero's promise on a small screen. */
+  .heroLower .heroLead {
+    order: 2;
+  }
+
+  /* Stacked, the steps keep their rhythm from a top rule on each one rather
+     than from the vertical dividers that separate the desktop columns. */
+  .journeySteps {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .journeySteps li,
+  .journeySteps li + li {
+    padding: 22px 0 2px;
+    border-left: 0;
+  }
+
+  .journeySteps li + li {
+    border-top: 1px solid var(--sp-line);
+  }
+}
+
+/* The moment doors. An owner finds their own sentence and goes straight to
+   the page written for it, without reading a word about the product first.
+   Used on the homepage and on /preview, so the rules live here. */
+
+.momentDoors {
+  margin: 30px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 14px;
+}
+
+.momentDoors a {
+  display: grid;
+  gap: 8px;
+  height: 100%;
+  padding: 24px 26px;
+  background: var(--sp-card);
+  border: 1px solid var(--sp-line-strong);
+  border-radius: var(--sp-radius-lg);
+  text-decoration: none;
+  transition: border-color 120ms ease, background 120ms ease;
+}
+
+.momentDoors a:hover,
+.momentDoors a:focus-visible {
+  border-color: var(--sp-sage);
+  background: var(--sp-soft);
+}
+
+.momentDoors strong {
+  font-family: var(--sp-font-display);
+  font-size: 21px;
+  line-height: 1.25;
+  letter-spacing: var(--sp-tracking-tight);
+  color: var(--sp-ink);
+}
+
+.momentDoors span {
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--sp-muted);
 }

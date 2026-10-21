@@ -35,3 +35,7 @@
 .contentSection li { margin: 6px 0; line-height: 1.55; max-width: 62ch; }
 .contentCta { margin-top: 40px; }
 .contentCta .primaryCta { display: inline-block; text-decoration: none; }
+
+/* The three-question card sits inside the article column, so it keeps the
+   reading width rather than stretching across the page. */
+.contentQuick .quickRead { margin-top: 20px; max-width: none; }

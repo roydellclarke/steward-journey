@@ -13,11 +13,20 @@ services:
     image: ghcr.io/roydellclarke/stewardpath-backend:v0.3.0
     env_file:
       - .env.production
+    environment:
+      # Caddy is the only way in (the backend publishes no host port), so the
+      # X-Forwarded-For it sets is the real client. Without this, uvicorn
+      # ignores that header and every request looks like it came from Caddy's
+      # own container IP, which collapses every per-IP rate limit in the API
+      # into one shared bucket. The subnet is pinned below so this value is
+      # deterministic rather than whatever Docker hands out today.
+      FORWARDED_ALLOW_IPS: "172.28.0.0/16"
     volumes:
       - stewardpath-data:/data/stewardpath   # durable owner data + auth.db
     restart: unless-stopped
     expose:
       - "8000"
+    networks: [edge]
 
   frontend:
     image: ghcr.io/roydellclarke/stewardpath-frontend:v0.3.0
@@ -26,6 +35,7 @@ services:
       - backend
     expose:
       - "3000"
+    networks: [edge]
 
   caddy:
     image: caddy:2-alpine
@@ -40,6 +50,14 @@ services:
     depends_on:
       - frontend
       - backend
+    networks: [edge]
+
+networks:
+  edge:
+    ipam:
+      config:
+        # Fixed so FORWARDED_ALLOW_IPS above stays correct across recreates.
+        - subnet: 172.28.0.0/16
 
 volumes:
   stewardpath-data:

@@ -1,0 +1,46 @@
+/* A paste-ready block. Reads as a quote, not as a form field. */
+
+.copyLine {
+  max-width: 660px;
+  padding: 24px 26px;
+  background: var(--sp-card);
+  border: 1px solid var(--sp-line-strong);
+  border-radius: var(--sp-radius-lg);
+  display: grid;
+  gap: 16px;
+}
+
+.copyText {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.65;
+  color: var(--sp-ink-soft);
+}
+
+.copyActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+
+.copyActions button {
+  /* styles.css forces a light -webkit-text-fill-color on buttons, which beats
+     `color` no matter how specific the rule that set it. Following our own
+     color keeps these readable wherever the component renders. */
+  -webkit-text-fill-color: currentColor;
+  min-height: 48px;
+  padding: 12px 24px;
+  font: inherit;
+  font-size: 17px;
+  color: var(--sp-on-dark);
+  background: var(--sp-ink);
+  border: 1px solid var(--sp-ink);
+  border-radius: var(--sp-radius-pill);
+  cursor: pointer;
+}
+
+.copyActions button:hover,
+.copyActions button:focus-visible { background: var(--sp-green-strong); }
+
+.copyActions span { font-size: 16px; color: var(--sp-sage-strong); }
