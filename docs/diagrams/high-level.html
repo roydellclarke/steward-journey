@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Runtime Stack</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-paper: #faf9f6; --color-ink: #15171a;
+      --color-muted: #646a65; --color-soft: #5a615c; --color-accent: #4a6a55;
+      --font-sans: 'Inter', -apple-system, 'Helvetica Neue', system-ui, sans-serif;
+      --font-display: 'Manrope', var(--font-sans);
+      --font-mono: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+    }
+    body { font-family: var(--font-sans); background: var(--color-paper); color: var(--color-ink);
+      min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 3rem 2rem; }
+    .frame { max-width: 1280px; width: 100%; }
+    .diagram-container { width: 100%; overflow-x: auto; }
+    .eyebrow { font-family: var(--font-mono); font-size: 0.66rem; font-weight: 500;
+      letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-muted); margin-bottom: 0.5rem; }
+    h1 { font-family: var(--font-display); font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+      font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.5rem; }
+    svg { width: 100%; min-width: 1000px; display: block; }
+    @media print { .diagram-container { overflow-x: visible; } svg { min-width: 0; } }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <p class="eyebrow">High-level · StewardPath</p>
+    <h1>Three containers, two concerns that cross everything</h1>
+    <div class="diagram-container">
+      <svg viewBox="0 0 1000 584" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="sp-hl-title sp-hl-desc">
+        <title id="sp-hl-title">StewardPath end to end, from outside the network to what the owner gets</title>
+        <desc id="sp-hl-desc">Three external systems sit outside a dashed boundary and feed a Docker network holding two stores, a scoring stage, a synthesis stage and the surfaces the owner reads. Passwordless identity and the audit trail run as bars beneath every phase.</desc>
+        <defs>
+          <marker id="hl-muted" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#646a65"/></marker>
+          <marker id="hl-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4a6a55"/></marker>
+        </defs>
+        <rect width="100%" height="100%" fill="#faf9f6"/>
+        <polygon points="0,4 180,4 192,18 180,32 0,32" fill="#eceae3"/>
+        <text x="96" y="21" fill="#5a615c" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.14em">SOURCES</text>
+        <polygon points="192,4 372,4 384,18 372,32 192,32 204,18" fill="#e3e0d6"/>
+        <text x="288" y="21" fill="#5a615c" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.14em">KEEP</text>
+        <polygon points="384,4 564,4 576,18 564,32 384,32 396,18" fill="#eceae3"/>
+        <text x="480" y="21" fill="#5a615c" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.14em">SCORE</text>
+        <polygon points="576,4 756,4 768,18 756,32 576,32 588,18" fill="#e3e0d6"/>
+        <text x="672" y="21" fill="#5a615c" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.14em">PREPARE</text>
+        <polygon points="768,4 964,4 964,32 768,32 780,18" fill="#eceae3"/>
+        <text x="866" y="21" fill="#5a615c" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.14em">DELIVER</text>
+        <rect x="4" y="40" width="132" height="336" rx="6" fill="#15171a" fill-opacity="0.02" stroke="#15171a" stroke-opacity="0.2" stroke-width="0.8" stroke-dasharray="6,3"/>
+        <rect x="196" y="40" width="768" height="336" rx="8" fill="#15171a" fill-opacity="0.02" stroke="#15171a" stroke-opacity="0.18" stroke-width="1.2"/>
+        <text x="212" y="362" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.12em">DOCKER NETWORK · 172.28.0.0/16 · THREE CONTAINERS</text>
+        <path d="M 132,104 H 154 a 8,8 0 0,1 16,0 H 212" fill="none" stroke="#646a65" stroke-width="1.0" marker-end="url(#hl-muted)"/>
+        <path d="M 132,184 H 154 Q 162,184 162,176 V 92 Q 162,84 170,84 H 212" fill="none" stroke="#646a65" stroke-width="1.0" marker-end="url(#hl-muted)"/>
+        <path d="M 132,264 H 166 Q 174,264 174,256 V 132 Q 174,124 182,124 H 212" fill="none" stroke="#646a65" stroke-width="1.0" marker-end="url(#hl-muted)"/>
+        <path d="M 364,104 H 404" fill="none" stroke="#4a6a55" stroke-width="1.2" marker-end="url(#hl-accent)"/>
+        <path d="M 556,104 H 596" fill="none" stroke="#4a6a55" stroke-width="1.2" marker-end="url(#hl-accent)"/>
+        <path d="M 748,104 H 790" fill="none" stroke="#646a65" stroke-width="1.0" marker-end="url(#hl-muted)"/>
+        <rect x="8" y="72" width="124" height="64" rx="6" fill="#4a6a55" fill-opacity="0.04" stroke="#4a6a55" stroke-opacity="0.55" stroke-width="1"/>
+        <rect x="16" y="80" width="28" height="12" rx="3" fill="#4a6a55" fill-opacity="0.18"/>
+        <text x="30" y="89" fill="#4a6a55" font-size="7" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">EXT</text>
+        <text x="70" y="114" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Owner's browser</text>
+        <text x="70" y="130" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">answers, taps, consent</text>
+        <rect x="8" y="152" width="124" height="64" rx="6" fill="#77465f" fill-opacity="0.04" stroke="#77465f" stroke-opacity="0.55" stroke-width="1"/>
+        <rect x="16" y="160" width="28" height="12" rx="3" fill="#77465f" fill-opacity="0.18"/>
+        <text x="30" y="169" fill="#77465f" font-size="7" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">EXT</text>
+        <text x="70" y="194" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Stripe</text>
+        <text x="70" y="210" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">checkout and webhook</text>
+        <rect x="8" y="232" width="124" height="64" rx="6" fill="#5d6636" fill-opacity="0.04" stroke="#5d6636" stroke-opacity="0.55" stroke-width="1"/>
+        <rect x="16" y="240" width="28" height="12" rx="3" fill="#5d6636" fill-opacity="0.18"/>
+        <text x="30" y="249" fill="#5d6636" font-size="7" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">EXT</text>
+        <text x="70" y="274" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Resend</text>
+        <text x="70" y="290" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">delivers the sign-in</text>
+        <rect x="212" y="64" width="152" height="80" rx="6" fill="#8a5942" fill-opacity="0.04" stroke="#8a5942" stroke-opacity="0.55" stroke-width="1"/>
+        <rect x="220" y="72" width="40" height="12" rx="3" fill="#8a5942" fill-opacity="0.18"/>
+        <text x="240" y="81" fill="#8a5942" font-size="7" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">STORE</text>
+        <text x="288" y="114" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">The two stores</text>
+        <text x="288" y="130" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">JSON files + SQLite</text>
+        <rect x="404" y="64" width="152" height="80" rx="6" fill="#4a6a55" fill-opacity="0.08" stroke="#4a6a55" stroke-opacity="1" stroke-width="1.4"/>
+        <rect x="412" y="72" width="40" height="12" rx="3" fill="#4a6a55" fill-opacity="0.18"/>
+        <text x="432" y="81" fill="#4a6a55" font-size="7" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">SCORE</text>
+        <text x="480" y="114" fill="#4a6a55" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Readiness scoring</text>
+        <text x="480" y="130" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">five drivers, weakest-link</text>
+        <rect x="596" y="64" width="152" height="80" rx="6" fill="#36646a" fill-opacity="0.04" stroke="#36646a" stroke-opacity="0.55" stroke-width="1"/>
+        <rect x="604" y="72" width="34" height="12" rx="3" fill="#36646a" fill-opacity="0.18"/>
+        <text x="621" y="81" fill="#36646a" font-size="7" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">PREP</text>
+        <text x="672" y="114" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Synthesis and handoff</text>
+        <text x="672" y="130" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">grounded in the answers</text>
+        <rect x="790" y="64" width="152" height="80" rx="6" fill="#7d6329" fill-opacity="0.04" stroke="#7d6329" stroke-opacity="0.55" stroke-width="1"/>
+        <rect x="798" y="72" width="28" height="12" rx="3" fill="#7d6329" fill-opacity="0.18"/>
+        <text x="812" y="81" fill="#7d6329" font-size="7" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">OUT</text>
+        <text x="866" y="114" fill="#15171a" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">What the owner gets</text>
+        <text x="866" y="130" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">report, plan, brief</text>
+        <rect x="4" y="388" width="960" height="40" rx="6" fill="#36646a" fill-opacity="0.05" stroke="#36646a" stroke-opacity="0.5" stroke-width="0.8"/>
+        <text x="482" y="406" fill="#15171a" font-size="10" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Passwordless identity</text>
+        <text x="482" y="420" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">HMAC digests · single-use codes · 30-day sessions</text>
+        <rect x="4" y="432" width="960" height="40" rx="6" fill="#5f5668" fill-opacity="0.05" stroke="#5f5668" stroke-opacity="0.5" stroke-width="0.8"/>
+        <text x="482" y="450" fill="#15171a" font-size="10" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Audit trail</text>
+        <text x="482" y="464" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">append-only, metadata only, outlives a deletion</text>
+        <polygon points="972,40 1000,40 1000,244 986,256 972,244" fill="#eceae3"/>
+        <text x="986" y="148" fill="#5a615c" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.14em" transform="rotate(-90 986 148)">SECURITY</text>
+        <polygon points="972,256 986,268 1000,256 1000,472 972,472" fill="#e3e0d6"/>
+        <text x="986" y="364" fill="#5a615c" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.14em" transform="rotate(-90 986 364)">OBSERVABILITY</text>
+        <line x1="4" y1="506" x2="964" y2="506" stroke="#15171a" stroke-opacity="0.12" stroke-width="1"/>
+        <text x="4" y="532" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">DASHED ZONE: OUTSIDE THE NETWORK · SOLID ZONE: THE THREE CONTAINERS · BARS: CONCERNS THAT CROSS EVERY PHASE</text>
+        <text x="4" y="552" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">NO ORCHESTRATION BAR: STEWARDPATH RUNS NO SCHEDULER, SO THAT SLOT IS LEFT EMPTY RATHER THAN FILLED</text>
+      </svg>
+    </div>
+  </div>
+</body>
+</html>
