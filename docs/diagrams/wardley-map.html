@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wardley Map</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-paper: #faf9f6; --color-ink: #15171a;
+      --color-muted: #646a65; --color-soft: #5a615c; --color-accent: #4a6a55;
+      --font-sans: 'Inter', -apple-system, 'Helvetica Neue', system-ui, sans-serif;
+      --font-display: 'Manrope', var(--font-sans);
+      --font-mono: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+    }
+    body { font-family: var(--font-sans); background: var(--color-paper); color: var(--color-ink);
+      min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 3rem 2rem; }
+    .frame { max-width: 1280px; width: 100%; }
+    .diagram-container { width: 100%; overflow-x: auto; }
+    .eyebrow { font-family: var(--font-mono); font-size: 0.66rem; font-weight: 500;
+      letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-muted); margin-bottom: 0.5rem; }
+    h1 { font-family: var(--font-display); font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+      font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.5rem; }
+    svg { width: 100%; min-width: 1040px; display: block; }
+    @media print { .diagram-container { overflow-x: visible; } svg { min-width: 0; } }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <p class="eyebrow">Wardley map · StewardPath</p>
+    <h1>What is worth building, and what to just buy</h1>
+    <div class="diagram-container">
+      <svg viewBox="0 0 1040 580" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="sp-wardley-title sp-wardley-desc">
+        <title id="sp-wardley-title">StewardPath's value chain against evolution</title>
+        <desc id="sp-wardley-desc">Nine components of StewardPath placed by how visible each is to the owner and how commoditised it has become. The scoring and successor work sit custom-built near genesis; sign-in, payments and hosting sit at commodity. Guided intake is drawn as moving toward product.</desc>
+        <defs>
+          <marker id="wm-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4a6a55"/></marker>
+        </defs>
+        <rect width="100%" height="100%" fill="#faf9f6"/>
+        <line x1="150" y1="50" x2="150" y2="490" stroke="#ddd9d0" stroke-width="1"/>
+        <line x1="150" y1="490" x2="980" y2="490" stroke="#ddd9d0" stroke-width="1"/>
+        <line x1="357.5" y1="50" x2="357.5" y2="490" stroke="#15171a" stroke-opacity="0.1" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="565.0" y1="50" x2="565.0" y2="490" stroke="#15171a" stroke-opacity="0.1" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="772.5" y1="50" x2="772.5" y2="490" stroke="#15171a" stroke-opacity="0.1" stroke-width="1" stroke-dasharray="4,4"/>
+        <text x="254" y="512" fill="#646a65" font-size="8" font-family="Geist Mono', ui-monospace, monospac" text-anchor="middle" letter-spacing="0.14em">GENESIS</text>
+        <text x="461" y="512" fill="#646a65" font-size="8" font-family="Geist Mono', ui-monospace, monospac" text-anchor="middle" letter-spacing="0.14em">CUSTOM-BUILT</text>
+        <text x="669" y="512" fill="#646a65" font-size="8" font-family="Geist Mono', ui-monospace, monospac" text-anchor="middle" letter-spacing="0.14em">PRODUCT</text>
+        <text x="876" y="512" fill="#646a65" font-size="8" font-family="Geist Mono', ui-monospace, monospac" text-anchor="middle" letter-spacing="0.14em">COMMODITY</text>
+        <text x="136" y="42" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end" letter-spacing="0.14em">VISIBLE</text>
+        <text x="136" y="56" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end" letter-spacing="0.14em">TO THE OWNER</text>
+        <text x="136" y="480" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end" letter-spacing="0.14em">INVISIBLE</text>
+        <text x="136" y="494" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end" letter-spacing="0.14em">PLUMBING</text>
+        <line x1="430" y1="96" x2="400" y2="172" stroke="#646a65" stroke-opacity="0.45" stroke-width="0.8"/>
+        <line x1="430" y1="96" x2="250" y2="172" stroke="#646a65" stroke-opacity="0.45" stroke-width="0.8"/>
+        <line x1="430" y1="96" x2="660" y2="248" stroke="#646a65" stroke-opacity="0.45" stroke-width="0.8"/>
+        <line x1="400" y1="172" x2="250" y2="172" stroke="#646a65" stroke-opacity="0.45" stroke-width="0.8"/>
+        <line x1="250" y1="172" x2="215" y2="248" stroke="#646a65" stroke-opacity="0.45" stroke-width="0.8"/>
+        <line x1="430" y1="96" x2="300" y2="324" stroke="#646a65" stroke-opacity="0.45" stroke-width="0.8"/>
+        <line x1="400" y1="172" x2="812" y2="372" stroke="#646a65" stroke-opacity="0.45" stroke-width="0.8"/>
+        <line x1="430" y1="96" x2="812" y2="372" stroke="#646a65" stroke-opacity="0.45" stroke-width="0.8"/>
+        <line x1="300" y1="324" x2="930" y2="416" stroke="#646a65" stroke-opacity="0.45" stroke-width="0.8"/>
+        <line x1="400" y1="172" x2="858" y2="462" stroke="#646a65" stroke-opacity="0.45" stroke-width="0.8"/>
+        <line x1="812" y1="372" x2="858" y2="462" stroke="#646a65" stroke-opacity="0.45" stroke-width="0.8"/>
+        <line x1="660" y1="248" x2="858" y2="462" stroke="#646a65" stroke-opacity="0.45" stroke-width="0.8"/>
+        <circle cx="430" cy="96" r="6" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-width="1"/>
+        <text x="430" y="82" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">A handoff on your terms</text>
+        <text x="430" y="116" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">the job the owner hires us for</text>
+        <path d="M 412 172 L 492 172" fill="none" stroke="#4a6a55" stroke-width="1.4" stroke-dasharray="5,4" marker-end="url(#wm-accent)"/>
+        <circle cx="400" cy="172" r="6" fill="#4a6a55" fill-opacity="0.12" stroke="#4a6a55" stroke-width="1.4"/>
+        <text x="400" y="158" fill="#4a6a55" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Guided intake</text>
+        <circle cx="250" cy="172" r="6" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-width="1"/>
+        <text x="250" y="158" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Readiness score</text>
+        <text x="250" y="192" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">weakest-link weighted</text>
+        <circle cx="215" cy="248" r="6" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-width="1"/>
+        <text x="215" y="234" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Successor scorecard</text>
+        <text x="215" y="268" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">fit, not price</text>
+        <circle cx="660" cy="248" r="6" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-width="1"/>
+        <text x="660" y="234" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Moment pages</text>
+        <circle cx="300" cy="324" r="6" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-width="1"/>
+        <text x="300" y="310" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">A person who reviews</text>
+        <text x="300" y="344" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">the one human touch</text>
+        <circle cx="812" cy="372" r="6" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-width="1"/>
+        <text x="812" y="358" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Passwordless sign-in</text>
+        <circle cx="930" cy="416" r="6" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-width="1"/>
+        <text x="930" y="402" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Payments</text>
+        <circle cx="858" cy="462" r="6" fill="#faf9f6" fill-opacity="1" stroke="#15171a" stroke-width="1"/>
+        <text x="858" y="448" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Hosting and TLS</text>
+        <line x1="24" y1="530" x2="1016" y2="530" stroke="#15171a" stroke-opacity="0.12" stroke-width="1"/>
+        <circle cx="32" cy="560" r="6" fill="#faf9f6" stroke="#15171a" stroke-width="1"/>
+        <text x="48" y="563" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">A THING WE DEPEND ON</text>
+        <circle cx="352" cy="560" r="6" fill="#4a6a55" fill-opacity="0.12" stroke="#4a6a55" stroke-width="1.4"/>
+        <path d="M 364 560 L 400 560" fill="none" stroke="#4a6a55" stroke-width="1.4" stroke-dasharray="5,4" marker-end="url(#wm-accent)"/>
+        <text x="412" y="563" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">MOVING TOWARD COMMODITY</text>
+        <line x1="760" y1="560" x2="796" y2="560" stroke="#646a65" stroke-opacity="0.45" stroke-width="0.8"/>
+        <text x="808" y="563" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">DEPENDS ON THE ONE BELOW</text>
+      </svg>
+    </div>
+  </div>
+</body>
+</html>
