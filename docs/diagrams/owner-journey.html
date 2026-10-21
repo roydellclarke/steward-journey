@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Owner Journey</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* Same skin as docs/diagrams/architecture.html: StewardPath's own tokens
+       from frontend/app/theme.css, so the two figures read as one set. */
+    :root {
+      --color-paper:   #faf9f6;
+      --color-card:    #ffffff;
+      --color-ink:     #15171a;
+      --color-muted:   #646a65;
+      --color-soft:    #5a615c;
+      --color-accent:  #4a6a55;
+      --font-sans:     'Inter', -apple-system, 'Helvetica Neue', system-ui, sans-serif;
+      --font-display:  'Manrope', var(--font-sans);
+      --font-mono:     'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-paper);
+      color: var(--color-ink);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 2rem;
+    }
+
+    .frame { max-width: 1280px; width: 100%; }
+    .diagram-container { width: 100%; overflow-x: auto; }
+
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    h1 {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      color: var(--color-ink);
+      margin-bottom: 1.5rem;
+    }
+
+    svg { width: 100%; min-width: 1200px; display: block; }
+
+    @media print {
+      .diagram-container { overflow-x: visible; }
+      svg { min-width: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <p class="eyebrow">User journey · StewardPath</p>
+    <h1>The hard part comes third</h1>
+
+    <div class="diagram-container">
+      <svg viewBox="0 0 1200 576" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="sp-journey-title sp-journey-desc">
+        <title id="sp-journey-title">A business owner's journey through StewardPath</title>
+        <desc id="sp-journey-desc">Across five stages the owner's confidence rises through three free questions, dips sharply at the sections about money and family, then recovers once a readiness score and a plan appear and a real person takes over.</desc>
+
+        <rect width="100%" height="100%" fill="#faf9f6"/>
+
+        <!-- STAGE HEADERS: 5 columns of 200px, 24px gutters, left margin 64 -->
+        <text x="164" y="40" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.18em">STAGE 1</text>
+        <text x="164" y="60" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Three questions</text>
+
+        <text x="388" y="40" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.18em">STAGE 2</text>
+        <text x="388" y="60" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Guided intake</text>
+
+        <text x="612" y="40" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.18em">STAGE 3</text>
+        <text x="612" y="60" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Money and family</text>
+
+        <text x="836" y="40" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.18em">STAGE 4</text>
+        <text x="836" y="60" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Score and plan</text>
+
+        <text x="1060" y="40" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.18em">STAGE 5</text>
+        <text x="1060" y="60" fill="#15171a" font-size="12" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">A real person</text>
+
+        <!-- SENTIMENT BAND: 160px tall, hairlines at HIGH / NEUTRAL / LOW -->
+        <line x1="64" y1="96" x2="1160" y2="96" stroke="#15171a" stroke-opacity="0.1" stroke-width="1"/>
+        <line x1="64" y1="176" x2="1160" y2="176" stroke="#15171a" stroke-opacity="0.1" stroke-width="1"/>
+        <line x1="64" y1="256" x2="1160" y2="256" stroke="#15171a" stroke-opacity="0.1" stroke-width="1"/>
+
+        <text x="56" y="99" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end" letter-spacing="0.14em">HIGH</text>
+        <text x="56" y="179" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end" letter-spacing="0.14em">NEUTRAL</text>
+        <text x="56" y="259" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end" letter-spacing="0.14em">LOW</text>
+
+        <!-- Curve: the approach to the trough is accent, the rest muted -->
+        <polyline points="164,136 388,176" fill="none" stroke="#646a65" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <polyline points="388,176 612,256" fill="none" stroke="#4a6a55" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <polyline points="612,256 836,136 1060,96" fill="none" stroke="#646a65" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+        <circle cx="164" cy="136" r="5" fill="#faf9f6" stroke="#646a65" stroke-width="1.5"/>
+        <circle cx="388" cy="176" r="5" fill="#faf9f6" stroke="#646a65" stroke-width="1.5"/>
+        <circle cx="612" cy="256" r="5" fill="#4a6a55"/>
+        <circle cx="836" cy="136" r="5" fill="#faf9f6" stroke="#646a65" stroke-width="1.5"/>
+        <circle cx="1060" cy="96" r="5" fill="#faf9f6" stroke="#646a65" stroke-width="1.5"/>
+
+        <!-- CONTENT ROW 1: ACTIONS -->
+        <line x1="64" y1="300" x2="1160" y2="300" stroke="#15171a" stroke-opacity="0.1" stroke-width="1"/>
+        <text x="56" y="325" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end" letter-spacing="0.14em">ACTIONS</text>
+
+        <text x="164" y="325" fill="#15171a" font-size="12" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Taps three answers,</text>
+        <text x="164" y="341" fill="#15171a" font-size="12" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">no account asked</text>
+
+        <text x="388" y="325" fill="#15171a" font-size="12" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Works through nine</text>
+        <text x="388" y="341" fill="#15171a" font-size="12" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">sections, easy ones first</text>
+
+        <text x="612" y="325" fill="#15171a" font-size="12" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Says what the books</text>
+        <text x="612" y="341" fill="#15171a" font-size="12" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">and the family look like</text>
+
+        <text x="836" y="325" fill="#15171a" font-size="12" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Reads one number and</text>
+        <text x="836" y="341" fill="#15171a" font-size="12" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">the steps that move it</text>
+
+        <text x="1060" y="325" fill="#15171a" font-size="12" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Books a private review</text>
+        <text x="1060" y="341" fill="#15171a" font-size="12" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">and hands over notes</text>
+
+        <!-- Pain marker: trough only -->
+        <rect x="528" y="358" width="168" height="16" rx="2" fill="#4a6a55" fill-opacity="0.05" stroke="#4a6a55" stroke-opacity="0.5" stroke-width="1" stroke-dasharray="3,3"/>
+        <text x="612" y="369" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">THE SENSITIVE ANSWERS</text>
+
+        <!-- CONTENT ROW 2: TOUCHPOINT -->
+        <line x1="64" y1="392" x2="1160" y2="392" stroke="#15171a" stroke-opacity="0.1" stroke-width="1"/>
+        <text x="56" y="417" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end" letter-spacing="0.14em">SURFACE</text>
+
+        <text x="164" y="417" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">homepage card</text>
+        <text x="388" y="417" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">/intake</text>
+        <text x="612" y="417" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">/intake + privacy note</text>
+        <text x="836" y="417" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">report view</text>
+        <text x="1060" y="417" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">email, then Stripe</text>
+
+        <!-- CONTENT ROW 3: ACCOUNT -->
+        <line x1="64" y1="440" x2="1160" y2="440" stroke="#15171a" stroke-opacity="0.1" stroke-width="1"/>
+        <text x="56" y="465" fill="#646a65" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end" letter-spacing="0.14em">ACCOUNT</text>
+
+        <text x="164" y="465" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">none</text>
+        <text x="388" y="465" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">none</text>
+        <text x="612" y="465" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">none</text>
+        <text x="836" y="465" fill="#646a65" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">none · email to return</text>
+        <text x="1060" y="465" fill="#4a6a55" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">sign in, then pay</text>
+
+        <line x1="64" y1="488" x2="1160" y2="488" stroke="#15171a" stroke-opacity="0.1" stroke-width="1"/>
+
+        <!-- LEGEND -->
+        <line x1="24" y1="512" x2="1176" y2="512" stroke="#15171a" stroke-opacity="0.12" stroke-width="1"/>
+
+        <line x1="24" y1="546" x2="52" y2="546" stroke="#646a65" stroke-width="1.5"/>
+        <circle cx="38" cy="546" r="5" fill="#faf9f6" stroke="#646a65" stroke-width="1.5"/>
+        <text x="64" y="549" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">HOW IT FEELS, STAGE BY STAGE</text>
+
+        <line x1="304" y1="546" x2="332" y2="546" stroke="#4a6a55" stroke-width="1.5"/>
+        <circle cx="318" cy="546" r="5" fill="#4a6a55"/>
+        <text x="344" y="549" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">THE TROUGH, AND THE RUN INTO IT</text>
+
+        <rect x="608" y="538" width="24" height="16" rx="2" fill="#4a6a55" fill-opacity="0.05" stroke="#4a6a55" stroke-opacity="0.5" stroke-width="1" stroke-dasharray="3,3"/>
+        <text x="644" y="549" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">WHERE THE FRICTION IS</text>
+      </svg>
+    </div>
+  </div>
+</body>
+</html>
