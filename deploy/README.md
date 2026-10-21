@@ -27,6 +27,7 @@ Copy `/.env.production.example` to `.env.production` and fill these in.
 | `STEWARDPATH_SECRET_KEY` | Signs sessions and magic links. Keep stable. | Generate: `python -c "import secrets; print(secrets.token_urlsafe(48))"` |
 | `STEWARDPATH_COOKIE_SECURE` | Must be `true` in production. | Set to `true` |
 | `STEWARDPATH_FRONTEND_ORIGIN` | Exact site origin, for CORS + link base. | `https://stewardpathfinder.com` |
+| `FORWARDED_ALLOW_IPS` | Which proxy IPs may set `X-Forwarded-For`. Without it the API sees Caddy's IP for every visitor and the per-IP rate limits all share one bucket. | Already set in `docker-compose.prod.yml` to the pinned `172.28.0.0/16` edge network. Change both together. |
 | `STEWARDPATH_DATA_ROOT` | Where owner data + auth.db live. | `/data/stewardpath` (backed by the volume) |
 | `STEWARDPATH_AUTH_DB_PATH` | Auth database path. | `/data/stewardpath/auth/auth.db` |
 | `STEWARDPATH_RESEND_API_KEY` | Sends sign-in codes. | resend.com dashboard |

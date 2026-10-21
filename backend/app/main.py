@@ -80,6 +80,31 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Refuse cross-site state-changing requests.
+#
+# CORS stops a foreign page from READING our response. It does not stop the
+# request being sent. A form-encoded or text/plain POST is a "simple request",
+# so the browser skips the preflight entirely and delivers it with the session
+# cookie attached. The cookie rides along because it must be SameSite=None: the
+# API and the frontend live on different hosts. Comparing Origin is what closes
+# that gap, and it covers every route at once.
+#
+# A missing Origin passes on purpose. Browsers attach Origin to every
+# POST/PUT/PATCH/DELETE, so no header means a non-browser caller (Stripe's
+# webhook, curl, our own server-side fetches) and no page can forge that.
+CSRF_SAFE_METHODS = frozenset({"GET", "HEAD", "OPTIONS"})
+ALLOWED_ORIGINS = frozenset({settings.frontend_origin.rstrip("/")})
+
+
+@app.middleware("http")
+async def enforce_origin(request: Request, call_next):
+    if request.method not in CSRF_SAFE_METHODS:
+        origin = request.headers.get("origin")
+        if origin is not None and origin.rstrip("/") not in ALLOWED_ORIGINS:
+            return JSONResponse(status_code=403, content={"detail": "Cross-site request refused."})
+    return await call_next(request)
+
+
 # Cap request bodies. Owner intake is far smaller than this; the cap stops a
 # single anonymous caller from filling the disk with a giant profile/intake
 # blob. This checks the declared length (what every browser and our frontend
