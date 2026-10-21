@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Answer Tiers</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-paper: #faf9f6; --color-ink: #15171a;
+      --color-muted: #646a65; --color-soft: #5a615c; --color-accent: #4a6a55;
+      --font-sans: 'Inter', -apple-system, 'Helvetica Neue', system-ui, sans-serif;
+      --font-display: 'Manrope', var(--font-sans);
+      --font-mono: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+    }
+    body { font-family: var(--font-sans); background: var(--color-paper); color: var(--color-ink);
+      min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 3rem 2rem; }
+    .frame { max-width: 1280px; width: 100%; }
+    .diagram-container { width: 100%; overflow-x: auto; }
+    .eyebrow { font-family: var(--font-mono); font-size: 0.66rem; font-weight: 500;
+      letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-muted); margin-bottom: 0.5rem; }
+    h1 { font-family: var(--font-display); font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+      font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.5rem; }
+    svg { width: 100%; min-width: 852px; display: block; }
+    @media print { .diagram-container { overflow-x: visible; } svg { min-width: 0; } }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <p class="eyebrow">Medallion · StewardPath</p>
+    <h1>One answer, four tiers, one reader until the last</h1>
+    <div class="diagram-container">
+      <svg viewBox="0 0 852 494" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="sp-med-title sp-med-desc">
+        <title id="sp-med-title">The four tiers an owner's answer passes through</title>
+        <desc id="sp-med-desc">An answer is kept raw as typed, migrated forward by schema version without discarding the old record, scored into five drivers with the reasoning attached, and finally released as a brief containing only the fields the owner chose. The owner is the sole reader until that last tier.</desc>
+        <defs>
+          <marker id="md-m" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#646a65"/></marker>
+          <marker id="md-a" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4a6a55"/></marker>
+        </defs>
+        <rect width="100%" height="100%" fill="#faf9f6"/>
+        <path d="M 102 80 C 102 24, 290 24, 290 80" fill="none" stroke="#646a65" stroke-width="1" marker-end="url(#md-m)"/>
+        <rect x="150" y="44" width="91" height="12" rx="2" fill="#faf9f6"/>
+        <text x="196" y="53" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">MIGRATE ON READ</text>
+        <path d="M 290 80 C 290 24, 478 24, 478 80" fill="none" stroke="#646a65" stroke-width="1" marker-end="url(#md-m)"/>
+        <rect x="366" y="44" width="37" height="12" rx="2" fill="#faf9f6"/>
+        <text x="384" y="53" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">SCORE</text>
+        <path d="M 478 80 C 478 24, 666 24, 666 80" fill="none" stroke="#4a6a55" stroke-width="1.4" marker-end="url(#md-a)"/>
+        <rect x="548" y="44" width="48" height="12" rx="2" fill="#faf9f6"/>
+        <text x="572" y="53" fill="#5a615c" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">RELEASE</text>
+        <rect x="16" y="80" width="172" height="326" rx="8" fill="#8a5942" fill-opacity="0.045" stroke="#8a5942" stroke-opacity="0.55" stroke-width="1"/>
+        <rect x="30" y="96" width="37" height="14" rx="3" fill="#8a5942" fill-opacity="0.2"/>
+        <text x="48.5" y="106" fill="#8a5942" font-size="8" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">RAW</text>
+        <text x="30" y="138" fill="#15171a" font-size="13" font-weight="600" font-family="'Inter', system-ui, sans-serif">Raw</text>
+        <text x="30" y="156" fill="#646a65" font-size="8.5" font-family="'Geist Mono', ui-monospace, monospace">as the owner typed it</text>
+        <line x1="30" y1="172" x2="174" y2="172" stroke="#8a5942" stroke-opacity="0.3" stroke-width="1"/>
+        <text x="30" y="198" fill="#8a5942" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.12em">WRITTEN BY</text>
+        <text x="30" y="214" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">the owner, one tap at</text>
+        <text x="30" y="227" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">a time</text>
+        <text x="30" y="256" fill="#8a5942" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.12em">FORMAT</text>
+        <text x="30" y="272" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">intake_state.json</text>
+        <text x="30" y="301" fill="#8a5942" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.12em">HOLDS</text>
+        <text x="30" y="317" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">every answer, skips</text>
+        <text x="30" y="330" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">included</text>
+        <text x="30" y="359" fill="#8a5942" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.12em">WHO READS IT</text>
+        <text x="30" y="375" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">the owner, nobody else</text>
+        <rect x="204" y="80" width="172" height="326" rx="8" fill="#7d6329" fill-opacity="0.045" stroke="#7d6329" stroke-opacity="0.55" stroke-width="1"/>
+        <rect x="218" y="96" width="72" height="14" rx="3" fill="#7d6329" fill-opacity="0.2"/>
+        <text x="254.0" y="106" fill="#7d6329" font-size="8" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">MIGRATED</text>
+        <text x="218" y="138" fill="#15171a" font-size="13" font-weight="600" font-family="'Inter', system-ui, sans-serif">Migrated</text>
+        <text x="218" y="156" fill="#646a65" font-size="8.5" font-family="'Geist Mono', ui-monospace, monospace">same answers, current shape</text>
+        <line x1="218" y1="172" x2="362" y2="172" stroke="#7d6329" stroke-opacity="0.3" stroke-width="1"/>
+        <text x="218" y="198" fill="#7d6329" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.12em">WRITTEN BY</text>
+        <text x="218" y="214" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif"></text>
+        <text x="218" y="227" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">migrate_profile_to_intake_state</text>
+        <text x="218" y="256" fill="#7d6329" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.12em">FORMAT</text>
+        <text x="218" y="272" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">schemaVersion forward</text>
+        <text x="218" y="301" fill="#7d6329" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.12em">HOLDS</text>
+        <text x="218" y="317" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">old records, never</text>
+        <text x="218" y="330" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">discarded</text>
+        <text x="218" y="359" fill="#7d6329" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.12em">WHO READS IT</text>
+        <text x="218" y="375" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">the owner, nobody else</text>
+        <rect x="392" y="80" width="172" height="326" rx="8" fill="#4a6a55" fill-opacity="0.045" stroke="#4a6a55" stroke-opacity="0.55" stroke-width="1"/>
+        <rect x="406" y="96" width="58" height="14" rx="3" fill="#4a6a55" fill-opacity="0.2"/>
+        <text x="435.0" y="106" fill="#4a6a55" font-size="8" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">SCORED</text>
+        <text x="406" y="138" fill="#15171a" font-size="13" font-weight="600" font-family="'Inter', system-ui, sans-serif">Scored</text>
+        <text x="406" y="156" fill="#646a65" font-size="8.5" font-family="'Geist Mono', ui-monospace, monospace">five drivers and a number</text>
+        <line x1="406" y1="172" x2="550" y2="172" stroke="#4a6a55" stroke-opacity="0.3" stroke-width="1"/>
+        <text x="406" y="198" fill="#4a6a55" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.12em">WRITTEN BY</text>
+        <text x="406" y="214" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">scoring.py</text>
+        <text x="406" y="243" fill="#4a6a55" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.12em">FORMAT</text>
+        <text x="406" y="259" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">driverScores +</text>
+        <text x="406" y="272" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">rationale</text>
+        <text x="406" y="301" fill="#4a6a55" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.12em">HOLDS</text>
+        <text x="406" y="317" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">why each score is what</text>
+        <text x="406" y="330" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">it is</text>
+        <text x="406" y="359" fill="#4a6a55" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.12em">WHO READS IT</text>
+        <text x="406" y="375" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">the owner, nobody else</text>
+        <rect x="580" y="80" width="172" height="326" rx="8" fill="#36646a" fill-opacity="0.09" stroke="#36646a" stroke-opacity="1" stroke-width="1.8"/>
+        <rect x="594" y="96" width="58" height="14" rx="3" fill="#36646a" fill-opacity="0.2"/>
+        <text x="623.0" y="106" fill="#36646a" font-size="8" font-weight="600" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">SHARED</text>
+        <text x="594" y="138" fill="#15171a" font-size="13" font-weight="600" font-family="'Inter', system-ui, sans-serif">Shared</text>
+        <text x="594" y="156" fill="#646a65" font-size="8.5" font-family="'Geist Mono', ui-monospace, monospace">only what was released</text>
+        <line x1="594" y1="172" x2="738" y2="172" stroke="#36646a" stroke-opacity="0.3" stroke-width="1"/>
+        <text x="594" y="198" fill="#36646a" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.12em">WRITTEN BY</text>
+        <text x="594" y="214" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">build_handoff</text>
+        <text x="594" y="243" fill="#36646a" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.12em">FORMAT</text>
+        <text x="594" y="259" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">the brief</text>
+        <text x="594" y="288" fill="#36646a" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.12em">HOLDS</text>
+        <text x="594" y="304" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">the fields the owner</text>
+        <text x="594" y="317" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">chose</text>
+        <text x="594" y="346" fill="#36646a" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.12em">WHO READS IT</text>
+        <text x="594" y="362" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">one advisor, once</text>
+        <text x="594" y="375" fill="#15171a" font-size="9" font-family="'Inter', system-ui, sans-serif">booked</text>
+        <rect x="16" y="422" width="820" height="56" rx="6" fill="#15171a"/>
+        <text x="418" y="446" fill="#faf9f6" font-size="11" font-weight="600" font-family="'Inter', system-ui, sans-serif" text-anchor="middle">Nothing is promoted without the owner</text>
+        <text x="418" y="463" fill="#faf9f6" fill-opacity="0.72" font-size="8.5" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">export or hard delete removes every tier at once · the audit log keeps only that it happened</text>
+      </svg>
+    </div>
+  </div>
+</body>
+</html>
